@@ -3,32 +3,37 @@ library(testthat)
 library(askpass)
 source('dv_api.R')
 
-# How are we writing these tests so that they rely on each other?
-# - Ideally each unit test should be independent
-# - The plan could be to split up unit tests into pieces that can be run as parts
-# - I don't know many distinct unit tests we'll have
+mainpath_state <- TRUE
 
-
-
-# TODO Tomorrow:
-# - Implement (bad) auth test step via builtin account
+# TODO:
 # - Begin implementing R03-R25
-#   - How am I sharing information between the pieces? Global variables in dv_tests.R? (<<-)
 
-r01alt_builtin_auth <- function() {
-  username <- askpass("Username for builtin account")
-  password <- askpass("Password for builtin account")
-  #username <- ''
-  #password <- ''
+r01alt_mainpath_builtin_auth <- function() {
+  if(!mainpath_state) { return(mainpath_state) } #Fails if previous mainpath tests have failed
   
-  sesh$navigate(paste(dv_server_url,'/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml', sep=''))
-  #Sys.sleep(1)
-  sesh$findElement(using="xpath", value='//*[@id="loginForm:credentialsContainer:0:credValue"]')$sendKeysToElement(list(username))
-  sesh$findElement(using="xpath", value='//*[@id="loginForm:credentialsContainer:1:sCredValue"]')$sendKeysToElement(list(password, key="enter"))
-  #NOTE: For some reason this button click works with directly setting username/password, but NOT when using askpass.
-  #      currently the code is just triggering an enter key after entering the password, but we may have the issue again
-  #sesh$findElement(using="xpath", value='//*[@id="loginForm:login"]')$clickElement()
-
+  mainpath_state <<- tryCatch({
+    username <- askpass("Username for builtin account")
+    password <- askpass("Password for builtin account")
+    #username <- ''
+    #password <- ''
+    
+    sesh$navigate(paste(dv_server_url,'/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml', sep=''))
+    #Sys.sleep(1)
+    sesh$findElement(using="xpath", value='//*[@id="loginForm:credentialsContainer:0:credValue"]')$sendKeysToElement(list(username))
+    sesh$findElement(using="xpath", value='//*[@id="loginForm:credentialsContainer:1:sCredValue"]')$sendKeysToElement(list(password, key="enter"))
+    #NOTE: For some reason this button click works with directly setting username/password, but NOT when using askpass.
+    #      currently the code is just triggering an enter key after entering the password, but we may have the issue again
+    #sesh$findElement(using="xpath", value='//*[@id="loginForm:login"]')$clickElement()
+    
+    expect_identical(1, 2)
+    return(TRUE)
+  }, expectation_failure=function(e) { #catch testthat failures
+    return(FALSE)
+  },error = function(e) { #catch general errors
+    return(false)
+  })
+    
+  return(mainpath_state)
 }
 
 load_dataverse_admin_info_from_file <- function() {
@@ -55,12 +60,6 @@ begin_user_browser <- function() {
 
 load_dataverse_admin_info_from_file()
 begin_user_browser()
-r01alt_builtin_auth()
-#print(dv_server_url)
-
-
-
-
-
+r01alt_mainpath_builtin_auth()
 
 sesh$closeWindow()
