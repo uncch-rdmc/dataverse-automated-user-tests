@@ -69,6 +69,7 @@ clean_up_mainpath <- function() {
   }, error = function(e) { #print error
     print(e)
   })
+  sesh$navigate(dv_server_url)
 }
 
 #We get the api token for the logged in user
@@ -78,26 +79,26 @@ test_get_api_token <- function() {
   login_user_api_token <<- toString(sesh$findElement(value='//*[@id="apiToken"]/pre/code')$getElementText())
 }
 
-#This is not currently needed for our requirements. It was built to get around permissions issues for our admin off the root dataverse 
-test_delete_dataverse <- function() {
-  sesh$navigate(paste(dv_server_url,'/dataverse/',dataverse_name, sep=''))
-  
-  Sys.sleep(default_wait)
-  
-  sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div/button')$clickElement() #click edit
-  sesh$findElement(value='//*[@id="dataverseForm:deleteDataset"]')$clickElement() #click delete
-  sesh$findElement(value='//*[@id="dataverseForm:j_idt435"]')$clickElement() #click confirm
-  
-  Sys.sleep(default_wait)
-  
-  expect_identical(paste(dv_server_url,'/dataverse/root/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
-  expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
-  
-}
+##This is not currently needed for our requirements. It was built to get around permissions issues for our admin off the root dataverse 
+# test_delete_dataverse <- function() {
+#   sesh$navigate(paste(dv_server_url,'/dataverse/',dataverse_name, sep=''))
+#   
+#   Sys.sleep(default_wait)
+#   
+#   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div/button')$clickElement() #click edit
+#   sesh$findElement(value='//*[@id="dataverseForm:deleteDataset"]')$clickElement() #click delete
+#   sesh$findElement(value='//*[@id="dataverseForm:j_idt435"]')$clickElement() #click confirm
+#   
+#   Sys.sleep(default_wait)
+#   
+#   expect_identical(paste(dv_server_url,'/dataverse/root/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
+#   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+#   
+# }
 
-####################
-### Actual Tests ###
-####################
+#########################
+### Requirement Tests ###
+#########################
 
 r01alt_mainpath_builtin_auth <- function() {
   username <- askpass("Username for builtin account")
@@ -126,15 +127,48 @@ r03_mainpath_create_sub_dataverse <- function() {
   sesh$findElement(value='//*[@id="addDataForm"]/div/ul/li[1]/a')$clickElement() #click new dataverse
   
   ### Create Dataverse Page ###
-  sesh$findElement(value='//*[@id="dataverseForm:identifier"]')$sendKeysToElement(list(dataverse_name)) #set dataverse identifier
-  sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]')$sendKeysToElement(list("u")) #set category undefined
+  sesh$findElement(value='//*[@id="dataverseForm:selectHostDataverse_input"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:selectHostDataverse_input"]')$sendKeysToElement(list(dv_props["host_dataverse"]))
+  Sys.sleep(2) # wait for host list to load
+  sesh$findElement(value='//*[@id="dataverseForm:selectHostDataverse_input"]')$sendKeysToElement(list(key = "enter"))
+  Sys.sleep(.5) # wait after click for ui to be usable
+  sesh$findElement(value='//*[@id="dataverseForm:name"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:name"]')$sendKeysToElement(list(dv_props["name"]))
+  sesh$findElement(value='//*[@id="dataverseForm:affiliation"]')$sendKeysToElement(list(dv_props["affiliation"]))
+  sesh$findElement(value='//*[@id="dataverseForm:identifier"]')$sendKeysToElement(list(dv_props["identifier"]))
+  sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]')$sendKeysToElement(list(dv_props["category"]))
+  sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$sendKeysToElement(list(dv_props["email"]))
+  sesh$findElement(value='//*[@id="dataverseForm:description"]')$sendKeysToElement(list(dv_props["description"]))
+  
   sesh$findElement(value='//*[@id="dataverseForm:save"]')$clickElement() #create dataverse
   
-  Sys.sleep(default_wait) 
+  Sys.sleep(default_wait)
   
-  ### Dataverse Page ###
+  ### Dataverse Page - Test Save Results ###
+  
   expect_identical(paste(dv_server_url,'/dataverse/',dataverse_name, '/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  expect_identical(toString(sesh$findElement(value='//*[@id="breadcrumbLnk0"]')$getElementText()), toString(dv_props["host_dataverse"]))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseHeader"]/div/div/a/h1')$getElementText()), toString(dv_props["name"]))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseHeader"]/div/div/span[1]')$getElementText()), paste('(', dv_props["affiliation"], ')', sep=''))
+  expect_identical(toString(sesh$getCurrentUrl()), paste(dv_server_url,'/dataverse/', dv_props["identifier"], '/', sep=''))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseDesc"]')$getElementText()), toString(dv_props["description"]))
+  #Sys.sleep(99999999)
+  
+  ### Dataverse Edit Page - Test Save Results Additional ###
+  
+  sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button')$clickElement()
+  sesh$findElement(value='//*[@id="dataverseForm:editInfo"]')$clickElement()
+
+  # Category and contactEmail do not show up in the overview (public) page, so we test them here
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]/option[@selected]')$getElementText()), toString(dv_props["category"]))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$getElementAttribute("value")), toString(dv_props["email"]))
+
+  sesh$findElement(value='//*[@id="dataverseForm:cancel"]')$clickElement()
+  
+  ### Dataverse Page - Publish ###
+  
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/button')$clickElement() #click publish
   sesh$findElement(value='//*[@id="dataverseForm:j_idt431"]')$clickElement() #confirm publish
   
@@ -165,3 +199,26 @@ r09_mainpath_create_dataset <- function() {
   dataset_id <<- sub(".*=", "", sesh$findElement(value='//*[@id="datasetForm:manageDatasetPermissions"]')$getElementAttribute("href")) 
   print(dataset_id)
 }
+
+###################################
+### Sub-test (called by others) ###
+###################################
+
+test_dataverse_metadata <- function() {
+  sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
+  
+}
+
+#######################
+### Data Structures ###
+#######################
+
+dv_props <- c(
+  "host_dataverse"="Root",
+  "name"=dataverse_name,
+  "affiliation"="Odum",
+  "identifier"=dataverse_name,
+  "category"="Journal",
+  "email"="test@example.com",
+  "description"="this is a test description <b>wow</b>"
+)
