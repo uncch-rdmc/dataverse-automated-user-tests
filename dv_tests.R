@@ -8,6 +8,7 @@ default_wait <- .5 #If a target system is running slow, bump this to increase th
 dataverse_name <- "rselenium-test-dataverse"
 dataset_name <- "rselenium-test-dataset"
 dataset_id <- "" #set by code
+login_user_api_token <- "" #set by code
 
 # TODO:
 # - Begin implementing R03-R25
@@ -22,6 +23,7 @@ load_dataverse_admin_info_from_file <- function() {
                        sep='=',col.names=c('key','value'))
   dtable <- data.table(dframe,key='key')
   
+  #TODO: remove api token if we end up not needing it (we pull the user's instead)
   dv_server_url <<- dtable["DATAVERSE_SERVER_URL"]$value
   dv_admin_api_token <<- dtable["DATAVERSE_API_TOKEN"]$value
 }
@@ -58,15 +60,22 @@ call_mainpath <- function(FUN) {
 
 clean_up_mainpath <- function() {
   tryCatch({
-    destroy_dataset(dataset_id, dv_server_url, dv_admin_api_token)
+    destroy_dataset(dataset_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
   }, error = function(e) { #print error
     print(e)
   })
   tryCatch({
-    delete_dataverse(dataverse_name, dv_server_url, dv_admin_api_token)
+    delete_dataverse(dataverse_name, dv_server_url, login_user_api_token) #dv_admin_api_token)
   }, error = function(e) { #print error
     print(e)
   })
+}
+
+#We get the api token for the logged in user
+test_get_api_token <- function() {
+  sesh$navigate(paste(dv_server_url,'/dataverseuser.xhtml?selectTab=apiTokenTab', sep=''))
+  #Note: This test assumes you have already clicked "Create Token" with this account.
+  login_user_api_token <<- toString(sesh$findElement(value='//*[@id="apiToken"]/pre/code')$getElementText())
 }
 
 #This is not currently needed for our requirements. It was built to get around permissions issues for our admin off the root dataverse 
@@ -111,6 +120,7 @@ r01alt_mainpath_builtin_auth <- function() {
 }
 
 r03_mainpath_create_sub_dataverse <- function() {
+  sesh$navigate(dv_server_url)
   ### Main Landing Page ###
   sesh$findElement(value='//*[@id="addDataForm"]/div/button')$clickElement() #click add data
   sesh$findElement(value='//*[@id="addDataForm"]/div/ul/li[1]/a')$clickElement() #click new dataverse
@@ -147,11 +157,11 @@ r09_mainpath_create_dataset <- function() {
   
   sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #create dataset
   
-  Sys.sleep(default_wait)
+  Sys.sleep(default_wait + 1)
   
-  expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   
   ### Get dataset id from permissions page url for later uses ###
   dataset_id <<- sub(".*=", "", sesh$findElement(value='//*[@id="datasetForm:manageDatasetPermissions"]')$getElementAttribute("href")) 
-  
+  print(dataset_id)
 }

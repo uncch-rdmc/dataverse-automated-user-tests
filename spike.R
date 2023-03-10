@@ -11,10 +11,12 @@ try(sesh$closeWindow())
 load_dataverse_admin_info_from_file()
 begin_user_browser()
 call_mainpath(r01alt_mainpath_builtin_auth)
+call_mainpath(test_get_api_token)
+
 call_mainpath(r03_mainpath_create_sub_dataverse)
 call_mainpath(r09_mainpath_create_dataset)
 #TODO: Ask Don tomorrow about ways to get delete permissions of dataverses directly off the root dataverse
 clean_up_mainpath()
-test_delete_dataverse()
+#test_delete_dataverse()
 #TODO: If we can't find a simple way for our admin to get permissions on the root dataverse, then we'll need a better path
 #      - Immediately we'll need a way to delete the dataset

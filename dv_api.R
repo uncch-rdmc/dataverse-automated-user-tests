@@ -5,7 +5,7 @@ library(httr)
 
 destroy_dataset <- function(id, server, token) {
   call <- paste(server, "/api/datasets/", id, "/destroy", sep='')
-  print(call)
+  #print(call)
   destroy_dataset_response <- DELETE(url = call,
                             add_headers('X-Dataverse-key' = token),
                             verbose(info = TRUE))
@@ -16,7 +16,7 @@ destroy_dataset <- function(id, server, token) {
 
 delete_dataverse <- function(alias, server, token) {
   call <- paste(server, "/api/dataverses/", alias, sep='')
-  print(call)
+  #print(call)
   delete_dataverse_response <- DELETE(url = call,
                                     add_headers('X-Dataverse-key' = token),
                                     verbose(info = TRUE))
