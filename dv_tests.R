@@ -58,18 +58,25 @@ call_mainpath <- function(FUN) {
   return(mainpath_state)
 }
 
-clean_up_mainpath <- function() {
-  tryCatch({
-    destroy_dataset(dataset_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
-  }, error = function(e) { #print error
-    print(e)
-  })
-  tryCatch({
-    delete_dataverse(dataverse_name, dv_server_url, login_user_api_token) #dv_admin_api_token)
-  }, error = function(e) { #print error
-    print(e)
-  })
-  sesh$navigate(dv_server_url)
+clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE) {
+  if(do_ds) {
+    tryCatch({
+      destroy_dataset(dataset_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
+    }, error = function(e) { #print error
+      print("Dataset Destroy Error")
+      print(e)
+    })
+  }
+  if(do_dv) {
+    tryCatch({
+      delete_dataverse(dataverse_name, dv_server_url, login_user_api_token) #dv_admin_api_token)
+      sesh$navigate(dv_server_url)
+    }, error = function(e) { #print error
+      print("Dataverse Delete Error")
+      print(e)
+    })
+  }
+
 }
 
 #We get the api token for the logged in user
@@ -95,26 +102,6 @@ get_api_token <- function() {
 #   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
 #   
 # }
-
-set_consistent_dataverse_metadata <- function(prefix='') {
-  # We clear all the elements for when this code is called during edit and there are already contents
-  sesh$findElement(value='//*[@id="dataverseForm:name"]')$clearElement()
-  sesh$findElement(value='//*[@id="dataverseForm:name"]')$sendKeysToElement(list(paste(prefix, dv_props["name"], sep='')))
-  sesh$findElement(value='//*[@id="dataverseForm:affiliation"]')$clearElement()
-  sesh$findElement(value='//*[@id="dataverseForm:affiliation"]')$sendKeysToElement(list(paste(prefix, dv_props["affiliation"], sep='')))
-  sesh$findElement(value='//*[@id="dataverseForm:identifier"]')$clearElement()
-  sesh$findElement(value='//*[@id="dataverseForm:identifier"]')$sendKeysToElement(list(paste(prefix, dv_props["identifier"], sep='')))
-  dataverse_name <<- paste(prefix, dv_props["identifier"], sep='')
-  sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]')$sendKeysToElement(list(dv_props["category"]))
-  sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$clearElement()
-  sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$sendKeysToElement(list(paste(prefix, dv_props["email"], sep='')))
-  sesh$findElement(value='//*[@id="dataverseForm:description"]')$clearElement()
-  sesh$findElement(value='//*[@id="dataverseForm:description"]')$sendKeysToElement(list(paste(prefix, dv_props["description"], sep='')))
-  
-  sesh$findElement(value='//*[@id="dataverseForm:save"]')$clickElement() #create dataverse
-  
-  Sys.sleep(default_wait)
-}
 
 #########################
 ### Requirement Tests ###
@@ -152,14 +139,14 @@ r03_mainpath_create_sub_dataverse <- function() {
   Sys.sleep(2) # wait for host list to load
   sesh$findElement(value='//*[@id="dataverseForm:selectHostDataverse_input"]')$sendKeysToElement(list(key = "enter"))
   Sys.sleep(.5) # wait after click for ui to be usable
-  set_consistent_dataverse_metadata(prefix="create") #Metadata that is same for create/edit
+  set_consistent_dataverse_metadata(add_string="create") #Metadata that is same for create/edit
  
   ### Test Save ###
   
   expect_identical(paste(dv_server_url,'/dataverse/',dataverse_name, '/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   
-  test_dataverse_metadata(prefix="create")
+  test_dataverse_metadata(add_string="create")
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
   
   ### Dataverse Page - Publish ###
@@ -184,18 +171,13 @@ r04_mainpath_edit_dataverse <- function() {
 }
 
 r09_mainpath_create_dataset <- function() {
+  sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
   sesh$findElement(value='//*[@id="addDataForm"]/div/button')$clickElement() #click add data
   sesh$findElement(value='//*[@id="addDataForm"]/div/ul/li[2]/a')$clickElement() #click new dataset
   
   Sys.sleep(default_wait)
   
-  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]')$sendKeysToElement(list(dataset_name)) #set dataset title
-  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]')$sendKeysToElement(list("test description")) #set dataset description (text)
-  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2"]')$clickElement() #click subject dropdown      #$sendKeysToElement(list("u")) 
-  Sys.sleep(.1)
-  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2_panel"]/div[2]/ul/li[14]/div')$clickElement() #click "other" inside dropdown
-  
-  sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #create dataset
+  set_consistent_dataset_metadata(add_string='create')
   
   Sys.sleep(default_wait + 1)
   
@@ -206,21 +188,51 @@ r09_mainpath_create_dataset <- function() {
   print(dataset_id)
 }
 
-###################################
-### Sub-test (called by others) ###
-###################################
+###########################################
+### Dataverse Test Additional Functions ###
+###########################################
 
-test_dataverse_metadata <- function(prefix='') {
+dv_props <- c(
+  'host_dataverse'='Root',
+  'name'=dataverse_name,
+  'affiliation'='Odum',
+  'identifier'=dataverse_name,
+  'category'='Journal',
+  'email'='test@example.com',
+  'description'='this is a test description'
+)
+
+set_consistent_dataverse_metadata <- function(add_string='') {
+  # We clear all the elements for when this code is called during edit and there are already contents
+  sesh$findElement(value='//*[@id="dataverseForm:name"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:name"]')$sendKeysToElement(list(paste(add_string, dv_props['name'], sep='')))
+  sesh$findElement(value='//*[@id="dataverseForm:affiliation"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:affiliation"]')$sendKeysToElement(list(paste(add_string, dv_props['affiliation'], sep='')))
+  sesh$findElement(value='//*[@id="dataverseForm:identifier"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:identifier"]')$sendKeysToElement(list(paste(add_string, dv_props['identifier'], sep='')))
+  dataverse_name <<- paste(add_string, dv_props['identifier'], sep='')
+  sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]')$sendKeysToElement(list(dv_props['category']))
+  sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$sendKeysToElement(list(paste(add_string, dv_props['email'], sep='')))
+  sesh$findElement(value='//*[@id="dataverseForm:description"]')$clearElement()
+  sesh$findElement(value='//*[@id="dataverseForm:description"]')$sendKeysToElement(list(paste(add_string, dv_props['description'], sep='')))
+  
+  sesh$findElement(value='//*[@id="dataverseForm:save"]')$clickElement() #create dataverse
+  
+  Sys.sleep(default_wait)
+}
+
+test_dataverse_metadata <- function(add_string='') {
   #TODO: Do we really need this navigate?
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, '/', sep=''))
   
   ### Dataverse Page - Test Save Results ###
   
-  expect_identical(toString(sesh$findElement(value='//*[@id="breadcrumbLnk0"]')$getElementText()), toString(dv_props["host_dataverse"]))
-  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseHeader"]/div/div/a/h1')$getElementText()), paste(prefix, dv_props["name"], sep=''))
-  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseHeader"]/div/div/span[1]')$getElementText()), paste('(', prefix, dv_props["affiliation"], ')', sep=''))
-  expect_identical(toString(sesh$getCurrentUrl()), paste(dv_server_url,'/dataverse/', prefix, dv_props["identifier"], '/', sep=''))
-  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseDesc"]')$getElementText()), paste(prefix, dv_props["description"], sep=''))
+  expect_identical(toString(sesh$findElement(value='//*[@id="breadcrumbLnk0"]')$getElementText()), toString(dv_props['host_dataverse']))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseHeader"]/div/div/a/h1')$getElementText()), paste(add_string, dv_props['name'], sep=''))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseHeader"]/div/div/span[1]')$getElementText()), paste('(', add_string, dv_props['affiliation'], ')', sep=''))
+  expect_identical(toString(sesh$getCurrentUrl()), paste(dv_server_url,'/dataverse/', add_string, dv_props['identifier'], '/', sep=''))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseDesc"]')$getElementText()), paste(add_string, dv_props['description'], sep=''))
   
   ### Dataverse Edit Page - Test Save Results Additional ###
   # Category and contactEmail do not show up in the overview (public) page, so we test them here
@@ -230,23 +242,115 @@ test_dataverse_metadata <- function(prefix='') {
   
   Sys.sleep(default_wait)
   
-  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]/option[@selected]')$getElementText()), toString(dv_props["category"]))
-  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$getElementAttribute("value")), paste(prefix, dv_props["email"], sep=''))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]/option[@selected]')$getElementText()), toString(dv_props['category']))
+  expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$getElementAttribute("value")), paste(add_string, dv_props['email'], sep=''))
   
   sesh$findElement(value='//*[@id="dataverseForm:cancel"]')$clickElement()
   
 }
 
-#######################
-### Data Structures ###
-#######################
+#########################################
+### Dataset Test Additional Functions ###
+#########################################
 
-dv_props <- c(
-  "host_dataverse"="Root",
-  "name"=dataverse_name,
-  "affiliation"="Odum",
-  "identifier"=dataverse_name,
-  "category"="Journal",
-  "email"="test@example.com",
-  "description"="this is a test description"
+ds_props <- c(
+  #'host_dataverse'='',
+  'title'=dataset_name,
+  'author_name'='author',
+  'author_affiliation'='affiliation',
+  #'author_id_type'='ORCID',
+  'author_id'='author_affil_id',
+  'contact_name'='contact',
+  'contact_affiliation'='contact_affil',
+  'contact_email'='test@example.com',
+  'description'='this is a test description',
+  'date'='2022-11-11',
+  'subject'='Physics',
+  'keyword_term'='keyword',
+  'keyword_cv_name'='vocab_name',
+  'keyword_cv_url'='https://odum.unc.edu/',
+  'related_pub_citation'='this is a test citation',
+  #'related_pub_id_type'='lissn',
+  'related_pub_id'='pub_id',
+  'related_pub_url'='https://odum.unc.edu/',
+  'notes'='this is a test note',
+  'depositor'='a depositor',
+  'deposit_date'='2020-01-01'
 )
+
+set_consistent_dataset_metadata <- function(add_string='') {
+  # We clear all the elements for when this code is called during edit and there are already contents
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['title'], sep='')))
+  
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['author_name'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['author_affiliation'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_label"]')$clickElement() #click author identifier type dropdown
+  Sys.sleep(.1)
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_2"]')$clickElement() #click "ISNI" inside dropdown
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['author_id'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['contact_name'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['contact_affiliation'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['contact_email'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]')$sendKeysToElement(list(paste(add_string, ds_props['description'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]')$sendKeysToElement(list(ds_props['date'], sep=''))
+  #TODO: add a clear for the select thing
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2"]')$clickElement() #click subject dropdown
+  Sys.sleep(.1)
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2_panel"]/div[2]/ul/li[14]/div')$clickElement() #click "other" inside dropdown
+  #TODO: maybe click out of the select
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['keyword_term'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['keyword_cv_name'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]')$sendKeysToElement(list(paste(ds_props['keyword_cv_url'], add_string, sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]')$sendKeysToElement(list(paste(add_string, ds_props['related_pub_citation'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_label"]')$clickElement() #click related pub id type dropdown
+  Sys.sleep(.1)
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_4"]')$clickElement() #click "doi" inside dropdown
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['related_pub_id'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]')$sendKeysToElement(list(paste(ds_props['related_pub_url'], add_string, sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]')$sendKeysToElement(list(paste(add_string, ds_props['notes'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['depositor'], sep='')))
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]')$clearElement()
+  sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]')$sendKeysToElement(list(ds_props['deposit_date'], sep=''))
+  
+  #TODO: Upload files here?
+  
+  sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #create dataset
+}
+
+test_dataset_metadata <- function(add_string='') {
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

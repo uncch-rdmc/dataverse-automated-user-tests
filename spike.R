@@ -13,6 +13,14 @@ begin_user_browser()
 call_mainpath(r01alt_mainpath_builtin_auth)
 call_mainpath(get_api_token)
 call_mainpath(r03_mainpath_create_sub_dataverse)
+#TODO: I'm seeing a ui error when calling r04 initially, even though the code passes. Investigate
 call_mainpath(r04_mainpath_edit_dataverse)
+
 call_mainpath(r09_mainpath_create_dataset)
-clean_up_mainpath()
+clean_up_mainpath() #TODO: Destroying dataset seemed to fail sometimes. Maybe we aren't waiting enough?
+
+source('dv_tests.R') #TODO: remove
+call_mainpath(r09_mainpath_create_dataset)
+clean_up_mainpath(do_dv=FALSE) #TODO: remove
+
+
