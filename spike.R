@@ -17,6 +17,7 @@ call_mainpath(r03_mainpath_create_sub_dataverse)
 call_mainpath(r04_mainpath_edit_dataverse)
 
 call_mainpath(r09_mainpath_create_dataset)
+call_mainpath(r10_mainpath_edit_dataset)
 clean_up_mainpath() #TODO: Destroying dataset seemed to fail sometimes. Maybe we aren't waiting enough?
 
 source('dv_tests.R') #TODO: remove
