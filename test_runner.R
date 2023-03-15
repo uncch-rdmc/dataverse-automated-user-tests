@@ -4,7 +4,7 @@
 #export PATH="/Users/madunlap/Downloads/chromedriver_mac64:$PATH"
 #java -jar ~/Downloads/selenium-server-standalone-3.9.1.jar
 #setwd("~/Documents/GitHub/dataverse-automated-user-tests")
-source('dv_tests.R')
+source('requirement_tests.R')
 
 try(sesh$closeWindow())
 
