@@ -185,7 +185,7 @@ r09_mainpath_create_dataset <- function() {
   
   ### Get dataset id from permissions page url for later uses ###
   dataset_id <<- sub(".*=", "", sesh$findElement(value='//*[@id="datasetForm:manageDatasetPermissions"]')$getElementAttribute("href")) 
-  print(dataset_id)
+  # print(dataset_id)
   
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
@@ -205,9 +205,9 @@ r10_mainpath_edit_dataset <- function() {
   
 
   Sys.sleep(default_wait)
-  print("BEFORE EDIT")
+  #print("BEFORE EDIT")
   set_dataset_metadata_edit(add_string='edit')
-  print("AFTER EDIT")
+  #print("AFTER EDIT")
   Sys.sleep(default_wait + 1)
   
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
@@ -216,9 +216,9 @@ r10_mainpath_edit_dataset <- function() {
   Sys.sleep(default_wait)
   
   #TODO: make is_update true after we implement setting those fields
-  print("BEFORE TEST")
+  #print("BEFORE TEST")
   test_dataset_metadata(add_string='edit', is_update=TRUE) 
-  print("AFTER TEST")
+  #print("AFTER TEST")
   sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click add data
 }
 
@@ -481,15 +481,31 @@ set_dataset_metadata_create <- function(add_string='') {
 }
 
 set_dataset_metadata_edit <- function(add_string='') {
+  
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv"]')$clickElement() #click author identifier type dropdown
+  Sys.sleep(.3)
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv_4"]')$clickElement() #click "VIAF" inside dropdown
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]/ul/li/span[1]')$clickElement() #Delete existing field "Other"
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]')$clickElement() #click subject dropdown
+  Sys.sleep(.3)
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2_panel"]/div[2]/ul/li[10]/div')$clickElement() #click "mathematical science" inside dropdown
+  #sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]/div[3]')$clickElement() #click related pub id type dropdown
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]')$clickElement() #click related pub id type dropdown
+  Sys.sleep(.3)
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv_4"]')$clickElement() #click "DOI" inside dropdown
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2"]/div[3]')$clickElement() #click language dropdown
+  Sys.sleep(.3)
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2_panel"]/div[2]/ul/li[2]')$clickElement() #click "Afar" inside dropdown
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv"]')$clickElement() #click contributor type dropdown
+  Sys.sleep(.3)
+  sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv_3"]')$clickElement() #click "Data Manager" inside dropdown
+  
   sesh$findElement(value=ds_edit_xpaths['title'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['title'])$sendKeysToElement(list(paste(add_string, ds_props['title'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['author_name'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['author_name'])$sendKeysToElement(list(paste(add_string, ds_props['author_name'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['author_affiliation'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['author_affiliation'])$sendKeysToElement(list(paste(add_string, ds_props['author_affiliation'], sep='')))
-  # sesh$findElement(value=ds_edit_xpaths[''])$clickElement() #click author identifier type dropdown
-  # Sys.sleep(.1)
-  # sesh$findElement(value=ds_edit_xpaths[''])$clickElement() #click "ISNI" inside dropdown
   sesh$findElement(value=ds_edit_xpaths['author_id'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['author_id'])$sendKeysToElement(list(paste(add_string, ds_props['author_id'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['contact_name'])$clearElement()
@@ -502,10 +518,6 @@ set_dataset_metadata_edit <- function(add_string='') {
   sesh$findElement(value=ds_edit_xpaths['description'])$sendKeysToElement(list(paste(add_string, ds_props['description'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['date'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['date'])$sendKeysToElement(list(ds_props['date'], sep=''))
-  # #TODO: add a clear for the select thing?
-  # sesh$findElement(value=ds_edit_xpaths[''])$clickElement() #click subject dropdown
-  # Sys.sleep(.1)
-  # sesh$findElement(value=ds_edit_xpaths[''])$clickElement() #click "other" inside dropdown
   sesh$findElement(value=ds_edit_xpaths['keyword_term'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['keyword_term'])$sendKeysToElement(list(paste(add_string, ds_props['keyword_term'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['keyword_cv_name'])$clearElement()
@@ -514,9 +526,6 @@ set_dataset_metadata_edit <- function(add_string='') {
   sesh$findElement(value=ds_edit_xpaths['keyword_cv_url'])$sendKeysToElement(list(paste(ds_props['keyword_cv_url'], add_string, sep='')))
   sesh$findElement(value=ds_edit_xpaths['related_pub_citation'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['related_pub_citation'])$sendKeysToElement(list(paste(add_string, ds_props['related_pub_citation'], sep='')))
-  # sesh$findElement(value=ds_edit_xpaths[''])$clickElement() #click related pub id type dropdown
-  # Sys.sleep(.1)
-  # sesh$findElement(value=ds_edit_xpaths[''])$clickElement() #click "doi" inside dropdown
   sesh$findElement(value=ds_edit_xpaths['related_pub_id'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['related_pub_id'])$sendKeysToElement(list(paste(add_string, ds_props['related_pub_id'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['related_pub_url'])$clearElement()
@@ -544,11 +553,6 @@ set_dataset_metadata_edit <- function(add_string='') {
   sesh$findElement(value=ds_edit_xpaths['topic_class_cv_name'])$sendKeysToElement(list(paste(add_string, ds_props['topic_class_cv_name'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['topic_class_cv_url'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['topic_class_cv_url'])$sendKeysToElement(list(paste(ds_props['topic_class_cv_url'], add_string, sep='')))
-  
-  #Fix like subject
-  # sesh$findElement(value=ds_edit_xpaths['language'])$clearElement()
-  # sesh$findElement(value=ds_edit_xpaths['language'])$sendKeysToElement(list(paste(add_string, ds_props['language'], sep='')))
-  
   sesh$findElement(value=ds_edit_xpaths['producer_name'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['producer_name'])$sendKeysToElement(list(paste(add_string, ds_props['producer_name'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['producer_affiliation'])$clearElement()
@@ -563,15 +567,12 @@ set_dataset_metadata_edit <- function(add_string='') {
   sesh$findElement(value=ds_edit_xpaths['producer_date'])$sendKeysToElement(list(toString(ds_props['producer_date'])))
   sesh$findElement(value=ds_edit_xpaths['producer_location'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['producer_location'])$sendKeysToElement(list(paste(add_string, ds_props['producer_location'], sep='')))
-  # sesh$findElement(value=ds_edit_xpaths['contributor_type'])$clearElement()
-  # sesh$findElement(value=ds_edit_xpaths['contributor_type'])$sendKeysToElement(list(paste(add_string, ds_props['contributor_type'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['contributor_name'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['contributor_name'])$sendKeysToElement(list(paste(add_string, ds_props['contributor_name'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['funding_info_agency'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['funding_info_agency'])$sendKeysToElement(list(paste(add_string, ds_props['funding_info_agency'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['funding_info_id'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['funding_info_id'])$sendKeysToElement(list(paste(add_string, ds_props['funding_info_id'], sep='')))
-  
   sesh$findElement(value=ds_edit_xpaths['distributor_name'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['distributor_name'])$sendKeysToElement(list(paste(add_string, ds_props['distributor_name'], sep='')))
   sesh$findElement(value=ds_edit_xpaths['distributor_affiliation'])$clearElement()
@@ -590,7 +591,6 @@ set_dataset_metadata_edit <- function(add_string='') {
   sesh$findElement(value=ds_edit_xpaths['time_period_end'])$sendKeysToElement(list(toString(ds_props['time_period_end'])))
   sesh$findElement(value=ds_edit_xpaths['date_of_collection_start'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['date_of_collection_start'])$sendKeysToElement(list(toString(ds_props['date_of_collection_start'])))
-  
   sesh$findElement(value=ds_edit_xpaths['date_of_collection_end'])$clearElement()
   sesh$findElement(value=ds_edit_xpaths['date_of_collection_end'])$sendKeysToElement(list(toString(ds_props['date_of_collection_end'])))
   sesh$findElement(value=ds_edit_xpaths['data_type'])$clearElement()
@@ -627,8 +627,9 @@ test_dataset_metadata <- function(add_string='', is_update=FALSE) {
   # }
   # add_string='edit'
   # is_update=TRUE
+  
   #For some reason, dates are false when tested identical. I'm not sure if some character is being replaced on the backend or what. But this is fine
-  #TODO: Attempt to fix the commented out expects
+  #We don't currently test some dropdowns results because it is extremely convoluted to test the values of jquery dropdowns.
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['title'])$getElementAttribute("value")), paste(add_string, ds_props['title'], sep=''))
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['author_name'])$getElementAttribute("value")), paste(add_string, ds_props['author_name'], sep=''))
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['author_affiliation'])$getElementAttribute("value")), paste(add_string, ds_props['author_affiliation'], sep=''))
@@ -646,7 +647,7 @@ test_dataset_metadata <- function(add_string='', is_update=FALSE) {
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['related_pub_citation'])$getElementAttribute("value")), paste(add_string, ds_props['related_pub_citation'], sep=''))
   #expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['related_pub_id_type'])$getElementAttribute("value")), paste(add_string, ds_props['related_pub_id_type'], sep=''))
   #TODO: I think this doesn't work because it needs the above set... but weirdly I thought it worked before???? Well it doesn't work now
-  #expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['related_pub_id'])$getElementAttribute("value")), paste(add_string, ds_props['related_pub_id'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['related_pub_id'])$getElementAttribute("value")), paste(add_string, ds_props['related_pub_id'], sep=''))
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['related_pub_url'])$getElementAttribute("value")), paste(ds_props['related_pub_url'], add_string, sep=''))
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['notes'])$getElementAttribute("value")), paste(add_string, ds_props['notes'], sep=''))
   expect_identical(toString(sesh$findElement(value=ds_edit_xpaths['depositor'])$getElementAttribute("value")), paste(add_string, ds_props['depositor'], sep=''))
