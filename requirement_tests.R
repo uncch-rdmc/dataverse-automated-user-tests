@@ -1,6 +1,7 @@
 library(RSelenium)
 library(testthat)
 library(askpass)
+library(urltools)
 source('functions/api_dataverse.R')
 source('functions/test_functions_dataset.R')
 source('functions/test_functions_dataverse.R')
@@ -10,6 +11,7 @@ default_wait <- .75 #If a target system is running slow, bump this to increase t
 dataverse_name <- "rselenium-test-dataverse"
 dataset_name <- "rselenium-test-dataset"
 dataset_id <- "" #set by code
+template_id <- "" #set by code
 login_user_api_token <- "" #set by code
 
 #########################
@@ -70,6 +72,7 @@ r03_mainpath_create_sub_dataverse <- function() {
 
 r04_mainpath_edit_dataverse <- function() {
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
+  Sys.sleep(default_wait)
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button')$clickElement()
   sesh$findElement(value='//*[@id="dataverseForm:editInfo"]')$clickElement()
   
@@ -79,8 +82,25 @@ r04_mainpath_edit_dataverse <- function() {
   test_dataverse_metadata()
 }
 
+r05_mainpath_create_metadata_template <- function() {
+  sesh$navigate(dv_server_url)
+  Sys.sleep(default_wait)
+  sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div[2]/div[2]/div/button')$clickElement() #click dataverse edit button
+  sesh$findElement(value='//*[@id="dataverseForm:manageTemplates"]')$clickElement() #click manage templates
+  Sys.sleep(default_wait)
+  sesh$findElement(value='//*[@id="manageTemplatesForm"]/div[1]/div/a')$clickElement() #click create dataset template
+  Sys.sleep(default_wait)
+  sesh$findElement(value='//*[@id="templateForm:templateName"]')$sendKeysToElement(list("test template create")) #Create template title
+  set_dataset_metadata_edit(add_string='create', xpath_dict=ds_template_xpaths)
+  sesh$findElement(value='//*[@id="templateForm:j_idt892"]')$clickElement() #click "Save + Add Terms"
+  Sys.sleep(default_wait)
+  expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  template_id <<- toString(param_get(toString(sesh$getCurrentUrl()), c("id")))
+}
+
 r09_mainpath_create_dataset <- function() {
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
+  Sys.sleep(default_wait)
   sesh$findElement(value='//*[@id="addDataForm"]/div/button')$clickElement() #click add data
   sesh$findElement(value='//*[@id="addDataForm"]/div/ul/li[2]/a')$clickElement() #click new dataset
   
@@ -109,7 +129,7 @@ r09_mainpath_create_dataset <- function() {
   
   Sys.sleep(default_wait)
   
-  test_dataset_metadata(add_string='create', is_update=FALSE)
+  test_dataset_metadata(add_string='create', is_update=FALSE, xpath_dict=ds_edit_xpaths)
   
   sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click out after testing data
   
@@ -122,7 +142,8 @@ r10_mainpath_edit_dataset <- function() {
   
   Sys.sleep(default_wait)
 
-  set_dataset_metadata_edit(add_string='edit')
+  set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_edit_xpaths)
+  sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #click to create dataset
 
   Sys.sleep(default_wait + 1)
   
@@ -139,7 +160,7 @@ r10_mainpath_edit_dataset <- function() {
   
   Sys.sleep(default_wait)
   
-  test_dataset_metadata(add_string='edit', is_update=TRUE) 
+  test_dataset_metadata(add_string='edit', is_update=TRUE, xpath_dict=ds_edit_xpaths) 
 
   sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click cancel out of edit after testing
 }
@@ -197,7 +218,7 @@ call_mainpath <- function(FUN) {
   return(mainpath_state)
 }
 
-clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE) {
+clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE, do_tmp=TRUE) {
   if(do_ds) {
     tryCatch({
       destroy_dataset(dataset_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
@@ -209,6 +230,15 @@ clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE) {
   if(do_dv) {
     tryCatch({
       delete_dataverse(dataverse_name, dv_server_url, login_user_api_token) #dv_admin_api_token)
+      sesh$navigate(dv_server_url)
+    }, error = function(e) { #print error
+      print("Dataverse Delete Error")
+      print(e)
+    })
+  }
+  if(do_tmp) {
+    tryCatch({
+      delete_dataset_template(template_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
       sesh$navigate(dv_server_url)
     }, error = function(e) { #print error
       print("Dataverse Delete Error")
