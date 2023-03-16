@@ -12,99 +12,6 @@ dataset_name <- "rselenium-test-dataset"
 dataset_id <- "" #set by code
 login_user_api_token <- "" #set by code
 
-# TODO:
-# - Begin implementing R03-R25
-# - How do I handle cleanup?
-#   - Probably best to tie it into the call_mainpath error code? Try to do deletes if possible.
-#   - I need to delete datasets AND a dataverse
-
-load_dataverse_admin_info_from_file <- function() {
-  #Currently this is programmed to read from a secret_table file located at a fixed directory
-  #TODO: This needs to be made dynamic once I understand how to do this better in rstudio
-  dframe <- read.table(file='/Users/madunlap/Documents/GitHub/secret_table.txt',header=FALSE,
-                       sep='=',col.names=c('key','value'))
-  dtable <- data.table(dframe,key='key')
-  
-  #TODO: remove api token if we end up not needing it (we pull the user's instead)
-  dv_server_url <<- dtable["DATAVERSE_SERVER_URL"]$value
-  dv_admin_api_token <<- dtable["DATAVERSE_API_TOKEN"]$value
-}
-
-begin_user_browser <- function() {
-  sesh <<- remoteDriver(
-    remoteServerAddr = "localhost",
-    port = 4444L,
-    browserName = "chrome"
-  )
-  #sesh$errorDetails()
-  sesh$open()
-  #sesh$getStatus()
-}
-
-# Wrapper for all mainpath test functions. Allows us to not rewrite the same code over-and-over for all tests
-call_mainpath <- function(FUN) {
-  if(!mainpath_state) { return(mainpath_state) } #Fails if previous mainpath tests have failed
-  
-  mainpath_state <<- tryCatch({
-    FUN()
-    return(TRUE)
-  }, expectation_failure=function(e) { #catch testthat failures
-    print(e)
-    return(FALSE)
-  },error = function(e) { #catch general errors
-    print(e)
-    print(sesh$errorDetails()$localizedMessage)
-    return(FALSE)
-  })
-  
-  return(mainpath_state)
-}
-
-clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE) {
-  if(do_ds) {
-    tryCatch({
-      destroy_dataset(dataset_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
-    }, error = function(e) { #print error
-      print("Dataset Destroy Error")
-      print(e)
-    })
-  }
-  if(do_dv) {
-    tryCatch({
-      delete_dataverse(dataverse_name, dv_server_url, login_user_api_token) #dv_admin_api_token)
-      sesh$navigate(dv_server_url)
-    }, error = function(e) { #print error
-      print("Dataverse Delete Error")
-      print(e)
-    })
-  }
-
-}
-
-#We get the api token for the logged in user
-get_api_token <- function() {
-  sesh$navigate(paste(dv_server_url,'/dataverseuser.xhtml?selectTab=apiTokenTab', sep=''))
-  #Note: This test assumes you have already clicked "Create Token" with this account.
-  login_user_api_token <<- toString(sesh$findElement(value='//*[@id="apiToken"]/pre/code')$getElementText())
-}
-
-##This is not currently needed for our requirements. It was built to get around permissions issues for our admin off the root dataverse 
-# test_delete_dataverse <- function() {
-#   sesh$navigate(paste(dv_server_url,'/dataverse/',dataverse_name, sep=''))
-#   
-#   Sys.sleep(default_wait)
-#   
-#   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div/button')$clickElement() #click edit
-#   sesh$findElement(value='//*[@id="dataverseForm:deleteDataset"]')$clickElement() #click delete
-#   sesh$findElement(value='//*[@id="dataverseForm:j_idt435"]')$clickElement() #click confirm
-#   
-#   Sys.sleep(default_wait)
-#   
-#   expect_identical(paste(dv_server_url,'/dataverse/root/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
-#   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
-#   
-# }
-
 #########################
 ### Requirement Tests ###
 #########################
@@ -189,14 +96,22 @@ r09_mainpath_create_dataset <- function() {
   dataset_id <<- sub(".*=", "", sesh$findElement(value='//*[@id="datasetForm:manageDatasetPermissions"]')$getElementAttribute("href")) 
   # print(dataset_id)
   
+  sesh$findElement(value='//*[@id="actionButtonBlock"]/div[1]/div/a')$clickElement() #click publish
+  Sys.sleep(1)
+  sesh$findElement(value='//*[@id="datasetForm:j_idt2547"]')$clickElement() #click publish confirm
+  #TODO: add smarter code that waits for a UI element change instead of a hard sleep.
+  Sys.sleep(15) #You have to wait on this page for the publish to finish.
+  
+  expect_identical(toString(sesh$findElement(value='//*[@id="title-label-block"]/span')$getElementText()), "Version 1.0") #Test dataset published
+  
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
-  sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
+  sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click edit dataset
   
   Sys.sleep(default_wait)
   
   test_dataset_metadata(add_string='create', is_update=FALSE)
   
-  sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click add data
+  sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click out after testing data
   
   Sys.sleep(default_wait)
 }
@@ -205,21 +120,123 @@ r10_mainpath_edit_dataset <- function() {
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
   
-
   Sys.sleep(default_wait)
-  #print("BEFORE EDIT")
+
   set_dataset_metadata_edit(add_string='edit')
-  #print("AFTER EDIT")
+
   Sys.sleep(default_wait + 1)
+  
+  sesh$findElement(value='//*[@id="actionButtonBlock"]/div[1]/div/a')$clickElement() #click publish
+  Sys.sleep(1)
+  sesh$findElement(value='//*[@id="datasetForm:j_idt2547"]')$clickElement() #click publish confirm
+  #TODO: add smarter code that waits for a UI element change instead of a hard sleep.
+  Sys.sleep(15) #You have to wait on this page for the publish to finish.
+  
+  expect_identical(toString(sesh$findElement(value='//*[@id="title-label-block"]/span')$getElementText()), "Version 1.1") #Test dataset published
   
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
   
   Sys.sleep(default_wait)
   
-  #TODO: make is_update true after we implement setting those fields
-  #print("BEFORE TEST")
   test_dataset_metadata(add_string='edit', is_update=TRUE) 
-  #print("AFTER TEST")
-  sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click add data
+
+  sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click cancel out of edit after testing
 }
+
+
+#############################################
+### Requirement Test Additional Functions ###
+#############################################
+
+# TODO:
+# - Begin implementing R03-R25
+# - How do I handle cleanup?
+#   - Probably best to tie it into the call_mainpath error code? Try to do deletes if possible.
+#   - I need to delete datasets AND a dataverse
+
+load_dataverse_admin_info_from_file <- function() {
+  #Currently this is programmed to read from a secret_table file located at a fixed directory
+  #TODO: This needs to be made dynamic once I understand how to do this better in rstudio
+  dframe <- read.table(file='/Users/madunlap/Documents/GitHub/secret_table.txt',header=FALSE,
+                       sep='=',col.names=c('key','value'))
+  dtable <- data.table(dframe,key='key')
+  
+  #TODO: remove api token if we end up not needing it (we pull the user's instead)
+  dv_server_url <<- dtable["DATAVERSE_SERVER_URL"]$value
+  dv_admin_api_token <<- dtable["DATAVERSE_API_TOKEN"]$value
+}
+
+begin_user_browser <- function() {
+  sesh <<- remoteDriver(
+    remoteServerAddr = "localhost",
+    port = 4444L,
+    browserName = "chrome"
+  )
+  #sesh$errorDetails()
+  sesh$open()
+  #sesh$getStatus()
+}
+
+# Wrapper for all mainpath test functions. Allows us to not rewrite the same code over-and-over for all tests
+call_mainpath <- function(FUN) {
+  if(!mainpath_state) { return(mainpath_state) } #Fails if previous mainpath tests have failed
+  
+  mainpath_state <<- tryCatch({
+    FUN()
+    return(TRUE)
+  }, expectation_failure=function(e) { #catch testthat failures
+    print(e)
+    return(FALSE)
+  },error = function(e) { #catch general errors
+    print(e)
+    print(sesh$errorDetails()$localizedMessage)
+    return(FALSE)
+  })
+  
+  return(mainpath_state)
+}
+
+clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE) {
+  if(do_ds) {
+    tryCatch({
+      destroy_dataset(dataset_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
+    }, error = function(e) { #print error
+      print("Dataset Destroy Error")
+      print(e)
+    })
+  }
+  if(do_dv) {
+    tryCatch({
+      delete_dataverse(dataverse_name, dv_server_url, login_user_api_token) #dv_admin_api_token)
+      sesh$navigate(dv_server_url)
+    }, error = function(e) { #print error
+      print("Dataverse Delete Error")
+      print(e)
+    })
+  }
+}
+
+#We get the api token for the logged in user
+get_api_token <- function() {
+  sesh$navigate(paste(dv_server_url,'/dataverseuser.xhtml?selectTab=apiTokenTab', sep=''))
+  #Note: This test assumes you have already clicked "Create Token" with this account.
+  login_user_api_token <<- toString(sesh$findElement(value='//*[@id="apiToken"]/pre/code')$getElementText())
+}
+
+##This is not currently needed for our requirements. It was built to get around permissions issues for our admin off the root dataverse 
+# test_delete_dataverse <- function() {
+#   sesh$navigate(paste(dv_server_url,'/dataverse/',dataverse_name, sep=''))
+#   
+#   Sys.sleep(default_wait)
+#   
+#   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div/button')$clickElement() #click edit
+#   sesh$findElement(value='//*[@id="dataverseForm:deleteDataset"]')$clickElement() #click delete
+#   sesh$findElement(value='//*[@id="dataverseForm:j_idt435"]')$clickElement() #click confirm
+#   
+#   Sys.sleep(default_wait)
+#   
+#   expect_identical(paste(dv_server_url,'/dataverse/root/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
+#   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+#   
+# }

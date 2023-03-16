@@ -10,7 +10,7 @@ destroy_dataset <- function(id, server, token) {
                             add_headers('X-Dataverse-key' = token),
                             verbose(info = TRUE))
   status_code(destroy_dataset_response)
-  content(destroy_dataset_response)
+  #content(destroy_dataset_response)
   #TODO: return anything?
 }
 
@@ -21,6 +21,6 @@ delete_dataverse <- function(alias, server, token) {
                                     add_headers('X-Dataverse-key' = token),
                                     verbose(info = TRUE))
   status_code(delete_dataverse_response)
-  content(delete_dataverse_response)
+  #content(delete_dataverse_response)
   #TODO: return anything?
 }
