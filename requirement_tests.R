@@ -96,6 +96,14 @@ r05_mainpath_create_metadata_template <- function() {
   Sys.sleep(default_wait)
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   template_id <<- toString(param_get(toString(sesh$getCurrentUrl()), c("id")))
+  # sesh$navigate(dv_server_url)
+  # Sys.sleep(default_wait)
+  # sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div[2]/div[2]/div/button')$clickElement() #click dataverse edit button
+  # sesh$findElement(value='//*[@id="dataverseForm:manageTemplates"]')$clickElement() #click manage templates
+  # Sys.sleep(9999999999)
+  #TODO: I'm not sure what ownerId refers to. We may need to go through the UI (like we probably will have to for delete anyways...)
+  sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=1&editMode=METADATA', sep=''))
+  test_dataset_metadata(add_string='create', xpath_dict=ds_template_xpaths)
 }
 
 r09_mainpath_create_dataset <- function() {
