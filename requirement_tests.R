@@ -2,17 +2,19 @@ library(RSelenium)
 library(testthat)
 library(askpass)
 library(urltools)
-source('functions/api_dataverse.R')
-source('functions/test_functions_dataset.R')
-source('functions/test_functions_dataverse.R')
 
 mainpath_state <- TRUE
-default_wait <- .75 #If a target system is running slow, bump this to increase the wait globally
+default_wait <- 2 #If a target system is running slow, bump this to increase the wait globally
 dataverse_name <- "rselenium-test-dataverse"
 dataset_name <- "rselenium-test-dataset"
 dataset_id <- "" #set by code
 template_id <- "" #set by code
+root_dv_id <- "1" #assumed
 login_user_api_token <- "" #set by code
+
+source('functions/api_dataverse.R')
+source('functions/test_functions_dataset.R')
+source('functions/test_functions_dataverse.R')
 
 #########################
 ### Requirement Tests ###
@@ -80,6 +82,7 @@ r04_mainpath_edit_dataverse <- function() {
   
   set_dataverse_metadata()
   test_dataverse_metadata()
+  Sys.sleep(1)
 }
 
 r05_mainpath_create_metadata_template <- function() {
@@ -116,7 +119,7 @@ r09_mainpath_create_dataset <- function() {
   
   set_dataset_metadata_create(add_string='create')
   
-  Sys.sleep(default_wait + 1)
+  Sys.sleep(default_wait)
   
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   
@@ -139,7 +142,7 @@ r09_mainpath_create_dataset <- function() {
   
   test_dataset_metadata(add_string='create', is_update=FALSE, xpath_dict=ds_edit_xpaths)
   
-  sesh$findElement(value='//*[@id="datasetForm:cancelTop"]')$clickElement() #click out after testing data
+  sesh$findElement(value='//*[@id="datasetForm:cancel"]')$clickElement() #click out after testing data
   
   Sys.sleep(default_wait)
 }
@@ -153,10 +156,10 @@ r10_mainpath_edit_dataset <- function() {
   set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_edit_xpaths)
   sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #click to create dataset
 
-  Sys.sleep(default_wait + 1)
+  Sys.sleep(default_wait)
   
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div[1]/div/a')$clickElement() #click publish
-  Sys.sleep(1)
+  Sys.sleep(default_wait)
   sesh$findElement(value='//*[@id="datasetForm:j_idt2547"]')$clickElement() #click publish confirm
   #TODO: add smarter code that waits for a UI element change instead of a hard sleep.
   Sys.sleep(15) #You have to wait on this page for the publish to finish.
@@ -245,13 +248,14 @@ clean_up_mainpath <- function(do_ds=TRUE, do_dv=TRUE, do_tmp=TRUE) {
     })
   }
   if(do_tmp) {
-    tryCatch({
-      delete_dataset_template(template_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
-      sesh$navigate(dv_server_url)
-    }, error = function(e) { #print error
-      print("Dataverse Delete Error")
-      print(e)
-    })
+    delete_template_via_ui(id=template_id, dv_id=root_dv_id) #based on the assu
+    # tryCatch({
+    #   delete_dataset_template(template_id, dv_server_url, login_user_api_token) #dv_admin_api_token)
+    #   sesh$navigate(dv_server_url)
+    # }, error = function(e) { #print error
+    #   print("Dataverse Delete Error")
+    #   print(e)
+    # })
   }
 }
 

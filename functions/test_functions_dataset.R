@@ -503,3 +503,29 @@ test_dataset_metadata <- function(add_string='', is_update=FALSE, xpath_dict=NUL
     expect_identical(toString(sesh$findElement(value=xpath_dict['doc_to_sources'])$getElementAttribute("value")), paste(add_string, ds_props['doc_to_sources'], sep=''))
   }
 }
+ #Delete
+delete_template_via_ui <- function(id, dv_id) {
+  sesh$navigate(paste(dv_server_url,'/manage-templates.xhtml?dataverseId=', root_dv_id, sep=''))
+  template_trs = sesh$findElements(value='//*[@id="manageTemplatesForm:allTemplates_data"]/tr')
+
+  for (tr in template_trs) {
+    tr_id = toString(param_get(toString(tr$findChildElement(value='td[4]/div/div/ul/li[1]/a')$getElementAttribute("href")), c("id")))
+    if (id == tr_id) {
+      tr$findChildElement(value='td[4]/div/a[3]')$clickElement()
+      Sys.sleep(.2)
+      sesh$findElement(value='//*[@id="manageTemplatesForm:contDeleteTemplateBtn"]')$clickElement()
+      return(TRUE)
+    }
+  }
+  
+  print(paste("Unable to delete dataset template with id:", id))
+  return(FALSE)
+  #TODO: Raise exception if we get here?
+  
+  # STEPS:
+  # Iterate through tr inside //*[@id="manageTemplatesForm:allTemplates_data"]
+  # Get the ID out of the edit data / metadata menu option
+  # - //*[@id="manageTemplatesForm:allTemplates_data"]/tr[1]/td[4]/div/div/ul/li[1]/a
+  # - <a href="/template.xhtml?id=10&amp;ownerId=1&amp;editMode=METADATA">Metadata</a>
+  # If it matches the provided id, we click the delete button in that tr
+}

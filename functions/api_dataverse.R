@@ -26,15 +26,16 @@ delete_dataverse <- function(alias, server, token) {
   #content(delete_dataverse_response)
   #TODO: return anything?
 }
-
-delete_dataset_template <- function(id, server, token) {
-  call <- paste(server, "/api/admin/template/", id, sep='')
-  #print(call)
-  delete_template_response <- DELETE(url = call,
-                                      add_headers('X-Dataverse-key' = token)
-                                      ,verbose(info = TRUE)
-                                     )
-  status_code(delete_template_response)
-  #content(delete_dataverse_response)
-  #TODO: return anything?
-}
+# 
+# #NOTE: This doesn't work by default on dataverse unless on localhost
+# delete_dataset_template <- function(id, server, token) {
+#   call <- paste(server, "/api/admin/template/", id, sep='')
+#   #print(call)
+#   delete_template_response <- DELETE(url = call,
+#                                       add_headers('X-Dataverse-key' = token)
+#                                       ,verbose(info = TRUE)
+#                                      )
+#   status_code(delete_template_response)
+#   #content(delete_dataverse_response)
+#   #TODO: return anything?
+# }
