@@ -15,10 +15,11 @@ call_mainpath(r01alt_mainpath_builtin_auth)
 call_mainpath(get_api_token)
 # call_mainpath(r05_mainpath_create_metadata_template)
 # clean_up_mainpath(do_ds=FALSE, do_dv=FALSE) #TODO: I think admin endpoints are blocked by default outside localhost... so I may need to delete this via the UI... but that's also fairly sketchy :(
-
 call_mainpath(r03_mainpath_create_sub_dataverse)
 call_mainpath(r04_mainpath_edit_dataverse)
 call_mainpath(r05_mainpath_create_metadata_template)
 call_mainpath(r09_mainpath_create_dataset)
 call_mainpath(r10_mainpath_edit_dataset)
 clean_up_mainpath()
+
+#destroy_dataset("234", dv_server_url, login_user_api_token)

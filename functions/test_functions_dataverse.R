@@ -29,8 +29,6 @@ set_dataverse_metadata <- function(add_string='') {
   
   sesh$findElement(value='//*[@id="dataverseForm:save"]')$clickElement() #create dataverse
  
-#TODO: TEST IMPLICIT  
-  # Sys.sleep(default_wait)
 }
 
 test_dataverse_metadata <- function(add_string='') {
@@ -51,9 +49,6 @@ test_dataverse_metadata <- function(add_string='') {
   
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button')$clickElement()
   sesh$findElement(value='//*[@id="dataverseForm:editInfo"]')$clickElement()
-
-#TODO: TEST IMPLICIT    
-  # Sys.sleep(default_wait)
   
   expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:dataverseCategory"]/option[@selected]')$getElementText()), toString(dv_props['category']))
   expect_identical(toString(sesh$findElement(value='//*[@id="dataverseForm:j_idt271:0:contactEmail"]')$getElementAttribute("value")), paste(add_string, dv_props['email'], sep=''))
