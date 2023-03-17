@@ -56,8 +56,8 @@ r03_mainpath_create_sub_dataverse <- function() {
  
   ### Test Save ###
   
-  expect_identical(paste(dv_server_url,'/dataverse/',dataverse_name, '/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  expect_identical(paste(dv_server_url,'/dataverse/',dataverse_name, '/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
   
   test_dataverse_metadata(add_string="create")
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
@@ -67,7 +67,8 @@ r03_mainpath_create_sub_dataverse <- function() {
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/button')$clickElement() #click publish
   sesh$findElement(value='//*[@id="dataverseForm:j_idt431"]')$clickElement() #confirm publish
   
-  Sys.sleep(default_wait)
+#TODO: TEST IMPLICIT
+  # Sys.sleep(default_wait)
   
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
 }
@@ -77,8 +78,8 @@ r04_mainpath_edit_dataverse <- function() {
   Sys.sleep(default_wait)
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button')$clickElement()
   sesh$findElement(value='//*[@id="dataverseForm:editInfo"]')$clickElement()
-  
-  Sys.sleep(default_wait)
+#TODO: TEST IMPLICIT
+  # Sys.sleep(default_wait)
   
   set_dataverse_metadata()
   test_dataverse_metadata()
@@ -206,7 +207,9 @@ begin_user_browser <- function() {
     browserName = "chrome"
   )
   #sesh$errorDetails()
-  sesh$open()
+  sesh$open(silent=TRUE)
+  sesh$setTimeout("implicit", milliseconds=15000)
+  # implicit_timeouts(sesh, 15000)
   #sesh$getStatus()
 }
 
@@ -265,6 +268,18 @@ get_api_token <- function() {
   #Note: This test assumes you have already clicked "Create Token" with this account.
   login_user_api_token <<- toString(sesh$findElement(value='//*[@id="apiToken"]/pre/code')$getElementText())
 }
+
+## Work around to actually set implicit timeout
+## From https://github.com/ropensci/RSelenium/issues/212
+## ... this is the same as setTimeout
+# library(jsonlite)
+# implicit_timeouts <- function (remDr, milliseconds)
+# {
+#   qpath <- sprintf("%s/session/%s/timeouts", remDr$serverURL,
+#                    remDr$sessionInfo[["id"]])
+#   remDr$queryRD(qpath, method = "POST", qdata = toJSON(list(type = "implicit", ms = milliseconds), 
+#                                                        auto_unbox = TRUE))
+# }
 
 ##This is not currently needed for our requirements. It was built to get around permissions issues for our admin off the root dataverse 
 # test_delete_dataverse <- function() {
