@@ -97,7 +97,7 @@ r05_mainpath_create_metadata_template <- function() {
   set_dataset_metadata_edit(add_string='create', xpath_dict=ds_template_xpaths)
 
   sesh$findElement(value='//*[@id="templateForm:j_idt892"]')$clickElement() #click "Save + Add Terms"
-  Sys.sleep(default_wait)
+
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   template_id <<- toString(param_get(toString(sesh$getCurrentUrl()), c("id")))
   # sesh$navigate(dv_server_url)
@@ -112,15 +112,11 @@ r05_mainpath_create_metadata_template <- function() {
 
 r09_mainpath_create_dataset <- function() {
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
-  Sys.sleep(default_wait)
+  
   sesh$findElement(value='//*[@id="addDataForm"]/div/button')$clickElement() #click add data
   sesh$findElement(value='//*[@id="addDataForm"]/div/ul/li[2]/a')$clickElement() #click new dataset
   
-  Sys.sleep(default_wait)
-  
   set_dataset_metadata_create(add_string='create')
-  
-  Sys.sleep(default_wait)
   
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   
@@ -138,8 +134,6 @@ r09_mainpath_create_dataset <- function() {
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click edit dataset
   
-  Sys.sleep(default_wait)
-  
   test_dataset_metadata(add_string='create', is_update=FALSE, xpath_dict=ds_edit_xpaths)
   
   sesh$findElement(value='//*[@id="datasetForm:cancel"]')$clickElement() #click out after testing data
@@ -150,8 +144,6 @@ r09_mainpath_create_dataset <- function() {
 r10_mainpath_edit_dataset <- function() {
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
-  
-  Sys.sleep(default_wait)
 
   set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_edit_xpaths)
   sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #click to create dataset
