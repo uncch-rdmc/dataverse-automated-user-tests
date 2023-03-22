@@ -21,6 +21,9 @@ source('functions/test_functions_dataverse.R')
 ### Requirement Tests ###
 #########################
 
+#NOTE: When looking at or expanding these tests, keep in mind that we use implicit wait after loading (saving) pages, instead of explicit wait.
+#      The code will continuously check for an element, so page loads are quicker. So those expect_identical calls that check an element value serve two purposes.
+
 r01alt_mainpath_builtin_auth <- function() {
   username <- askpass("Username for builtin account")
   password <- askpass("Password for builtin account")
@@ -103,14 +106,18 @@ r05_mainpath_create_metadata_template <- function() {
 
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   template_id <<- toString(param_get(toString(sesh$getCurrentUrl()), c("id")))
-  # sesh$navigate(dv_server_url)
-  # Sys.sleep(default_wait)
-  # sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div[2]/div[2]/div/button')$clickElement() #click dataverse edit button
-  # sesh$findElement(value='//*[@id="dataverseForm:manageTemplates"]')$clickElement() #click manage templates
-  # Sys.sleep(9999999999)
 
+  set_template_license(add_string='create')
+  sesh$findElement(value='//*[@id="templateForm:j_idt893"]')$clickElement() #click "Save Dataset Template" (which actually just saves the license)
+  
+  expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  Sys.sleep(default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
+  
   sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=', dataverse_id, '&editMode=METADATA', sep=''))
   test_dataset_metadata(add_string='create', xpath_dict=ds_template_xpaths)
+  
+  sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=', dataverse_id, '&editMode=LICENSE', sep=''))
+  test_template_license(add_string='create')
 }
 
 r06_mainpath_edit_metadata_template <- function() {
@@ -118,8 +125,18 @@ r06_mainpath_edit_metadata_template <- function() {
   set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_template_xpaths)
   sesh$findElement(value='//*[@id="templateForm:j_idt893"]')$clickElement() #click "Save + Add Terms"
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  
+  sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=', dataverse_id, '&editMode=LICENSE', sep=''))
+  set_template_license(add_string='edit')
+  sesh$findElement(value='//*[@id="templateForm:j_idt893"]')$clickElement() #click "Save Changes"
+  Sys.sleep(default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
+  
   sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=', dataverse_id, '&editMode=METADATA', sep=''))
   test_dataset_metadata(add_string='edit', xpath_dict=ds_template_xpaths)
+  
+  sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=', dataverse_id, '&editMode=LICENSE', sep=''))
+  test_template_license(add_string='edit')
+
 }
 
 r09_mainpath_create_dataset <- function() {

@@ -207,6 +207,59 @@ ds_template_xpaths <- c(
   'doc_to_sources'='//*[@id="templateForm:j_idt620:0:j_idt623:34:fieldvaluelist:0:description"]'
 )
 
+ds_license_xpaths <- c(
+  'terms_restricted'='//*[@id="templateForm:metadata_TermsAccess"]',
+  'access_place'='//*[@id="templateForm:dataAccessPlace"]',
+  'original_archive'='//*[@id="templateForm:originalArchive"]',
+  'available_status'='//*[@id="templateForm:availabilityStatus"]',
+  'access_contact'='//*[@id="templateForm:contactForAccess"]',
+  'collection_size'='//*[@id="templateForm:sizeOfCollection"]',
+  'study_completion'='//*[@id="templateForm:studyCompletion"]'
+)
+
+ds_license_props <- c(
+  'terms_restricted'='restricted',
+  'access_place'='data access place',
+  'original_archive'='original archive',
+  'available_status'='availability status',
+  'access_contact'='contact for access',
+  'collection_size'='size of collection',
+  'study_completion'='study completion'
+)
+
+#TODO: move?
+set_template_license <- function(add_string='') {
+  sesh$findElement(value='//*[@id="templateForm:licenses_label"]')$clickElement() #click license dropdown
+  Sys.sleep(.2)
+  sesh$findElement(value='//*[@id="templateForm:licenses_1"]')$clickElement() #click "cc-by 4.0" inside dropdown
+  Sys.sleep(.2)
+  
+  sesh$findElement(value=ds_license_xpaths['terms_restricted'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['terms_restricted'])$sendKeysToElement(list(paste(add_string, ds_license_props['terms_restricted'], sep='')))
+  sesh$findElement(value=ds_license_xpaths['access_place'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['access_place'])$sendKeysToElement(list(paste(add_string, ds_license_props['access_place'], sep='')))
+  sesh$findElement(value=ds_license_xpaths['original_archive'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['original_archive'])$sendKeysToElement(list(paste(add_string, ds_license_props['original_archive'], sep='')))
+  sesh$findElement(value=ds_license_xpaths['available_status'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['available_status'])$sendKeysToElement(list(paste(add_string, ds_license_props['available_status'], sep='')))
+  sesh$findElement(value=ds_license_xpaths['access_contact'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['access_contact'])$sendKeysToElement(list(paste(add_string, ds_license_props['access_contact'], sep='')))
+  sesh$findElement(value=ds_license_xpaths['collection_size'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['collection_size'])$sendKeysToElement(list(paste(add_string, ds_license_props['collection_size'], sep='')))
+  sesh$findElement(value=ds_license_xpaths['study_completion'])$clearElement()
+  sesh$findElement(value=ds_license_xpaths['study_completion'])$sendKeysToElement(list(paste(add_string, ds_license_props['study_completion'], sep='')))
+}
+
+test_template_license <- function(add_string='') {
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['terms_restricted'])$getElementAttribute("value")), paste(add_string, ds_license_props['terms_restricted'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['access_place'])$getElementAttribute("value")), paste(add_string, ds_license_props['access_place'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['original_archive'])$getElementAttribute("value")), paste(add_string, ds_license_props['original_archive'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['available_status'])$getElementAttribute("value")), paste(add_string, ds_license_props['available_status'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['access_contact'])$getElementAttribute("value")), paste(add_string, ds_license_props['access_contact'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['collection_size'])$getElementAttribute("value")), paste(add_string, ds_license_props['collection_size'], sep=''))
+  expect_identical(toString(sesh$findElement(value=ds_license_xpaths['study_completion'])$getElementAttribute("value")), paste(add_string, ds_license_props['study_completion'], sep=''))
+}
+
 # We have different functions for create / edit as the xpath changes between the two, and there is no other way to get the fields
 set_dataset_metadata_create <- function(add_string='') {
   # We clear all the elements for when this code is called during edit and there are already contents
