@@ -15,6 +15,7 @@ destroy_dataset <- function(id, server, token) {
   #TODO: return anything?
 }
 
+#TODO: Maybe delete based on ID now that we are storing that
 delete_dataverse <- function(alias, server, token) {
   call <- paste(server, "/api/dataverses/", alias, sep='')
   #print(call)

@@ -502,9 +502,10 @@ test_dataset_metadata <- function(add_string='', is_update=FALSE, xpath_dict=NUL
     expect_identical(toString(sesh$findElement(value=xpath_dict['doc_to_sources'])$getElementAttribute("value")), paste(add_string, ds_props['doc_to_sources'], sep=''))
   }
 }
- #Delete
+
+#NOTE: We probably don't need this anymore now that we are adding it to a sub-dataverse that we are deleting
 delete_template_via_ui <- function(id, dv_id) {
-  sesh$navigate(paste(dv_server_url,'/manage-templates.xhtml?dataverseId=', root_dv_id, sep=''))
+  sesh$navigate(paste(dv_server_url,'/manage-templates.xhtml?dataverseId=', dv_id, sep=''))
   template_trs = sesh$findElements(value='//*[@id="manageTemplatesForm:allTemplates_data"]/tr')
 
   for (tr in template_trs) {
