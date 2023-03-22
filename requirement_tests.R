@@ -32,11 +32,13 @@ r01alt_mainpath_builtin_auth <- function() {
   sesh$findElement(value='//*[@id="loginForm:credentialsContainer:1:sCredValue"]')$sendKeysToElement(list(password, key="enter"))
   #NOTE: For some reason this button click works with directly setting username/password, but NOT when using askpass.
   #      currently the code is just triggering an enter key after entering the password, but we may have the issue again
+  #      ...
+  #      I'm pretty sure this is an old issue due to using safari
+  
   #sesh$findElement(using="xpath", value='//*[@id="loginForm:login"]')$clickElement()
   #sesh$screenshot(file = 'atest.png')
   
-  Sys.sleep(default_wait) #Wait for page load. We should be able to use setImplicitWaitTimeout, but that doesn't seem to work currently due to rselenium being stale
-  
+  sesh$findElement(value='//*[@id="dataverseDesc"]') #Find element to wait for load
   expect_identical(paste(dv_server_url,'/dataverse.xhtml', sep=''), toString(sesh$getCurrentUrl()))
 }
 
@@ -56,8 +58,8 @@ r03_mainpath_create_sub_dataverse <- function() {
  
   ### Test Save ###
   
-  expect_identical(paste(dv_server_url,'/dataverse/',dataverse_name, '/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  expect_identical(paste(dv_server_url,'/dataverse/',dataverse_name, '/', sep=''), toString(sesh$getCurrentUrl())) #confirm page
   
   test_dataverse_metadata(add_string="create")
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
@@ -66,8 +68,6 @@ r03_mainpath_create_sub_dataverse <- function() {
   
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/button')$clickElement() #click publish
   sesh$findElement(value='//*[@id="dataverseForm:j_idt431"]')$clickElement() #confirm publish
-  
-  Sys.sleep(default_wait)
   
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div')$getElementAttribute("class")), "alert alert-success") #confirm success alert
 }
@@ -78,16 +78,16 @@ r04_mainpath_edit_dataverse <- function() {
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button')$clickElement()
   sesh$findElement(value='//*[@id="dataverseForm:editInfo"]')$clickElement()
   
-  Sys.sleep(default_wait)
-  
   set_dataverse_metadata()
   test_dataverse_metadata()
-  Sys.sleep(1)
+  
+  Sys.sleep(1) #wait before switching pages in r05
 }
 
 r05_mainpath_create_metadata_template <- function() {
   sesh$navigate(dv_server_url)
   Sys.sleep(default_wait)
+
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div/div[2]/div[2]/div/button')$clickElement() #click dataverse edit button
   sesh$findElement(value='//*[@id="dataverseForm:manageTemplates"]')$clickElement() #click manage templates
   Sys.sleep(default_wait)
@@ -95,8 +95,9 @@ r05_mainpath_create_metadata_template <- function() {
   Sys.sleep(default_wait)
   sesh$findElement(value='//*[@id="templateForm:templateName"]')$sendKeysToElement(list("test template create")) #Create template title
   set_dataset_metadata_edit(add_string='create', xpath_dict=ds_template_xpaths)
+
   sesh$findElement(value='//*[@id="templateForm:j_idt892"]')$clickElement() #click "Save + Add Terms"
-  Sys.sleep(default_wait)
+
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   template_id <<- toString(param_get(toString(sesh$getCurrentUrl()), c("id")))
   # sesh$navigate(dv_server_url)
@@ -111,15 +112,11 @@ r05_mainpath_create_metadata_template <- function() {
 
 r09_mainpath_create_dataset <- function() {
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
-  Sys.sleep(default_wait)
+  
   sesh$findElement(value='//*[@id="addDataForm"]/div/button')$clickElement() #click add data
   sesh$findElement(value='//*[@id="addDataForm"]/div/ul/li[2]/a')$clickElement() #click new dataset
   
-  Sys.sleep(default_wait)
-  
   set_dataset_metadata_create(add_string='create')
-  
-  Sys.sleep(default_wait)
   
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
   
@@ -128,17 +125,14 @@ r09_mainpath_create_dataset <- function() {
   # print(dataset_id)
   
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div[1]/div/a')$clickElement() #click publish
-  Sys.sleep(1)
+
   sesh$findElement(value='//*[@id="datasetForm:j_idt2547"]')$clickElement() #click publish confirm
-  #TODO: add smarter code that waits for a UI element change instead of a hard sleep.
-  Sys.sleep(15) #You have to wait on this page for the publish to finish.
-  
+
+  sesh$findElement(value='label-default', using='class name') #Find element to wait for load. May trigger prematurely with files added.
   expect_identical(toString(sesh$findElement(value='//*[@id="title-label-block"]/span')$getElementText()), "Version 1.0") #Test dataset published
   
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click edit dataset
-  
-  Sys.sleep(default_wait)
   
   test_dataset_metadata(add_string='create', is_update=FALSE, xpath_dict=ds_edit_xpaths)
   
@@ -150,26 +144,19 @@ r09_mainpath_create_dataset <- function() {
 r10_mainpath_edit_dataset <- function() {
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
-  
-  Sys.sleep(default_wait)
 
   set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_edit_xpaths)
   sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #click to create dataset
 
-  Sys.sleep(default_wait)
-  
   sesh$findElement(value='//*[@id="actionButtonBlock"]/div[1]/div/a')$clickElement() #click publish
-  Sys.sleep(default_wait)
+
   sesh$findElement(value='//*[@id="datasetForm:j_idt2547"]')$clickElement() #click publish confirm
-  #TODO: add smarter code that waits for a UI element change instead of a hard sleep.
-  Sys.sleep(15) #You have to wait on this page for the publish to finish.
   
+  sesh$findElement(value='label-default', using='class name') #Find element to wait for load. May trigger prematurely with files added.
   expect_identical(toString(sesh$findElement(value='//*[@id="title-label-block"]/span')$getElementText()), "Version 1.1") #Test dataset published
   
   sesh$findElement(value='//*[@id="editDataSet"]')$clickElement() #click add data
   sesh$findElement(value='//*[@id="datasetForm:editMetadata"]')$clickElement() #click new dataset
-  
-  Sys.sleep(default_wait)
   
   test_dataset_metadata(add_string='edit', is_update=TRUE, xpath_dict=ds_edit_xpaths) 
 
@@ -206,7 +193,11 @@ begin_user_browser <- function() {
     browserName = "chrome"
   )
   #sesh$errorDetails()
-  sesh$open()
+  sesh$open(silent=TRUE)
+  #NOTE: This sets the timeout used to search for elements. This does not apply to other things like checking the current URL.
+  #      In some places in this code we check for an element before checking the URL to leverage this dynamic check instead of setting explicit waits
+  sesh$setTimeout("implicit", milliseconds=20000) #Set very high to handle dataverse publish steps
+  # implicit_timeouts(sesh, 15000)
   #sesh$getStatus()
 }
 

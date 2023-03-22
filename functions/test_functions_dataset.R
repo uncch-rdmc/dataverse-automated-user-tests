@@ -218,7 +218,7 @@ set_dataset_metadata_create <- function(add_string='') {
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]')$clearElement()
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['author_affiliation'], sep='')))
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_label"]')$clickElement() #click author identifier type dropdown
-  Sys.sleep(.1)
+  Sys.sleep(.2)
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_2"]')$clickElement() #click "ISNI" inside dropdown
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]')$clearElement()
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['author_id'], sep='')))
@@ -234,7 +234,7 @@ set_dataset_metadata_create <- function(add_string='') {
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]')$sendKeysToElement(list(ds_props['date'], sep=''))
   #TODO: add a clear for the select thing?
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2"]')$clickElement() #click subject dropdown
-  Sys.sleep(.1)
+  Sys.sleep(.2)
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2_panel"]/div[2]/ul/li[14]/div')$clickElement() #click "other" inside dropdown
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]')$clearElement()
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['keyword_term'], sep='')))
@@ -245,7 +245,7 @@ set_dataset_metadata_create <- function(add_string='') {
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]')$clearElement()
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]')$sendKeysToElement(list(paste(add_string, ds_props['related_pub_citation'], sep='')))
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_label"]')$clickElement() #click related pub id type dropdown
-  Sys.sleep(.1)
+  Sys.sleep(.2)
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_4"]')$clickElement() #click "doi" inside dropdown
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]')$clearElement()
   sesh$findElement(value='//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]')$sendKeysToElement(list(paste(add_string, ds_props['related_pub_id'], sep='')))
@@ -269,21 +269,21 @@ set_dataset_metadata_edit <- function(add_string='', xpath_dict=NULL) {
   if (isTRUE(all.equal(xpath_dict,ds_edit_xpaths))) {
     
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv"]')$clickElement() #click author identifier type dropdown
-    Sys.sleep(.3)
+    Sys.sleep(.5)
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv_4"]')$clickElement() #click "VIAF" inside dropdown
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]/ul/li/span[1]')$clickElement() #Delete existing field "Other"
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]')$clickElement() #click subject dropdown
-    Sys.sleep(.3)
+    Sys.sleep(.5)
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2_panel"]/div[2]/ul/li[10]/div')$clickElement() #click "mathematical science" inside dropdown
     #sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]/div[3]')$clickElement() #click related pub id type dropdown
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]')$clickElement() #click related pub id type dropdown
-    Sys.sleep(.3)
+    Sys.sleep(.5)
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv_4"]')$clickElement() #click "DOI" inside dropdown
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2"]/div[3]')$clickElement() #click language dropdown
-    Sys.sleep(.3)
+    Sys.sleep(.5)
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2_panel"]/div[2]/ul/li[2]')$clickElement() #click "Afar" inside dropdown
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv"]')$clickElement() #click contributor type dropdown
-    Sys.sleep(.3)
+    Sys.sleep(.5)
     sesh$findElement(value='//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv_3"]')$clickElement() #click "Data Manager" inside dropdown
     
     # sesh$findElement(value='//*[@id="datasetForm:saveBottom"]')$clickElement() #create dataset
@@ -301,7 +301,6 @@ set_dataset_metadata_edit <- function(add_string='', xpath_dict=NULL) {
     sesh$findElement(value='//*[@id="templateForm:j_idt620:0:j_idt623:13:unique2"]')$clickElement() #click language dropdown
     Sys.sleep(.5)
     sesh$findElement(value='//*[@id="templateForm:j_idt620:0:j_idt623:13:unique2_panel"]/div[2]/ul/li[72]')$clickElement() #click "Inuktitut" inside dropdown
-    
     sesh$findElement(value='//*[@id="templateForm:j_idt620:0:j_idt623:17:j_idt677:0:j_idt679:0:cvv"]')$clickElement() #click contributor type dropdown
     Sys.sleep(.5)
     sesh$findElement(value='//*[@id="templateForm:j_idt620:0:j_idt623:17:j_idt677:0:j_idt679:0:cvv_11"]')$clickElement() #click "Researcher" inside dropdown
