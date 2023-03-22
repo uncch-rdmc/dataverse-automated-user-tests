@@ -110,6 +110,15 @@ r05_mainpath_create_metadata_template <- function() {
   test_dataset_metadata(add_string='create', xpath_dict=ds_template_xpaths)
 }
 
+r06_mainpath_edit_metadata_template <- function() {
+  sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=1&editMode=METADATA', sep=''))
+  set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_template_xpaths)
+  sesh$findElement(value='//*[@id="templateForm:j_idt893"]')$clickElement() #click "Save + Add Terms"
+  expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
+  sesh$navigate(paste(dv_server_url, '/template.xhtml?id=', template_id, '&ownerId=1&editMode=METADATA', sep=''))
+  test_dataset_metadata(add_string='edit', xpath_dict=ds_template_xpaths)
+}
+
 r09_mainpath_create_dataset <- function() {
   sesh$navigate(paste(dv_server_url, '/dataverse/', dataverse_name, sep=''))
   
