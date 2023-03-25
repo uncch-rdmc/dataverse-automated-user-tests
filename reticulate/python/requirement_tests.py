@@ -16,16 +16,23 @@ from webdriver_manager.chrome import ChromeDriverManager
 # - Can we make this code useful for people testing without R?
 
 class RequirementTests:
-  #exec(compile(open('/Users/madunlap/Documents/GitHub/secret_table_user_test.py').read()))
   exec(compile(source=open('/Users/madunlap/Documents/GitHub/secret_table_user_test.py').read(), filename='.', mode='exec')) #Reads file with secret info.
   sesh = None
   test_case = None
   failed = False
   test_case = unittest.TestCase()
+  username = None
+  password = None
   
   def r01alt_mainpath_builtin_auth(self, tc):
     self.sesh.get(f'{DV_URL}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
-  
+    self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:0:credValue"]').send_keys(self.username)
+    self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:1:sCredValue"]').send_keys(self.password)
+    self.sesh.find_element('xpath', '//*[@id="loginForm:login"]').click()
+    
+    self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
+    tc.assertEqual(f'{DV_URL}/dataverse.xhtml', self.sesh.current_url)
+   
   #############################################
   ### Requirement Test Additional Functions ###
   #############################################
@@ -34,8 +41,6 @@ class RequirementTests:
     options = Options()
     self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     self.sesh.implicitly_wait(20) #Set high for dataset publish. Maybe we should keep it low normally and set it up when needed?
-    self.sesh.get("https://xkcd.com")
-    #tc.assertIn("| CORE2 Admin Site", "NOPE")
 
   def test_caller(self, req_funct):
     if self.failed:
@@ -53,12 +58,17 @@ class RequirementTests:
       return False
   
   #For use when getting the results of the individual steps doesn't matter. Not used by our R code  
+  #TODO: make username/password optional somehow whe we do oauth
   def linear_test_runner(self, username, password):
+    print(f"Set username/password: {self.set_username_password(username, password)}")
     print(f"Begin Browser: {self.test_caller(self.begin_user_browser)}")
     print(f"R01alt mainpath auth: {self.test_caller(self.r01alt_mainpath_builtin_auth)}")
     self.sesh.close()
     return self.failed
     
+  def set_username_password(self, username, password):
+    self.username = username
+    self.password = password
     
     
     
