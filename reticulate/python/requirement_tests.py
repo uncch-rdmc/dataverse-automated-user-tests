@@ -51,3 +51,17 @@ class RequirementTests:
       #print(traceback.format_exc())
       traceback.print_exc()
       return False
+  
+  #For use when getting the results of the individual steps doesn't matter. Not used by our R code  
+  def linear_test_runner(self, username, password):
+    print(f"Begin Browser: {self.test_caller(self.begin_user_browser)}")
+    print(f"R01alt mainpath auth: {self.test_caller(self.r01alt_mainpath_builtin_auth)}")
+    self.sesh.close()
+    return self.failed
+    
+    
+    
+    
+    
+    
+    
