@@ -1,0 +1,17 @@
+library(reticulate)
+
+#setwd("~/Documents/GitHub/dataverse-automated-user-tests/reticulate")
+source('helper.R')
+
+source_python('python/requirement_tests.py')
+#py_tests <- PyClass('RequirementTests')
+py_tests <- RequirementTests()
+
+py_tests$test_caller(py_tests$begin_user_browser)
+
+#get_dv_username_password()
+
+py_tests$test_caller(py_tests$r01alt_mainpath_builtin_auth)
+
+# print(username)
+# print(password)
