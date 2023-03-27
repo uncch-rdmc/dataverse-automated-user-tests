@@ -309,7 +309,7 @@ ds_license_props = {
 
 
 #TODO: move?
-def set_template_license(add_string=''):
+def set_template_license(tc, add_string=''):
   self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
   time.sleep(.2)
   self.sesh.find_element('xpath','//*[@id="templateForm:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
@@ -330,17 +330,17 @@ def set_template_license(add_string=''):
   self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).clear()
   self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).send_keys(add_string + ds_license_props['study_completion'])
 
-def test_template_license(add_string=''):
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).get_attribute('value'), add_string+ds_license_props['terms_restricted']
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['access_place']).get_attribute('value'), add_string+ds_license_props['access_place']
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['original_archive']).get_attribute('value'), add_string+ds_license_props['original_archive']
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['available_status']).get_attribute('value'), add_string+ds_license_props['available_status']
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['access_contact']).get_attribute('value'), add_string+ds_license_props['access_contact']
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['collection_size']).get_attribute('value'), add_string+ds_license_props['collection_size']
-  expect_identical(self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).get_attribute('value'), add_string+ds_license_props['study_completion']
+def test_template_license(tc, add_string=''):
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).get_attribute('value'), add_string+ds_license_props['terms_restricted']
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['access_place']).get_attribute('value'), add_string+ds_license_props['access_place']
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['original_archive']).get_attribute('value'), add_string+ds_license_props['original_archive']
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['available_status']).get_attribute('value'), add_string+ds_license_props['available_status']
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['access_contact']).get_attribute('value'), add_string+ds_license_props['access_contact']
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['collection_size']).get_attribute('value'), add_string+ds_license_props['collection_size']
+  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).get_attribute('value'), add_string+ds_license_props['study_completion']
 
 # We have different functions for create / edit as the xpath changes between the two, and there is no other way to get the fields
-def set_dataset_metadata_create(add_string=''):
+def set_dataset_metadata_create(tc, add_string=''):
   # We clear all the elements for when this code is called during edit and there are already contents
   self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').clear()
   self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').send_keys(add_string + ds_props['title'])
@@ -394,7 +394,7 @@ def set_dataset_metadata_create(add_string=''):
   self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
 
 #also supports dataset template
-def set_dataset_metadata_edit(add_string='', xpath_dict=NULL):
+def set_dataset_metadata_edit(tc, add_string='', xpath_dict=NULL):
   #NOTE: For some reason moving some of these dropdown tests to the bottom of this files causes it to fail. Is it because they are too far off the page or... I have no idea what?
   if xpath_dict == ds_edit_xpaths:
     self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv"]').click() #click author identifier type dropdown
@@ -552,7 +552,7 @@ def set_dataset_metadata_edit(add_string='', xpath_dict=NULL):
   self.sesh.find_element('xpath',xpath_dict['doc_to_sources']).send_keys(add_string + ds_props['doc_to_sources'])  
 
 #Also supports dataset template
-def test_dataset_metadata(add_string='', is_update=FALSE, xpath_dict=NULL):
+def test_dataset_metadata(tc, add_string='', is_update=FALSE, xpath_dict=NULL):
   # if (is_update) {
   #   time.sleep(999999999)
   # }
@@ -561,71 +561,73 @@ def test_dataset_metadata(add_string='', is_update=FALSE, xpath_dict=NULL):
   
   #For some reason, dates are false when tested identical. I'm not sure if some character is being replaced on the backend or what. But this is fine
   #We don't currently test some dropdowns results because it is extremely convoluted to test the values of jquery dropdowns.
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['title']).get_attribute('value'), add_string+ds_props['title'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['author_name']).get_attribute('value'), add_string+ds_props['author_name'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['author_affiliation']).get_attribute('value'), add_string+ds_props['author_affiliation'])
-  #expect_identical(self.sesh.find_element('xpath',xpath_dict['author_id_type']).get_attribute('value'), add_string+ds_props['author_id_type'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['author_id']).get_attribute('value'), add_string+ds_props['author_id'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['contact_name']).get_attribute('value'), add_string+ds_props['contact_name'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['contact_affiliation']).get_attribute('value'), add_string+ds_props['contact_affiliation'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['contact_email']).get_attribute('value'), add_string+ds_props['contact_email'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['description']).get_attribute('value'), add_string+ds_props['description'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['date']).get_attribute('value'), ds_props['date'])
-  #expect_identical(self.sesh.find_element('xpath',xpath_dict['subject']).get_attribute('value'), add_string+ds_props['subject'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['keyword_term']).get_attribute('value'), add_string+ds_props['keyword_term'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['keyword_cv_name']).get_attribute('value'), add_string+ds_props['keyword_cv_name'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['keyword_cv_url']).get_attribute('value'), ds_props['keyword_cv_url']+add_string)
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['related_pub_citation']).get_attribute('value'), add_string+ds_props['related_pub_citation'])
-  #expect_identical(self.sesh.find_element('xpath',xpath_dict['related_pub_id_type']).get_attribute('value'), add_string+ds_props['related_pub_id_type']
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['title']).get_attribute('value'), add_string+ds_props['title'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_name']).get_attribute('value'), add_string+ds_props['author_name'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_affiliation']).get_attribute('value'), add_string+ds_props['author_affiliation'])
+  #tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_id_type']).get_attribute('value'), add_string+ds_props['author_id_type'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_id']).get_attribute('value'), add_string+ds_props['author_id'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contact_name']).get_attribute('value'), add_string+ds_props['contact_name'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contact_affiliation']).get_attribute('value'), add_string+ds_props['contact_affiliation'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contact_email']).get_attribute('value'), add_string+ds_props['contact_email'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['description']).get_attribute('value'), add_string+ds_props['description'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['date']).get_attribute('value'), ds_props['date'])
+  #tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['subject']).get_attribute('value'), add_string+ds_props['subject'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['keyword_term']).get_attribute('value'), add_string+ds_props['keyword_term'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['keyword_cv_name']).get_attribute('value'), add_string+ds_props['keyword_cv_name'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['keyword_cv_url']).get_attribute('value'), ds_props['keyword_cv_url']+add_string)
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_citation']).get_attribute('value'), add_string+ds_props['related_pub_citation'])
+  #tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_id_type']).get_attribute('value'), add_string+ds_props['related_pub_id_type']
   #TODO: I think this doesn't work because it needs the above set... but weirdly I thought it worked before???? Well it doesn't work now
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['related_pub_id']).get_attribute('value'), add_string+ds_props['related_pub_id'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['related_pub_url']).get_attribute('value'), ds_props['related_pub_url']+add_string)
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['notes']).get_attribute('value'), add_string+ds_props['notes'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['depositor']).get_attribute('value'), add_string+ds_props['depositor'])
-  expect_identical(self.sesh.find_element('xpath',xpath_dict['deposit_date']).get_attribute('value'), ds_props['deposit_date'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_id']).get_attribute('value'), add_string+ds_props['related_pub_id'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_url']).get_attribute('value'), ds_props['related_pub_url']+add_string)
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['notes']).get_attribute('value'), add_string+ds_props['notes'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['depositor']).get_attribute('value'), add_string+ds_props['depositor'])
+  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['deposit_date']).get_attribute('value'), ds_props['deposit_date'])
   
   if is_update:
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['subtitle']).get_attribute('value'), add_string+ds_props['subtitle'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['alternative_title']).get_attribute('value'), add_string+ds_props['alternative_title'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['alternative_url']).get_attribute('value'), ds_props['alternative_url']+add_string)
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['other_id_agency']).get_attribute('value'), add_string+ds_props['other_id_agency'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['other_id_id']).get_attribute('value'), add_string+ds_props['other_id_id'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['topic_class_term']).get_attribute('value'), add_string+ds_props['topic_class_term'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).get_attribute('value'), add_string+ds_props['topic_class_cv_name'])
-    # expect_identical(self.sesh.find_element('xpath',xpath_dict['language']).get_attribute('value'), add_string+ds_props['language'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['producer_name']).get_attribute('value'), add_string+ds_props['producer_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['producer_affiliation']).get_attribute('value'), add_string+ds_props['producer_affiliation'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).get_attribute('value'), add_string+ds_props['producer_abbrev_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['producer_url']).get_attribute('value'), ds_props['producer_url']+add_string)
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['producer_logo_url']).get_attribute('value'), ds_props['producer_logo_url']+add_string)
-    expect_equivalent(self.sesh.find_element('xpath',xpath_dict['producer_date']).get_attribute('value'), ds_props['producer_date'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['producer_location']).get_attribute('value'), add_string+ds_props['producer_location'])
-    # expect_identical(self.sesh.find_element('xpath',xpath_dict['contributor_type']).get_attribute('value'), add_string+ds_props['contributor_type'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['contributor_name']).get_attribute('value'), add_string+ds_props['contributor_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['funding_info_agency']).get_attribute('value'), add_string+ds_props['funding_info_agency'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['funding_info_id']).get_attribute('value'), add_string+ds_props['funding_info_id'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['distributor_name']).get_attribute('value'), add_string+ds_props['distributor_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['distributor_affiliation']).get_attribute('value'), add_string+ds_props['distributor_affiliation'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).get_attribute('value'), add_string+ds_props['distributor_abbrev_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['distributor_url']).get_attribute('value'), ds_props['distributor_url']+add_string)
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['distributor_logo_url']).get_attribute('value'), ds_props['distributor_logo_url']+add_string)
-    expect_equivalent(self.sesh.find_element('xpath',xpath_dict['distribution_date']).get_attribute('value'), ds_props['distribution_date'])
-    expect_equivalent(self.sesh.find_element('xpath',xpath_dict['time_period_start']).get_attribute('value'), ds_props['time_period_start'])
-    expect_equivalent(self.sesh.find_element('xpath',xpath_dict['time_period_end']).get_attribute('value'), ds_props['time_period_end'])
-    expect_equivalent(self.sesh.find_element('xpath',xpath_dict['date_of_collection_start']).get_attribute('value'), ds_props['date_of_collection_start'])
-    expect_equivalent(self.sesh.find_element('xpath',xpath_dict['date_of_collection_end']).get_attribute('value'), ds_props['date_of_collection_end'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['data_type']).get_attribute('value'), add_string+ds_props['data_type'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['series_name']).get_attribute('value'), add_string+ds_props['series_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['series_info']).get_attribute('value'), add_string+ds_props['series_info'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['software_name']).get_attribute('value'), add_string+ds_props['software_name'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['software_version']).get_attribute('value'), add_string+ds_props['software_version'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['related_material']).get_attribute('value'), add_string+ds_props['related_material'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['related_dataset']).get_attribute('value'), add_string+ds_props['related_dataset'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['other_reference']).get_attribute('value'), add_string+ds_props['other_reference'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['data_source']).get_attribute('value'), add_string+ds_props['data_source'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['origin_hist_sources']).get_attribute('value'), add_string+ds_props['origin_hist_sources'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['character_of_sources']).get_attribute('value'), add_string+ds_props['character_of_sources'])
-    expect_identical(self.sesh.find_element('xpath',xpath_dict['doc_to_sources']).get_attribute('value'), add_string+ds_props['doc_to_sources'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['subtitle']).get_attribute('value'), add_string+ds_props['subtitle'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['alternative_title']).get_attribute('value'), add_string+ds_props['alternative_title'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['alternative_url']).get_attribute('value'), ds_props['alternative_url']+add_string)
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['other_id_agency']).get_attribute('value'), add_string+ds_props['other_id_agency'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['other_id_id']).get_attribute('value'), add_string+ds_props['other_id_id'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['topic_class_term']).get_attribute('value'), add_string+ds_props['topic_class_term'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).get_attribute('value'), add_string+ds_props['topic_class_cv_name'])
+    # tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['language']).get_attribute('value'), add_string+ds_props['language'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_name']).get_attribute('value'), add_string+ds_props['producer_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_affiliation']).get_attribute('value'), add_string+ds_props['producer_affiliation'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).get_attribute('value'), add_string+ds_props['producer_abbrev_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_url']).get_attribute('value'), ds_props['producer_url']+add_string)
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_logo_url']).get_attribute('value'), ds_props['producer_logo_url']+add_string)
+    #NOTE: This line was an equivalent test in R
+    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['producer_date']).get_attribute('value'), ds_props['producer_date'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_location']).get_attribute('value'), add_string+ds_props['producer_location'])
+    # tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contributor_type']).get_attribute('value'), add_string+ds_props['contributor_type'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contributor_name']).get_attribute('value'), add_string+ds_props['contributor_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['funding_info_agency']).get_attribute('value'), add_string+ds_props['funding_info_agency'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['funding_info_id']).get_attribute('value'), add_string+ds_props['funding_info_id'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_name']).get_attribute('value'), add_string+ds_props['distributor_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_affiliation']).get_attribute('value'), add_string+ds_props['distributor_affiliation'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).get_attribute('value'), add_string+ds_props['distributor_abbrev_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_url']).get_attribute('value'), ds_props['distributor_url']+add_string)
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_logo_url']).get_attribute('value'), ds_props['distributor_logo_url']+add_string)
+    #NOTE: The 5 lines below test equivalent before, so if they blow up in python try that again
+    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['distribution_date']).get_attribute('value'), ds_props['distribution_date'])
+    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['time_period_start']).get_attribute('value'), ds_props['time_period_start'])
+    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['time_period_end']).get_attribute('value'), ds_props['time_period_end'])
+    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['date_of_collection_start']).get_attribute('value'), ds_props['date_of_collection_start'])
+    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['date_of_collection_end']).get_attribute('value'), ds_props['date_of_collection_end'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['data_type']).get_attribute('value'), add_string+ds_props['data_type'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['series_name']).get_attribute('value'), add_string+ds_props['series_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['series_info']).get_attribute('value'), add_string+ds_props['series_info'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['software_name']).get_attribute('value'), add_string+ds_props['software_name'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['software_version']).get_attribute('value'), add_string+ds_props['software_version'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_material']).get_attribute('value'), add_string+ds_props['related_material'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_dataset']).get_attribute('value'), add_string+ds_props['related_dataset'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['other_reference']).get_attribute('value'), add_string+ds_props['other_reference'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['data_source']).get_attribute('value'), add_string+ds_props['data_source'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['origin_hist_sources']).get_attribute('value'), add_string+ds_props['origin_hist_sources'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['character_of_sources']).get_attribute('value'), add_string+ds_props['character_of_sources'])
+    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['doc_to_sources']).get_attribute('value'), add_string+ds_props['doc_to_sources'])
 
 # #NOTE: We probably don't need this anymore now that we are adding it to a sub-dataverse that we are deleting
 # def delete_template_via_ui(id, dv_id):
