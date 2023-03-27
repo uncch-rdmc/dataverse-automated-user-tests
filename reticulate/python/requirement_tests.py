@@ -1,4 +1,10 @@
 import time, unittest, os, traceback
+
+#TODO: These import paths will almost certainly break when running this code outside R. Not sure how to fix this.
+#      ... Ideally there would be some way to tell reticulate what directory to work from?
+from python.dataset_test_helper import *
+from python.dataverse_test_helper import *
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 #from seleniumwire import webdriver
@@ -24,6 +30,9 @@ class RequirementTests:
   username = None
   password = None
   
+  #TODO: we may want to reference our dataset title, dataverse name and dataverse identifier from the dictionaries instead of a global like before
+  # ...  or we completely avoid the dictionaries. it probably can't live in two places.
+  
   def r01alt_mainpath_builtin_auth(self, tc):
     self.sesh.get(f'{DV_URL}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
     self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:0:credValue"]').send_keys(self.username)
@@ -32,7 +41,7 @@ class RequirementTests:
     
     self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
     tc.assertEqual(f'{DV_URL}/dataverse.xhtml', self.sesh.current_url)
-   
+  
   #############################################
   ### Requirement Test Additional Functions ###
   #############################################
