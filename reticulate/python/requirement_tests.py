@@ -21,8 +21,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 #   - Should we build it into python or r?
 # - Can we make this code useful for people testing without R?
 
+exec(compile(source=open('/Users/madunlap/Documents/GitHub/secret_table_user_test.py').read(), filename='.', mode='exec')) #Reads file with secret info.
+
 class RequirementTests:
-  exec(compile(source=open('/Users/madunlap/Documents/GitHub/secret_table_user_test.py').read(), filename='.', mode='exec')) #Reads file with secret info.
   sesh = None
   test_case = None
   failed = False
@@ -44,152 +45,152 @@ class RequirementTests:
   
   ### UNTESTED REQUIREMENT TESTS  
   def r03_mainpath_create_sub_dataverse(self, tc):
-    self.sesh.get(dv_server_url)
+    self.sesh.get(DV_URL)
     ### Main Landing Page ###
-    self.sesh.find_element(value='//*[@id="addDataForm"]/div/button').click() #click add data
-    self.sesh.find_element(value='//*[@id="addDataForm"]/div/ul/li[1]/a').click() #click new dataverse
+    self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
+    self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[1]/a').click() #click new dataverse
     
     ### Create Dataverse Page ###
-    self.sesh.find_element(value='//*[@id="dataverseForm:selectHostDataverse_input"]').clear()
-    self.sesh.find_element(value='//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(dv_props["host_dataverse"])
+    self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').clear()
+    self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(dv_props["host_dataverse"])
     time.sleep(2) # wait for host list to load
-    self.sesh.find_element(value='//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
+    self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
     time.sleep(.5) # wait after click for ui to be usable
-    set_dataverse_metadata(tc, add_string="create") #Metadata that is same for create/edit
+    set_dataverse_metadata(self.sesh, tc, add_string="create") #Metadata that is same for create/edit
    
     ### Test Save ###
     
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
-    tc.assertEqual(dv_server_url+'/dataverse/'+dataverse_name+'/', self.sesh.current_url) #confirm page
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+    tc.assertEqual(DV_URL+'/dataverse/'+dataverse_name+'/', self.sesh.current_url) #confirm page
     
-    test_dataverse_metadata(add_string="create")
-    self.sesh.get(dv_server_url+'/dataverse/'+dataverse_name)
+    test_dataverse_metadata(self.sesh, tc, add_string="create")
+    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
     
     ### Dataverse Page - Publish ###
     
-    self.sesh.find_element(value='//*[@id="actionButtonBlock"]/div/div/div[2]/button').click() #click publish
-    self.sesh.find_element(value='//*[@id="dataverseForm:j_idt431"]').click() #confirm publish
+    self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/button').click() #click publish
+    self.sesh.find_element('xpath', '//*[@id="dataverseForm:j_idt431"]').click() #confirm publish
     
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
     
-    dataverse_id <<- sub(".*=", "", self.sesh.find_element(value='//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
+    dataverse_id <<- sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
   
   def r04_mainpath_edit_dataverse(self, tc):
-    self.sesh.get(dv_server_url+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
     time.sleep(default_wait)
-    self.sesh.find_element(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
-    self.sesh.find_element(value='//*[@id="dataverseForm:editInfo"]').click()
+    self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
+    self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
     
-    set_dataverse_metadata()
-    test_dataverse_metadata()
+    set_dataverse_metadata(self.sesh, tc)
+    test_dataverse_metadata(self.sesh, tc)
     
     time.sleep(1) #wait before switching pages in r05
   
   def r05_mainpath_create_metadata_template(self, tc):
-    self.sesh.get(dv_server_url+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
     time.sleep(default_wait)
   
-    self.sesh.find_element(value='//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
-    self.sesh.find_element(value='//*[@id="dataverseForm:manageTemplates"]').click() #click manage templates
+    self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
+    self.sesh.find_element('xpath', '//*[@id="dataverseForm:manageTemplates"]').click() #click manage templates
     time.sleep(default_wait)
-    self.sesh.find_element(value='//*[@id="manageTemplatesForm"]/div[1]/div/a').click() #click create dataset template
+    self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm"]/div[1]/div/a').click() #click create dataset template
     time.sleep(default_wait)
-    self.sesh.find_element(value='//*[@id="templateForm:templateName"]').send_keys("test template create") #Create template title
-    set_dataset_metadata_edit(add_string='create', xpath_dict=ds_template_xpaths)
+    self.sesh.find_element('xpath', '//*[@id="templateForm:templateName"]').send_keys("test template create") #Create template title
+    set_dataset_metadata_edit(self.sesh, tc, add_string='create', xpath_dict=ds_template_xpaths)
     
-    self.sesh.find_element(value='//*[@id="templateForm:j_idt620:0:j_idt623:0:instr"]').click()
+    self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt620:0:j_idt623:0:instr"]').click()
     time.sleep(.2)
   #TODO: What?
     self.sesh.switch_to.active_element.send_keys("test"+"WOWOWOWOW")
     time.sleep(999999999999)
     
       
-    self.sesh.find_element(value='//*[@id="templateForm:j_idt892"]').click() #click "Save + Add Terms"
+    self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt892"]').click() #click "Save + Add Terms"
   
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
     
   #TODO: Replace param_get with a new way to get the query params from a url
     template_id <<- param_get(self.sesh.current_url, "id")
   
-    set_template_license(add_string='create')
-    self.sesh.find_element(value='//*[@id="templateForm:j_idt893"]').click() #click "Save Dataset Template" (which actually just saves the license)
+    set_template_license(self.sesh, tc, add_string='create')
+    self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Dataset Template" (which actually just saves the license)
     
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
     time.sleep(default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
     
-    self.sesh.get(dv_server_url+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=METADATA')
-    test_dataset_metadata(add_string='create', xpath_dict=ds_template_xpaths)
+    self.sesh.get(DV_URL+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=METADATA')
+    test_dataset_metadata(self.sesh, tc, add_string='create', xpath_dict=ds_template_xpaths)
     
-    self.sesh.get(dv_server_url+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=LICENSE')
-    test_template_license(add_string='create')
+    self.sesh.get(DV_URL+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=LICENSE')
+    test_template_license(self.sesh, tc, add_string='create')
   
   def r06_mainpath_edit_metadata_template(self, tc):
-    self.sesh.get(dv_server_url+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=METADATA')
-    set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_template_xpaths)
-    self.sesh.find_element(value='//*[@id="templateForm:j_idt893"]').click() #click "Save + Add Terms"
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+    self.sesh.get(DV_URL+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=METADATA')
+    set_dataset_metadata_edit(self.sesh, tc, add_string='edit', xpath_dict=ds_template_xpaths)
+    self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save + Add Terms"
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
     
-    self.sesh.get(dv_server_url+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=LICENSE')
-    set_template_license(add_string='edit')
-    self.sesh.find_element(value='//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
+    self.sesh.get(DV_URL+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=LICENSE')
+    set_template_license(self.sesh, tc, add_string='edit')
+    self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
     time.sleep(default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
     
-    self.sesh.get(dv_server_url+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=METADATA')
-    test_dataset_metadata(add_string='edit', xpath_dict=ds_template_xpaths)
+    self.sesh.get(DV_URL+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=METADATA')
+    test_dataset_metadata(self.sesh, tc, add_string='edit', xpath_dict=ds_template_xpaths)
     
-    self.sesh.get(dv_server_url+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=LICENSE')
-    test_template_license(add_string='edit')
+    self.sesh.get(DV_URL+'/template.xhtml?id='+template_id+'&ownerId='+dataverse_id+'&editMode=LICENSE')
+    test_template_license(self.sesh, tc, add_string='edit')
   
   def r09_mainpath_create_dataset(self, tc):
-    self.sesh.get(dv_server_url+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
     
-    self.sesh.find_element(value='//*[@id="addDataForm"]/div/button').click() #click add data
-    self.sesh.find_element(value='//*[@id="addDataForm"]/div/ul/li[2]/a').click() #click new dataset
+    self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
+    self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[2]/a').click() #click new dataset
     
-    set_dataset_metadata_create(add_string='create')
+    set_dataset_metadata_create(self.sesh, tc, add_string='create')
     
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
     
     ### Get dataset id from permissions page url for later uses ###
-    dataset_id <<- sub(".*=", "", self.sesh.find_element(value='//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
+    dataset_id <<- sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
     # print(dataset_id)
     
-    self.sesh.find_element(value='//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
+    self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
   
-    self.sesh.find_element(value='//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
   
-    self.sesh.find_element(value='label-default', using='class name') #Find element to wait for load. May trigger prematurely with files added.
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="title-label-block"]/span').text, "Version 1.0") #Test dataset published
+    self.sesh.find_element('xpath', 'label-default', using='class name') #Find element to wait for load. May trigger prematurely with files added.
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.0") #Test dataset published
     
-    self.sesh.find_element(value='//*[@id="editDataSet"]').click() #click add data
-    self.sesh.find_element(value='//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
+    self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
     
-    test_dataset_metadata(add_string='create', is_update=FALSE, xpath_dict=ds_edit_xpaths)
+    test_dataset_metadata(self.sesh, tc, add_string='create', is_update=FALSE, xpath_dict=ds_edit_xpaths)
     
-    self.sesh.find_element(value='//*[@id="datasetForm:cancel"]').click() #click out after testing data
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
     
     time.sleep(default_wait)
   
   def r10_mainpath_edit_dataset(self, tc):
-    self.sesh.find_element(value='//*[@id="editDataSet"]').click() #click add data
-    self.sesh.find_element(value='//*[@id="datasetForm:editMetadata"]').click() #click new dataset
+    self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
   
-    set_dataset_metadata_edit(add_string='edit', xpath_dict=ds_edit_xpaths)
-    self.sesh.find_element(value='//*[@id="datasetForm:saveBottom"]').click() #click to create dataset
+    set_dataset_metadata_edit(self.sesh, tc, add_string='edit', xpath_dict=ds_edit_xpaths)
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to create dataset
   
-    self.sesh.find_element(value='//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
+    self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
   
-    self.sesh.find_element(value='//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
     
-    self.sesh.find_element(value='label-default', using='class name') #Find element to wait for load. May trigger prematurely with files added.
-    tc.assertEqual(self.sesh.find_element(value='//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
+    self.sesh.find_element('xpath', 'label-default', using='class name') #Find element to wait for load. May trigger prematurely with files added.
+    tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
     
-    self.sesh.find_element(value='//*[@id="editDataSet"]').click() #click add data
-    self.sesh.find_element(value='//*[@id="datasetForm:editMetadata"]').click() #click new dataset
+    self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
     
-    test_dataset_metadata(add_string='edit', is_update=TRUE, xpath_dict=ds_edit_xpaths) 
+    test_dataset_metadata(self.sesh, tc, add_string='edit', is_update=TRUE, xpath_dict=ds_edit_xpaths) 
   
-    self.sesh.find_element(value='//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
+    self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
   
   #############################################
   ### Requirement Test Additional Functions ###

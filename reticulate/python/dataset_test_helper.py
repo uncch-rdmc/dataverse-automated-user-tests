@@ -309,250 +309,250 @@ ds_license_props = {
 
 
 #TODO: move?
-def set_template_license(tc, add_string=''):
-  self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
+def set_template_license(sesh, tc, add_string=''):
+  sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
   time.sleep(.2)
-  self.sesh.find_element('xpath','//*[@id="templateForm:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
+  sesh.find_element('xpath','//*[@id="templateForm:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
   time.sleep(.2)
   
-  self.sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).send_keys(add_string + ds_license_props['terms_restricted'])
-  self.sesh.find_element('xpath',ds_license_xpaths['access_place']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['access_place']).send_keys(add_string + ds_license_props['access_place'])
-  self.sesh.find_element('xpath',ds_license_xpaths['original_archive']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['original_archive']).send_keys(add_string + ds_license_props['original_archive'])
-  self.sesh.find_element('xpath',ds_license_xpaths['available_status']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['available_status']).send_keys(add_string + ds_license_props['available_status'])
-  self.sesh.find_element('xpath',ds_license_xpaths['access_contact']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['access_contact']).send_keys(add_string + ds_license_props['access_contact'])
-  self.sesh.find_element('xpath',ds_license_xpaths['collection_size']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['collection_size']).send_keys(add_string + ds_license_props['collection_size'])
-  self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).clear()
-  self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).send_keys(add_string + ds_license_props['study_completion'])
+  sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).send_keys(add_string + ds_license_props['terms_restricted'])
+  sesh.find_element('xpath',ds_license_xpaths['access_place']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['access_place']).send_keys(add_string + ds_license_props['access_place'])
+  sesh.find_element('xpath',ds_license_xpaths['original_archive']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['original_archive']).send_keys(add_string + ds_license_props['original_archive'])
+  sesh.find_element('xpath',ds_license_xpaths['available_status']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['available_status']).send_keys(add_string + ds_license_props['available_status'])
+  sesh.find_element('xpath',ds_license_xpaths['access_contact']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['access_contact']).send_keys(add_string + ds_license_props['access_contact'])
+  sesh.find_element('xpath',ds_license_xpaths['collection_size']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['collection_size']).send_keys(add_string + ds_license_props['collection_size'])
+  sesh.find_element('xpath',ds_license_xpaths['study_completion']).clear()
+  sesh.find_element('xpath',ds_license_xpaths['study_completion']).send_keys(add_string + ds_license_props['study_completion'])
 
-def test_template_license(tc, add_string=''):
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).get_attribute('value'), add_string+ds_license_props['terms_restricted']
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['access_place']).get_attribute('value'), add_string+ds_license_props['access_place']
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['original_archive']).get_attribute('value'), add_string+ds_license_props['original_archive']
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['available_status']).get_attribute('value'), add_string+ds_license_props['available_status']
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['access_contact']).get_attribute('value'), add_string+ds_license_props['access_contact']
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['collection_size']).get_attribute('value'), add_string+ds_license_props['collection_size']
-  tc.assertEqual((self.sesh.find_element('xpath',ds_license_xpaths['study_completion']).get_attribute('value'), add_string+ds_license_props['study_completion']
+def test_template_license(sesh, tc, add_string=''):
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['terms_restricted']).get_attribute('value'), add_string+ds_license_props['terms_restricted'])
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['access_place']).get_attribute('value'), add_string+ds_license_props['access_place'])
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['original_archive']).get_attribute('value'), add_string+ds_license_props['original_archive'])
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['available_status']).get_attribute('value'), add_string+ds_license_props['available_status'])
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['access_contact']).get_attribute('value'), add_string+ds_license_props['access_contact'])
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['collection_size']).get_attribute('value'), add_string+ds_license_props['collection_size'])
+  tc.assertEqual(sesh.find_element('xpath',ds_license_xpaths['study_completion']).get_attribute('value'), add_string+ds_license_props['study_completion'])
 
 # We have different functions for create / edit as the xpath changes between the two, and there is no other way to get the fields
-def set_dataset_metadata_create(tc, add_string=''):
+def set_dataset_metadata_create(sesh, tc, add_string=''):
   # We clear all the elements for when this code is called during edit and there are already contents
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').send_keys(add_string + ds_props['title'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').send_keys(add_string + ds_props['title'])
   
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + ds_props['author_name'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + ds_props['author_affiliation'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_label"]').click() #click author identifier type dropdown
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + ds_props['author_name'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + ds_props['author_affiliation'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_label"]').click() #click author identifier type dropdown
   time.sleep(.2)
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_2"]').click() #click "ISNI" inside dropdown
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]').send_keys(add_string + ds_props['author_id'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + ds_props['contact_name'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + ds_props['contact_affiliation'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]').send_keys(add_string + ds_props['contact_email'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]').send_keys(add_string + ds_props['description'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]').send_keys(list(ds_props['date']))
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_2"]').click() #click "ISNI" inside dropdown
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]').send_keys(add_string + ds_props['author_id'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + ds_props['contact_name'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + ds_props['contact_affiliation'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]').send_keys(add_string + ds_props['contact_email'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]').send_keys(add_string + ds_props['description'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]').send_keys(ds_props['date'])
   #TODO: add a clear for the select thing?
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2"]').click() #click subject dropdown
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2"]').click() #click subject dropdown
   time.sleep(.2)
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2_panel"]/div[2]/ul/li[14]/div').click() #click "other" inside dropdown
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + ds_props['keyword_term'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + ds_props['keyword_cv_name'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]').send_keys(list(paste(ds_props['keyword_cv_url'], add_string)
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]').send_keys(add_string + ds_props['related_pub_citation'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_label"]').click() #click related pub id type dropdown
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2_panel"]/div[2]/ul/li[14]/div').click() #click "other" inside dropdown
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + ds_props['keyword_term'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + ds_props['keyword_cv_name'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]').send_keys(ds_props['keyword_cv_url']+add_string)
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]').send_keys(add_string + ds_props['related_pub_citation'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_label"]').click() #click related pub id type dropdown
   time.sleep(.2)
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_4"]').click() #click "doi" inside dropdown
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]').send_keys(add_string + ds_props['related_pub_id'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').send_keys(list(paste(ds_props['related_pub_url'], add_string)
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').send_keys(add_string + ds_props['notes'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').send_keys(add_string + ds_props['depositor'])
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').clear()
-  self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').send_keys(list(ds_props['deposit_date']))
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_4"]').click() #click "doi" inside dropdown
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]').send_keys(add_string + ds_props['related_pub_id'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').send_keys(ds_props['related_pub_url']+add_string)
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').send_keys(add_string + ds_props['notes'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').send_keys(add_string + ds_props['depositor'])
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').clear()
+  sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').send_keys(ds_props['deposit_date'])
   
   #TODO: Upload files here?
-  self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
+  sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
 
 #also supports dataset template
-def set_dataset_metadata_edit(tc, add_string='', xpath_dict=NULL):
+def set_dataset_metadata_edit(sesh, tc, add_string='', xpath_dict=None):
   #NOTE: For some reason moving some of these dropdown tests to the bottom of this files causes it to fail. Is it because they are too far off the page or... I have no idea what?
   if xpath_dict == ds_edit_xpaths:
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv"]').click() #click author identifier type dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv"]').click() #click author identifier type dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv_4"]').click() #click "VIAF" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]/ul/li/span[1]').click() #Delete existing field "Other"
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]').click() #click subject dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv_4"]').click() #click "VIAF" inside dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]/ul/li/span[1]').click() #Delete existing field "Other"
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2"]').click() #click subject dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2_panel"]/div[2]/ul/li[10]/div').click() #click "mathematical science" inside dropdown
-    #self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]/div[3]').click() #click related pub id type dropdown
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]').click() #click related pub id type dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:8:unique2_panel"]/div[2]/ul/li[10]/div').click() #click "mathematical science" inside dropdown
+    #sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]/div[3]').click() #click related pub id type dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv"]').click() #click related pub id type dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv_4"]').click() #click "DOI" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2"]/div[3]').click() #click language dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:11:j_idt1679:0:j_idt1681:1:cvv_4"]').click() #click "DOI" inside dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2"]/div[3]').click() #click language dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2_panel"]/div[2]/ul/li[2]').click() #click "Afar" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv"]').click() #click contributor type dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:13:unique2_panel"]/div[2]/ul/li[2]').click() #click "Afar" inside dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv"]').click() #click contributor type dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv_3"]').click() #click "Data Manager" inside dropdown
+    sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv_3"]').click() #click "Data Manager" inside dropdown
     
-    # self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
+    # sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
   elif xpath_dict == ds_template_xpaths:
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]').click() #click author identifier type dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]').click() #click author identifier type dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv_5"]').click() #click "GND" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:8:editPrimitiveValueFragment"]/div[3]/div/div/div').click() #click subject dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv_5"]').click() #click "GND" inside dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:8:editPrimitiveValueFragment"]/div[3]/div/div/div').click() #click subject dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:8:unique2_panel"]/div[2]/ul/li[6]').click() #click "Computer and Information Science" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:11:j_idt677:0:j_idt679:1:cvv"]').click() #click related pub id type dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:8:unique2_panel"]/div[2]/ul/li[6]').click() #click "Computer and Information Science" inside dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:11:j_idt677:0:j_idt679:1:cvv"]').click() #click related pub id type dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:11:j_idt677:0:j_idt679:1:cvv_5"]').click() #click "ean13" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:13:unique2"]').click() #click language dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:11:j_idt677:0:j_idt679:1:cvv_5"]').click() #click "ean13" inside dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:13:unique2"]').click() #click language dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:13:unique2_panel"]/div[2]/ul/li[72]').click() #click "Inuktitut" inside dropdown
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:17:j_idt677:0:j_idt679:0:cvv"]').click() #click contributor type dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:13:unique2_panel"]/div[2]/ul/li[72]').click() #click "Inuktitut" inside dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:17:j_idt677:0:j_idt679:0:cvv"]').click() #click contributor type dropdown
     time.sleep(.5)
-    self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:17:j_idt677:0:j_idt679:0:cvv_11"]').click() #click "Researcher" inside dropdown
+    sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:17:j_idt677:0:j_idt679:0:cvv_11"]').click() #click "Researcher" inside dropdown
 
-  self.sesh.find_element('xpath',xpath_dict['title']).clear()
-  self.sesh.find_element('xpath',xpath_dict['title']).send_keys(add_string + ds_props['title'])
-  self.sesh.find_element('xpath',xpath_dict['author_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['author_name']).send_keys(add_string + ds_props['author_name'])
-  self.sesh.find_element('xpath',xpath_dict['author_affiliation']).clear()
-  self.sesh.find_element('xpath',xpath_dict['author_affiliation']).send_keys(add_string + ds_props['author_affiliation'])
-  self.sesh.find_element('xpath',xpath_dict['author_id']).clear()
-  self.sesh.find_element('xpath',xpath_dict['author_id']).send_keys(add_string + ds_props['author_id'])
-  self.sesh.find_element('xpath',xpath_dict['contact_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['contact_name']).send_keys(add_string + ds_props['contact_name'])
-  self.sesh.find_element('xpath',xpath_dict['contact_affiliation']).clear()
-  self.sesh.find_element('xpath',xpath_dict['contact_affiliation']).send_keys(add_string + ds_props['contact_affiliation'])
-  self.sesh.find_element('xpath',xpath_dict['contact_email']).clear()
-  self.sesh.find_element('xpath',xpath_dict['contact_email']).send_keys(add_string + ds_props['contact_email'])
-  self.sesh.find_element('xpath',xpath_dict['description']).clear()
-  self.sesh.find_element('xpath',xpath_dict['description']).send_keys(add_string + ds_props['description'])
-  self.sesh.find_element('xpath',xpath_dict['date']).clear()
-  self.sesh.find_element('xpath',xpath_dict['date']).send_keys(list(ds_props['date']))
-  self.sesh.find_element('xpath',xpath_dict['keyword_term']).clear()
-  self.sesh.find_element('xpath',xpath_dict['keyword_term']).send_keys(add_string + ds_props['keyword_term'])
-  self.sesh.find_element('xpath',xpath_dict['keyword_cv_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['keyword_cv_name']).send_keys(add_string + ds_props['keyword_cv_name'])
-  self.sesh.find_element('xpath',xpath_dict['keyword_cv_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['keyword_cv_url']).send_keys(list(paste(ds_props['keyword_cv_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['related_pub_citation']).clear()
-  self.sesh.find_element('xpath',xpath_dict['related_pub_citation']).send_keys(add_string + ds_props['related_pub_citation'])
-  self.sesh.find_element('xpath',xpath_dict['related_pub_id']).clear()
-  self.sesh.find_element('xpath',xpath_dict['related_pub_id']).send_keys(add_string + ds_props['related_pub_id'])
-  self.sesh.find_element('xpath',xpath_dict['related_pub_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['related_pub_url']).send_keys(list(paste(ds_props['related_pub_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['notes']).clear()
-  self.sesh.find_element('xpath',xpath_dict['notes']).send_keys(add_string + ds_props['notes'])
-  self.sesh.find_element('xpath',xpath_dict['depositor']).clear()
-  self.sesh.find_element('xpath',xpath_dict['depositor']).send_keys(add_string + ds_props['depositor'])
-  self.sesh.find_element('xpath',xpath_dict['deposit_date']).clear()
-  self.sesh.find_element('xpath',xpath_dict['deposit_date']).send_keys(list(ds_props['deposit_date']))
+  sesh.find_element('xpath',xpath_dict['title']).clear()
+  sesh.find_element('xpath',xpath_dict['title']).send_keys(add_string + ds_props['title'])
+  sesh.find_element('xpath',xpath_dict['author_name']).clear()
+  sesh.find_element('xpath',xpath_dict['author_name']).send_keys(add_string + ds_props['author_name'])
+  sesh.find_element('xpath',xpath_dict['author_affiliation']).clear()
+  sesh.find_element('xpath',xpath_dict['author_affiliation']).send_keys(add_string + ds_props['author_affiliation'])
+  sesh.find_element('xpath',xpath_dict['author_id']).clear()
+  sesh.find_element('xpath',xpath_dict['author_id']).send_keys(add_string + ds_props['author_id'])
+  sesh.find_element('xpath',xpath_dict['contact_name']).clear()
+  sesh.find_element('xpath',xpath_dict['contact_name']).send_keys(add_string + ds_props['contact_name'])
+  sesh.find_element('xpath',xpath_dict['contact_affiliation']).clear()
+  sesh.find_element('xpath',xpath_dict['contact_affiliation']).send_keys(add_string + ds_props['contact_affiliation'])
+  sesh.find_element('xpath',xpath_dict['contact_email']).clear()
+  sesh.find_element('xpath',xpath_dict['contact_email']).send_keys(add_string + ds_props['contact_email'])
+  sesh.find_element('xpath',xpath_dict['description']).clear()
+  sesh.find_element('xpath',xpath_dict['description']).send_keys(add_string + ds_props['description'])
+  sesh.find_element('xpath',xpath_dict['date']).clear()
+  sesh.find_element('xpath',xpath_dict['date']).send_keys(ds_props['date'])
+  sesh.find_element('xpath',xpath_dict['keyword_term']).clear()
+  sesh.find_element('xpath',xpath_dict['keyword_term']).send_keys(add_string + ds_props['keyword_term'])
+  sesh.find_element('xpath',xpath_dict['keyword_cv_name']).clear()
+  sesh.find_element('xpath',xpath_dict['keyword_cv_name']).send_keys(add_string + ds_props['keyword_cv_name'])
+  sesh.find_element('xpath',xpath_dict['keyword_cv_url']).clear()
+  sesh.find_element('xpath',xpath_dict['keyword_cv_url']).send_keys(ds_props['keyword_cv_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['related_pub_citation']).clear()
+  sesh.find_element('xpath',xpath_dict['related_pub_citation']).send_keys(add_string + ds_props['related_pub_citation'])
+  sesh.find_element('xpath',xpath_dict['related_pub_id']).clear()
+  sesh.find_element('xpath',xpath_dict['related_pub_id']).send_keys(add_string + ds_props['related_pub_id'])
+  sesh.find_element('xpath',xpath_dict['related_pub_url']).clear()
+  sesh.find_element('xpath',xpath_dict['related_pub_url']).send_keys(ds_props['related_pub_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['notes']).clear()
+  sesh.find_element('xpath',xpath_dict['notes']).send_keys(add_string + ds_props['notes'])
+  sesh.find_element('xpath',xpath_dict['depositor']).clear()
+  sesh.find_element('xpath',xpath_dict['depositor']).send_keys(add_string + ds_props['depositor'])
+  sesh.find_element('xpath',xpath_dict['deposit_date']).clear()
+  sesh.find_element('xpath',xpath_dict['deposit_date']).send_keys(ds_props['deposit_date'])
   
-  self.sesh.find_element('xpath',xpath_dict['subtitle']).clear()
-  self.sesh.find_element('xpath',xpath_dict['subtitle']).send_keys(add_string + ds_props['subtitle'])
-  self.sesh.find_element('xpath',xpath_dict['alternative_title']).clear()
-  self.sesh.find_element('xpath',xpath_dict['alternative_title']).send_keys(add_string + ds_props['alternative_title'])
-  self.sesh.find_element('xpath',xpath_dict['alternative_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['alternative_url']).send_keys(list(paste(ds_props['alternative_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['other_id_agency']).clear()
-  self.sesh.find_element('xpath',xpath_dict['other_id_agency']).send_keys(add_string + ds_props['other_id_agency'])
-  self.sesh.find_element('xpath',xpath_dict['other_id_id']).clear()
-  self.sesh.find_element('xpath',xpath_dict['other_id_id']).send_keys(add_string + ds_props['other_id_id'])
-  self.sesh.find_element('xpath',xpath_dict['topic_class_term']).clear()
-  self.sesh.find_element('xpath',xpath_dict['topic_class_term']).send_keys(add_string + ds_props['topic_class_term'])
-  self.sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).send_keys(add_string + ds_props['topic_class_cv_name'])
-  self.sesh.find_element('xpath',xpath_dict['topic_class_cv_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['topic_class_cv_url']).send_keys(list(paste(ds_props['topic_class_cv_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['producer_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_name']).send_keys(add_string + ds_props['producer_name'])
-  self.sesh.find_element('xpath',xpath_dict['producer_affiliation']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_affiliation']).send_keys(add_string + ds_props['producer_affiliation'])
-  self.sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).send_keys(add_string + ds_props['producer_abbrev_name'])
-  self.sesh.find_element('xpath',xpath_dict['producer_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_url']).send_keys(list(paste(ds_props['producer_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['producer_logo_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_logo_url']).send_keys(list(paste(ds_props['producer_logo_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['producer_date']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_date']).send_keys(list(ds_props['producer_date']
-  self.sesh.find_element('xpath',xpath_dict['producer_location']).clear()
-  self.sesh.find_element('xpath',xpath_dict['producer_location']).send_keys(add_string + ds_props['producer_location'])
-  self.sesh.find_element('xpath',xpath_dict['contributor_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['contributor_name']).send_keys(add_string + ds_props['contributor_name'])
-  self.sesh.find_element('xpath',xpath_dict['funding_info_agency']).clear()
-  self.sesh.find_element('xpath',xpath_dict['funding_info_agency']).send_keys(add_string + ds_props['funding_info_agency'])
-  self.sesh.find_element('xpath',xpath_dict['funding_info_id']).clear()
-  self.sesh.find_element('xpath',xpath_dict['funding_info_id']).send_keys(add_string + ds_props['funding_info_id'])
-  self.sesh.find_element('xpath',xpath_dict['distributor_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['distributor_name']).send_keys(add_string + ds_props['distributor_name'])
-  self.sesh.find_element('xpath',xpath_dict['distributor_affiliation']).clear()
-  self.sesh.find_element('xpath',xpath_dict['distributor_affiliation']).send_keys(add_string + ds_props['distributor_affiliation'])
-  self.sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).send_keys(add_string + ds_props['distributor_abbrev_name'])
-  self.sesh.find_element('xpath',xpath_dict['distributor_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['distributor_url']).send_keys(list(paste(ds_props['distributor_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['distributor_logo_url']).clear()
-  self.sesh.find_element('xpath',xpath_dict['distributor_logo_url']).send_keys(list(paste(ds_props['distributor_logo_url'], add_string)
-  self.sesh.find_element('xpath',xpath_dict['distribution_date']).clear()
-  self.sesh.find_element('xpath',xpath_dict['distribution_date']).send_keys(list(ds_props['distribution_date']
-  self.sesh.find_element('xpath',xpath_dict['time_period_start']).clear()
-  self.sesh.find_element('xpath',xpath_dict['time_period_start']).send_keys(list(ds_props['time_period_start']
-  self.sesh.find_element('xpath',xpath_dict['time_period_end']).clear()
-  self.sesh.find_element('xpath',xpath_dict['time_period_end']).send_keys(list(ds_props['time_period_end']
-  self.sesh.find_element('xpath',xpath_dict['date_of_collection_start']).clear()
-  self.sesh.find_element('xpath',xpath_dict['date_of_collection_start']).send_keys(list(ds_props['date_of_collection_start']
-  self.sesh.find_element('xpath',xpath_dict['date_of_collection_end']).clear()
-  self.sesh.find_element('xpath',xpath_dict['date_of_collection_end']).send_keys(list(ds_props['date_of_collection_end']
-  self.sesh.find_element('xpath',xpath_dict['data_type']).clear()
-  self.sesh.find_element('xpath',xpath_dict['data_type']).send_keys(add_string + ds_props['data_type'])
-  self.sesh.find_element('xpath',xpath_dict['series_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['series_name']).send_keys(add_string + ds_props['series_name'])
-  self.sesh.find_element('xpath',xpath_dict['series_info']).clear()
-  self.sesh.find_element('xpath',xpath_dict['series_info']).send_keys(add_string + ds_props['series_info'])
-  self.sesh.find_element('xpath',xpath_dict['software_name']).clear()
-  self.sesh.find_element('xpath',xpath_dict['software_name']).send_keys(add_string + ds_props['software_name'])
-  self.sesh.find_element('xpath',xpath_dict['software_version']).clear()
-  self.sesh.find_element('xpath',xpath_dict['software_version']).send_keys(add_string + ds_props['software_version'])
-  self.sesh.find_element('xpath',xpath_dict['related_material']).clear()
-  self.sesh.find_element('xpath',xpath_dict['related_material']).send_keys(add_string + ds_props['related_material'])
-  self.sesh.find_element('xpath',xpath_dict['related_dataset']).clear()
-  self.sesh.find_element('xpath',xpath_dict['related_dataset']).send_keys(add_string + ds_props['related_dataset'])
-  self.sesh.find_element('xpath',xpath_dict['other_reference']).clear()
-  self.sesh.find_element('xpath',xpath_dict['other_reference']).send_keys(add_string + ds_props['other_reference'])
-  self.sesh.find_element('xpath',xpath_dict['data_source']).clear()
-  self.sesh.find_element('xpath',xpath_dict['data_source']).send_keys(add_string + ds_props['data_source'])
-  self.sesh.find_element('xpath',xpath_dict['origin_hist_sources']).clear()
-  self.sesh.find_element('xpath',xpath_dict['origin_hist_sources']).send_keys(add_string + ds_props['origin_hist_sources'])  
-  self.sesh.find_element('xpath',xpath_dict['character_of_sources']).clear()
-  self.sesh.find_element('xpath',xpath_dict['character_of_sources']).send_keys(add_string + ds_props['character_of_sources'])  
-  self.sesh.find_element('xpath',xpath_dict['doc_to_sources']).clear()
-  self.sesh.find_element('xpath',xpath_dict['doc_to_sources']).send_keys(add_string + ds_props['doc_to_sources'])  
+  sesh.find_element('xpath',xpath_dict['subtitle']).clear()
+  sesh.find_element('xpath',xpath_dict['subtitle']).send_keys(add_string + ds_props['subtitle'])
+  sesh.find_element('xpath',xpath_dict['alternative_title']).clear()
+  sesh.find_element('xpath',xpath_dict['alternative_title']).send_keys(add_string + ds_props['alternative_title'])
+  sesh.find_element('xpath',xpath_dict['alternative_url']).clear()
+  sesh.find_element('xpath',xpath_dict['alternative_url']).send_keys(ds_props['alternative_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['other_id_agency']).clear()
+  sesh.find_element('xpath',xpath_dict['other_id_agency']).send_keys(add_string + ds_props['other_id_agency'])
+  sesh.find_element('xpath',xpath_dict['other_id_id']).clear()
+  sesh.find_element('xpath',xpath_dict['other_id_id']).send_keys(add_string + ds_props['other_id_id'])
+  sesh.find_element('xpath',xpath_dict['topic_class_term']).clear()
+  sesh.find_element('xpath',xpath_dict['topic_class_term']).send_keys(add_string + ds_props['topic_class_term'])
+  sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).clear()
+  sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).send_keys(add_string + ds_props['topic_class_cv_name'])
+  sesh.find_element('xpath',xpath_dict['topic_class_cv_url']).clear()
+  sesh.find_element('xpath',xpath_dict['topic_class_cv_url']).send_keys(ds_props['topic_class_cv_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['producer_name']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_name']).send_keys(add_string + ds_props['producer_name'])
+  sesh.find_element('xpath',xpath_dict['producer_affiliation']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_affiliation']).send_keys(add_string + ds_props['producer_affiliation'])
+  sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).send_keys(add_string + ds_props['producer_abbrev_name'])
+  sesh.find_element('xpath',xpath_dict['producer_url']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_url']).send_keys(ds_props['producer_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['producer_logo_url']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_logo_url']).send_keys(ds_props['producer_logo_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['producer_date']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_date']).send_keys(ds_props['producer_date'])
+  sesh.find_element('xpath',xpath_dict['producer_location']).clear()
+  sesh.find_element('xpath',xpath_dict['producer_location']).send_keys(add_string + ds_props['producer_location'])
+  sesh.find_element('xpath',xpath_dict['contributor_name']).clear()
+  sesh.find_element('xpath',xpath_dict['contributor_name']).send_keys(add_string + ds_props['contributor_name'])
+  sesh.find_element('xpath',xpath_dict['funding_info_agency']).clear()
+  sesh.find_element('xpath',xpath_dict['funding_info_agency']).send_keys(add_string + ds_props['funding_info_agency'])
+  sesh.find_element('xpath',xpath_dict['funding_info_id']).clear()
+  sesh.find_element('xpath',xpath_dict['funding_info_id']).send_keys(add_string + ds_props['funding_info_id'])
+  sesh.find_element('xpath',xpath_dict['distributor_name']).clear()
+  sesh.find_element('xpath',xpath_dict['distributor_name']).send_keys(add_string + ds_props['distributor_name'])
+  sesh.find_element('xpath',xpath_dict['distributor_affiliation']).clear()
+  sesh.find_element('xpath',xpath_dict['distributor_affiliation']).send_keys(add_string + ds_props['distributor_affiliation'])
+  sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).clear()
+  sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).send_keys(add_string + ds_props['distributor_abbrev_name'])
+  sesh.find_element('xpath',xpath_dict['distributor_url']).clear()
+  sesh.find_element('xpath',xpath_dict['distributor_url']).send_keys(ds_props['distributor_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['distributor_logo_url']).clear()
+  sesh.find_element('xpath',xpath_dict['distributor_logo_url']).send_keys(ds_props['distributor_logo_url']+add_string)
+  sesh.find_element('xpath',xpath_dict['distribution_date']).clear()
+  sesh.find_element('xpath',xpath_dict['distribution_date']).send_keys(ds_props['distribution_date'])
+  sesh.find_element('xpath',xpath_dict['time_period_start']).clear()
+  sesh.find_element('xpath',xpath_dict['time_period_start']).send_keys(ds_props['time_period_start'])
+  sesh.find_element('xpath',xpath_dict['time_period_end']).clear()
+  sesh.find_element('xpath',xpath_dict['time_period_end']).send_keys(ds_props['time_period_end'])
+  sesh.find_element('xpath',xpath_dict['date_of_collection_start']).clear()
+  sesh.find_element('xpath',xpath_dict['date_of_collection_start']).send_keys(ds_props['date_of_collection_start'])
+  sesh.find_element('xpath',xpath_dict['date_of_collection_end']).clear()
+  sesh.find_element('xpath',xpath_dict['date_of_collection_end']).send_keys(ds_props['date_of_collection_end'])
+  sesh.find_element('xpath',xpath_dict['data_type']).clear()
+  sesh.find_element('xpath',xpath_dict['data_type']).send_keys(add_string + ds_props['data_type'])
+  sesh.find_element('xpath',xpath_dict['series_name']).clear()
+  sesh.find_element('xpath',xpath_dict['series_name']).send_keys(add_string + ds_props['series_name'])
+  sesh.find_element('xpath',xpath_dict['series_info']).clear()
+  sesh.find_element('xpath',xpath_dict['series_info']).send_keys(add_string + ds_props['series_info'])
+  sesh.find_element('xpath',xpath_dict['software_name']).clear()
+  sesh.find_element('xpath',xpath_dict['software_name']).send_keys(add_string + ds_props['software_name'])
+  sesh.find_element('xpath',xpath_dict['software_version']).clear()
+  sesh.find_element('xpath',xpath_dict['software_version']).send_keys(add_string + ds_props['software_version'])
+  sesh.find_element('xpath',xpath_dict['related_material']).clear()
+  sesh.find_element('xpath',xpath_dict['related_material']).send_keys(add_string + ds_props['related_material'])
+  sesh.find_element('xpath',xpath_dict['related_dataset']).clear()
+  sesh.find_element('xpath',xpath_dict['related_dataset']).send_keys(add_string + ds_props['related_dataset'])
+  sesh.find_element('xpath',xpath_dict['other_reference']).clear()
+  sesh.find_element('xpath',xpath_dict['other_reference']).send_keys(add_string + ds_props['other_reference'])
+  sesh.find_element('xpath',xpath_dict['data_source']).clear()
+  sesh.find_element('xpath',xpath_dict['data_source']).send_keys(add_string + ds_props['data_source'])
+  sesh.find_element('xpath',xpath_dict['origin_hist_sources']).clear()
+  sesh.find_element('xpath',xpath_dict['origin_hist_sources']).send_keys(add_string + ds_props['origin_hist_sources'])  
+  sesh.find_element('xpath',xpath_dict['character_of_sources']).clear()
+  sesh.find_element('xpath',xpath_dict['character_of_sources']).send_keys(add_string + ds_props['character_of_sources'])  
+  sesh.find_element('xpath',xpath_dict['doc_to_sources']).clear()
+  sesh.find_element('xpath',xpath_dict['doc_to_sources']).send_keys(add_string + ds_props['doc_to_sources'])  
 
 #Also supports dataset template
-def test_dataset_metadata(tc, add_string='', is_update=FALSE, xpath_dict=NULL):
+def test_dataset_metadata(sesh, tc, add_string='', is_update=False, xpath_dict=None):
   # if (is_update) {
   #   time.sleep(999999999)
   # }
@@ -561,73 +561,73 @@ def test_dataset_metadata(tc, add_string='', is_update=FALSE, xpath_dict=NULL):
   
   #For some reason, dates are false when tested identical. I'm not sure if some character is being replaced on the backend or what. But this is fine
   #We don't currently test some dropdowns results because it is extremely convoluted to test the values of jquery dropdowns.
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['title']).get_attribute('value'), add_string+ds_props['title'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_name']).get_attribute('value'), add_string+ds_props['author_name'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_affiliation']).get_attribute('value'), add_string+ds_props['author_affiliation'])
-  #tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_id_type']).get_attribute('value'), add_string+ds_props['author_id_type'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['author_id']).get_attribute('value'), add_string+ds_props['author_id'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contact_name']).get_attribute('value'), add_string+ds_props['contact_name'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contact_affiliation']).get_attribute('value'), add_string+ds_props['contact_affiliation'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contact_email']).get_attribute('value'), add_string+ds_props['contact_email'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['description']).get_attribute('value'), add_string+ds_props['description'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['date']).get_attribute('value'), ds_props['date'])
-  #tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['subject']).get_attribute('value'), add_string+ds_props['subject'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['keyword_term']).get_attribute('value'), add_string+ds_props['keyword_term'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['keyword_cv_name']).get_attribute('value'), add_string+ds_props['keyword_cv_name'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['keyword_cv_url']).get_attribute('value'), ds_props['keyword_cv_url']+add_string)
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_citation']).get_attribute('value'), add_string+ds_props['related_pub_citation'])
-  #tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_id_type']).get_attribute('value'), add_string+ds_props['related_pub_id_type']
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['title']).get_attribute('value'), add_string+ds_props['title'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['author_name']).get_attribute('value'), add_string+ds_props['author_name'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['author_affiliation']).get_attribute('value'), add_string+ds_props['author_affiliation'])
+  #tc.assertEqual(sesh.find_element('xpath',xpath_dict['author_id_type']).get_attribute('value'), add_string+ds_props['author_id_type'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['author_id']).get_attribute('value'), add_string+ds_props['author_id'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['contact_name']).get_attribute('value'), add_string+ds_props['contact_name'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['contact_affiliation']).get_attribute('value'), add_string+ds_props['contact_affiliation'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['contact_email']).get_attribute('value'), add_string+ds_props['contact_email'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['description']).get_attribute('value'), add_string+ds_props['description'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['date']).get_attribute('value'), ds_props['date'])
+  #tc.assertEqual(sesh.find_element('xpath',xpath_dict['subject']).get_attribute('value'), add_string+ds_props['subject'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['keyword_term']).get_attribute('value'), add_string+ds_props['keyword_term'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['keyword_cv_name']).get_attribute('value'), add_string+ds_props['keyword_cv_name'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['keyword_cv_url']).get_attribute('value'), ds_props['keyword_cv_url']+add_string)
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['related_pub_citation']).get_attribute('value'), add_string+ds_props['related_pub_citation'])
+  #tc.assertEqual(sesh.find_element('xpath',xpath_dict['related_pub_id_type']).get_attribute('value'), add_string+ds_props['related_pub_id_type']
   #TODO: I think this doesn't work because it needs the above set... but weirdly I thought it worked before???? Well it doesn't work now
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_id']).get_attribute('value'), add_string+ds_props['related_pub_id'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_pub_url']).get_attribute('value'), ds_props['related_pub_url']+add_string)
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['notes']).get_attribute('value'), add_string+ds_props['notes'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['depositor']).get_attribute('value'), add_string+ds_props['depositor'])
-  tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['deposit_date']).get_attribute('value'), ds_props['deposit_date'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['related_pub_id']).get_attribute('value'), add_string+ds_props['related_pub_id'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['related_pub_url']).get_attribute('value'), ds_props['related_pub_url']+add_string)
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['notes']).get_attribute('value'), add_string+ds_props['notes'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['depositor']).get_attribute('value'), add_string+ds_props['depositor'])
+  tc.assertEqual(sesh.find_element('xpath',xpath_dict['deposit_date']).get_attribute('value'), ds_props['deposit_date'])
   
   if is_update:
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['subtitle']).get_attribute('value'), add_string+ds_props['subtitle'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['alternative_title']).get_attribute('value'), add_string+ds_props['alternative_title'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['alternative_url']).get_attribute('value'), ds_props['alternative_url']+add_string)
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['other_id_agency']).get_attribute('value'), add_string+ds_props['other_id_agency'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['other_id_id']).get_attribute('value'), add_string+ds_props['other_id_id'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['topic_class_term']).get_attribute('value'), add_string+ds_props['topic_class_term'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).get_attribute('value'), add_string+ds_props['topic_class_cv_name'])
-    # tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['language']).get_attribute('value'), add_string+ds_props['language'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_name']).get_attribute('value'), add_string+ds_props['producer_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_affiliation']).get_attribute('value'), add_string+ds_props['producer_affiliation'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).get_attribute('value'), add_string+ds_props['producer_abbrev_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_url']).get_attribute('value'), ds_props['producer_url']+add_string)
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_logo_url']).get_attribute('value'), ds_props['producer_logo_url']+add_string)
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['subtitle']).get_attribute('value'), add_string+ds_props['subtitle'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['alternative_title']).get_attribute('value'), add_string+ds_props['alternative_title'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['alternative_url']).get_attribute('value'), ds_props['alternative_url']+add_string)
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['other_id_agency']).get_attribute('value'), add_string+ds_props['other_id_agency'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['other_id_id']).get_attribute('value'), add_string+ds_props['other_id_id'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['topic_class_term']).get_attribute('value'), add_string+ds_props['topic_class_term'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['topic_class_cv_name']).get_attribute('value'), add_string+ds_props['topic_class_cv_name'])
+    # tc.assertEqual(sesh.find_element('xpath',xpath_dict['language']).get_attribute('value'), add_string+ds_props['language'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_name']).get_attribute('value'), add_string+ds_props['producer_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_affiliation']).get_attribute('value'), add_string+ds_props['producer_affiliation'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_abbrev_name']).get_attribute('value'), add_string+ds_props['producer_abbrev_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_url']).get_attribute('value'), ds_props['producer_url']+add_string)
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_logo_url']).get_attribute('value'), ds_props['producer_logo_url']+add_string)
     #NOTE: This line was an equivalent test in R
-    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['producer_date']).get_attribute('value'), ds_props['producer_date'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['producer_location']).get_attribute('value'), add_string+ds_props['producer_location'])
-    # tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contributor_type']).get_attribute('value'), add_string+ds_props['contributor_type'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['contributor_name']).get_attribute('value'), add_string+ds_props['contributor_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['funding_info_agency']).get_attribute('value'), add_string+ds_props['funding_info_agency'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['funding_info_id']).get_attribute('value'), add_string+ds_props['funding_info_id'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_name']).get_attribute('value'), add_string+ds_props['distributor_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_affiliation']).get_attribute('value'), add_string+ds_props['distributor_affiliation'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).get_attribute('value'), add_string+ds_props['distributor_abbrev_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_url']).get_attribute('value'), ds_props['distributor_url']+add_string)
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['distributor_logo_url']).get_attribute('value'), ds_props['distributor_logo_url']+add_string)
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_date']).get_attribute('value'), ds_props['producer_date'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['producer_location']).get_attribute('value'), add_string+ds_props['producer_location'])
+    # tc.assertEqual(sesh.find_element('xpath',xpath_dict['contributor_type']).get_attribute('value'), add_string+ds_props['contributor_type'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['contributor_name']).get_attribute('value'), add_string+ds_props['contributor_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['funding_info_agency']).get_attribute('value'), add_string+ds_props['funding_info_agency'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['funding_info_id']).get_attribute('value'), add_string+ds_props['funding_info_id'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['distributor_name']).get_attribute('value'), add_string+ds_props['distributor_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['distributor_affiliation']).get_attribute('value'), add_string+ds_props['distributor_affiliation'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['distributor_abbrev_name']).get_attribute('value'), add_string+ds_props['distributor_abbrev_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['distributor_url']).get_attribute('value'), ds_props['distributor_url']+add_string)
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['distributor_logo_url']).get_attribute('value'), ds_props['distributor_logo_url']+add_string)
     #NOTE: The 5 lines below test equivalent before, so if they blow up in python try that again
-    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['distribution_date']).get_attribute('value'), ds_props['distribution_date'])
-    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['time_period_start']).get_attribute('value'), ds_props['time_period_start'])
-    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['time_period_end']).get_attribute('value'), ds_props['time_period_end'])
-    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['date_of_collection_start']).get_attribute('value'), ds_props['date_of_collection_start'])
-    tc.assertEqual(self.sesh.find_element('xpath',xpath_dict['date_of_collection_end']).get_attribute('value'), ds_props['date_of_collection_end'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['data_type']).get_attribute('value'), add_string+ds_props['data_type'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['series_name']).get_attribute('value'), add_string+ds_props['series_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['series_info']).get_attribute('value'), add_string+ds_props['series_info'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['software_name']).get_attribute('value'), add_string+ds_props['software_name'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['software_version']).get_attribute('value'), add_string+ds_props['software_version'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_material']).get_attribute('value'), add_string+ds_props['related_material'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['related_dataset']).get_attribute('value'), add_string+ds_props['related_dataset'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['other_reference']).get_attribute('value'), add_string+ds_props['other_reference'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['data_source']).get_attribute('value'), add_string+ds_props['data_source'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['origin_hist_sources']).get_attribute('value'), add_string+ds_props['origin_hist_sources'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['character_of_sources']).get_attribute('value'), add_string+ds_props['character_of_sources'])
-    tc.assertEqual((self.sesh.find_element('xpath',xpath_dict['doc_to_sources']).get_attribute('value'), add_string+ds_props['doc_to_sources'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['distribution_date']).get_attribute('value'), ds_props['distribution_date'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['time_period_start']).get_attribute('value'), ds_props['time_period_start'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['time_period_end']).get_attribute('value'), ds_props['time_period_end'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['date_of_collection_start']).get_attribute('value'), ds_props['date_of_collection_start'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['date_of_collection_end']).get_attribute('value'), ds_props['date_of_collection_end'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['data_type']).get_attribute('value'), add_string+ds_props['data_type'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['series_name']).get_attribute('value'), add_string+ds_props['series_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['series_info']).get_attribute('value'), add_string+ds_props['series_info'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['software_name']).get_attribute('value'), add_string+ds_props['software_name'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['software_version']).get_attribute('value'), add_string+ds_props['software_version'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['related_material']).get_attribute('value'), add_string+ds_props['related_material'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['related_dataset']).get_attribute('value'), add_string+ds_props['related_dataset'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['other_reference']).get_attribute('value'), add_string+ds_props['other_reference'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['data_source']).get_attribute('value'), add_string+ds_props['data_source'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['origin_hist_sources']).get_attribute('value'), add_string+ds_props['origin_hist_sources'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['character_of_sources']).get_attribute('value'), add_string+ds_props['character_of_sources'])
+    tc.assertEqual(sesh.find_element('xpath',xpath_dict['doc_to_sources']).get_attribute('value'), add_string+ds_props['doc_to_sources'])
 
 # #NOTE: We probably don't need this anymore now that we are adding it to a sub-dataverse that we are deleting
 # def delete_template_via_ui(id, dv_id):
@@ -639,7 +639,7 @@ def test_dataset_metadata(tc, add_string='', is_update=FALSE, xpath_dict=NULL):
 #     if id == tr_id:
 #       tr$findChildElement(value='td[4]/div/a[3]').click()
 #       time.sleep(.2)
-#       self.sesh.find_element('xpath','//*[@id="manageTemplatesForm:contDeleteTemplateBtn"]').click()
+#       sesh.find_element('xpath','//*[@id="manageTemplatesForm:contDeleteTemplateBtn"]').click()
 #       return(TRUE)
 #   
 #   print(paste("Unable to delete dataset template with id:", id))
