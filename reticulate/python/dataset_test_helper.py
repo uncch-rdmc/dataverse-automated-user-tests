@@ -1,10 +1,12 @@
+dataset_name = "test_dataset"
+
 #################################
 ### Dataset Test Dictionaries ###
 #################################
 
 ds_props = {
   #'host_dataverse': '',
-  'title': 'title', #=dataset_name,
+  'title': dataset_name,
   'author_name': 'author',
   'author_affiliation': 'affiliation',
   #'author_id_type': 'ORCID',

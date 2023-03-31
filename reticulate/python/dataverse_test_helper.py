@@ -1,12 +1,14 @@
+dataverse_name = "test_dataverse"
+
 ###################################
 ### Dataverse Test Dictionaries ###
 ###################################
 
 dv_props = {
   'host_dataverse': 'Root',
-  'name': 'name', #dataverse_name,
+  'name': dataverse_name,
   'affiliation': 'Odum',
-  'identifier': 'identifier', #dataverse_name,
+  'identifier': dataverse_name,
   'category': 'Journal',
   'email': 'test@example.com',
   'description': 'this is a test description'
@@ -26,6 +28,8 @@ def set_dataverse_metadata(sesh, tc, add_string=''):
   sesh.find_element('xpath','//*[@id="dataverseForm:identifier"]').clear()
   sesh.find_element('xpath','//*[@id="dataverseForm:identifier"]').send_keys(add_string + dv_props['identifier'])
   #TODO: How are we fixing this in python?
+  dataverse_name = add_string+dv_props['identifier']
+  print("dataverse_test_helper dataverse_name:" + dataverse_name)
   #dataverse_name <<- paste(add_string, dv_props['identifier'])
   sesh.find_element('xpath','//*[@id="dataverseForm:dataverseCategory"]').send_keys(list(dv_props['category']))
   sesh.find_element('xpath','//*[@id="dataverseForm:j_idt271:0:contactEmail"]').clear()

@@ -101,7 +101,13 @@ r05_mainpath_create_metadata_template <- function() {
   Sys.sleep(default_wait)
   sesh$findElement(value='//*[@id="templateForm:templateName"]')$sendKeysToElement(list("test template create")) #Create template title
   set_dataset_metadata_edit(add_string='create', xpath_dict=ds_template_xpaths)
-
+  
+  sesh$findElement(value='//*[@id="templateForm:j_idt620:0:j_idt623:0:instr"]')$clickElement()
+  Sys.sleep(.2)
+  sesh$sendKeysToActiveElement(list(paste("test", "WOWOWOWOW", sep='')))
+  Sys.sleep(999999999999)
+  
+    
   sesh$findElement(value='//*[@id="templateForm:j_idt892"]')$clickElement() #click "Save + Add Terms"
 
   expect_identical(paste(sesh$findElement(value='//*[@id="messagePanel"]/div/div[1]')$getElementAttribute("class")), "alert alert-success") #confirm success alert
@@ -206,7 +212,7 @@ r10_mainpath_edit_dataset <- function() {
 load_dataverse_admin_info_from_file <- function() {
   #Currently this is programmed to read from a secret_table file located at a fixed directory
   #TODO: This needs to be made dynamic once I understand how to do this better in rstudio
-  dframe <- read.table(file='/Users/madunlap/Documents/GitHub/secret_table.txt',header=FALSE,
+  dframe <- read.table(file='(/Users/madunlap/Documents/GitHub/secret_table_user_test.txt)',header=FALSE,
                        sep='=',col.names=c('key','value'))
   dtable <- data.table(dframe,key='key')
   

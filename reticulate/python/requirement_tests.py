@@ -2,8 +2,8 @@ import time, unittest, os, traceback
 
 #TODO: These import paths will almost certainly break when running this code outside R. Not sure how to fix this.
 #      ... Ideally there would be some way to tell reticulate what directory to work from?
-from python.dataset_test_helper import *
-from python.dataverse_test_helper import *
+import python.dataset_test_helper as dst
+import python.dataverse_test_helper as dvt
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
@@ -56,15 +56,15 @@ class RequirementTests:
     time.sleep(2) # wait for host list to load
     self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
     time.sleep(.5) # wait after click for ui to be usable
-    set_dataverse_metadata(self.sesh, tc, add_string="create") #Metadata that is same for create/edit
+    dvt.set_dataverse_metadata(self.sesh, tc, add_string="create") #Metadata that is same for create/edit
    
     ### Test Save ###
-    
     tc.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
-    tc.assertEqual(DV_URL+'/dataverse/'+dataverse_name+'/', self.sesh.current_url) #confirm page
+    print("requirement_test dvt.dataverse_name:" + dvt.dataverse_name)
+    tc.assertEqual(DV_URL+'/dataverse/'+dvt.dataverse_name+'/', self.sesh.current_url) #confirm page
     
     test_dataverse_metadata(self.sesh, tc, add_string="create")
-    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dvt.dataverse_name)
     
     ### Dataverse Page - Publish ###
     
@@ -76,7 +76,7 @@ class RequirementTests:
     dataverse_id <<- sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
   
   def r04_mainpath_edit_dataverse(self, tc):
-    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dvt.dataverse_name)
     time.sleep(default_wait)
     self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
     self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
@@ -87,7 +87,7 @@ class RequirementTests:
     time.sleep(1) #wait before switching pages in r05
   
   def r05_mainpath_create_metadata_template(self, tc):
-    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dvt.dataverse_name)
     time.sleep(default_wait)
   
     self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
@@ -142,7 +142,7 @@ class RequirementTests:
     test_template_license(self.sesh, tc, add_string='edit')
   
   def r09_mainpath_create_dataset(self, tc):
-    self.sesh.get(DV_URL+'/dataverse/'+dataverse_name)
+    self.sesh.get(DV_URL+'/dataverse/'+dvt.dataverse_name)
     
     self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
     self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[2]/a').click() #click new dataset

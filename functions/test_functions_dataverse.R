@@ -28,7 +28,6 @@ set_dataverse_metadata <- function(add_string='') {
   sesh$findElement(value='//*[@id="dataverseForm:description"]')$sendKeysToElement(list(paste(add_string, dv_props['description'], sep='')))
   
   sesh$findElement(value='//*[@id="dataverseForm:save"]')$clickElement() #create dataverse
- 
 }
 
 test_dataverse_metadata <- function(add_string='') {
