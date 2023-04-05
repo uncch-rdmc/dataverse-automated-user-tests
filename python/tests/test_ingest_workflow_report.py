@@ -12,6 +12,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 #Note: I was seeing duplicate templates early into porting the code. I think its resolved but be aware
 class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, DatasetTestingMixin):
+    def __init__(self, *args, **kwargs):
+        self.screenshots = kwargs.pop('screenshots', False)
+        super(IngestWorkflowReportTestCase, self).__init__( *args, **kwargs)
+
     def setUp(self):
         self.username = os.getenv('DATAVERSE_TEST_USER_USERNAME_BUILTIN')
         self.password = os.getenv('DATAVERSE_TEST_USER_PASSWORD_BUILTIN')
@@ -80,10 +84,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
 
+        return {}
+
     def get_api_token(self):
         #Note: This code assumes you have already clicked "Create Token" with this account.
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=apiTokenTab')
         self.api_token = self.sesh.find_element('xpath', '//*[@id="apiToken"]/pre/code').text
+
+        return {}
     
     def r03_mainpath_create_sub_dataverse(self):
         self.sesh.get(self.dv_url)
@@ -118,6 +126,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.dataverse_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
 
+        return {}
+
     def r04_mainpath_edit_dataverse(self):
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         time.sleep(self.default_wait)
@@ -134,6 +144,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.confirm_dataverse_metadata()
         
         time.sleep(1) #wait before switching pages in r05
+
+        return {}
     
     def r05_mainpath_create_metadata_template(self):
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
@@ -184,6 +196,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.confirm_template_license(add_string='create')
+
+        return {}
     
     def r06_mainpath_edit_metadata_template(self):
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
@@ -209,6 +223,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.confirm_template_license(add_string='edit')
+
+        return {}
     
     def r09_mainpath_create_dataset(self):
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
@@ -239,6 +255,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
         
         time.sleep(self.default_wait)
+
+        return {}
     
     def r10_mainpath_edit_dataset(self):
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
@@ -259,4 +277,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         
         self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths) 
     
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click cancel out of edit after testing
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
+
+        return {}
