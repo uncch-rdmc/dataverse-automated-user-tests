@@ -1,4 +1,5 @@
-import time, unittest, os, requests, re
+import time, unittest, os, requests, re, base64, PIL  #NOTE: We import PIL for screenshots. It may be nice to not require this for everyone
+from io import BytesIO
 from urllib import parse
 from tests.mixins.dataverse_testing_mixin import *
 from tests.mixins.dataset_testing_mixin import *
@@ -27,6 +28,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
         self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        if self.screenshots:
+            self.sesh.set_window_size(800,600)
         
         # #after starting, open a new one to an old one https://stackoverflow.com/questions/8344776/
         # self.sesh = webdriver.Remote(command_executor='http://localhost:54570', desired_capabilities={})
@@ -70,12 +73,17 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             except Exception as e:
                 print("Unable to delete dataverse on tearDown. Error: " + e)
 
+    def get_screenshot_as_pil(self):
+        if self.screenshots:
+            return PIL.Image.open(BytesIO(base64.b64decode(self.sesh.get_screenshot_as_base64())))
 
     ######################
     ### SUB-TEST CALLS ###
     ######################
 
     def r01alt_mainpath_builtin_auth(self):
+        results = {}
+
         self.sesh.get(f'{self.dv_url}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:0:credValue"]').send_keys(self.username)
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:1:sCredValue"]').send_keys(self.password)
@@ -84,12 +92,15 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
 
-        return {}
+        if self.screenshots: results['screenshot1'] = self.get_screenshot_as_pil() #self.sesh.get_screenshot_as_base64()#get_screenshot_as_png()
+
+        return results
 
     def get_api_token(self):
         #Note: This code assumes you have already clicked "Create Token" with this account.
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=apiTokenTab')
         self.api_token = self.sesh.find_element('xpath', '//*[@id="apiToken"]/pre/code').text
+
 
         return {}
     
