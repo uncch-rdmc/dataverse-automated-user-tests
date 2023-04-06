@@ -1,0 +1,52 @@
+{# template.html #}
+
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Results</title>
+</head>
+
+<body>
+
+{#  Structure:
+    - Intro section with list of all requirements tested
+    - Subsequent sections for each requirement tested
+      - List of steps for each requirement
+      - Screenshots for each step when relevant
+
+    ... Are we basing these requirements off the 25 thu-mai provided, or the walkthrough she emailed
+    ... ... I think we are doing the 25 provided, I'll break out the pieces of her workflow
+
+
+
+#}
+
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r03_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r04_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r05_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r06_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r09_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r10_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r11_title}}</p>
+<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{r12_title}}</p>
+
+
+{{r01_s01}}
+
+
+
+
+  {# <h1>{{ test_name }} Results</h1>
+  <ul>
+  {% for student in students %}
+    <li>
+      <em>{{ student.name }}:</em> {{ student.score }}/{{ max_score }}
+    </li>
+  {% endfor %}
+  </ul> #}
+</body>
+</html>
