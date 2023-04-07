@@ -15,14 +15,15 @@ def main():
 
     ingest_test = t.IngestWorkflowReportTestCase(screenshots=True)
     ingest_test.setUp()
-
-    test01_result = ingest_test.r01alt_mainpath_builtin_auth()
+    result = ingest_test.test_requirements()
+    ingest_test.tearDown()
 
     #print(template.render(**text))
 
     with open('output.html', 'w') as f:
         #f.write(template.render(**text))
-        f.write(template.render(text=text, screenshots=test01_result)) #we want them in the dictionary for template iteration
+        # print(result)
+        f.write(template.render(text=text, screenshots=result)) #we want them in the dictionary for template iteration
 
     print("rendered")
 

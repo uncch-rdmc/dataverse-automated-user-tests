@@ -1,4 +1,4 @@
-import time, unittest, os, requests, re#, base64, PIL  #NOTE: We import PIL for screenshots. It may be nice to not require this for everyone
+import time, unittest, os, requests, re
 from io import BytesIO
 from urllib import parse
 from python.tests.mixins.dataverse_testing_mixin import *
@@ -10,6 +10,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from webdriver_manager.chrome import ChromeDriverManager
+
+#NOTE: Our use of step in the code is for screenshot taking. Sometimes the code to confirm a step happens after another step has been done.
 
 #Note: I was seeing duplicate templates early into porting the code. I think its resolved but be aware
 class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, DatasetTestingMixin):
@@ -29,7 +31,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
         self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         if self.screenshots:
-            self.sesh.set_window_size(800,600)
+            self.sesh.set_window_size(1200,827) #675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
         
         # #after starting, open a new one to an old one https://stackoverflow.com/questions/8344776/
         # self.sesh = webdriver.Remote(command_executor='http://localhost:54570', desired_capabilities={})
@@ -50,12 +52,15 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         screenshots.update(self.r01alt_mainpath_builtin_auth())
         self.get_api_token()
         screenshots.update(self.r03_mainpath_create_sub_dataverse())
-        screenshots.update(self.r04_mainpath_edit_dataverse())
-        screenshots.update(self.r05_mainpath_create_metadata_template())
-        screenshots.update(self.r06_mainpath_edit_metadata_template())
-        screenshots.update(self.r09_mainpath_create_dataset())
-        screenshots.update(self.r10_mainpath_edit_dataset())
+        # screenshots.update(self.r04_mainpath_edit_dataverse())
+        # screenshots.update(self.r05_mainpath_create_metadata_template())
+        # screenshots.update(self.r06_mainpath_edit_metadata_template())
+        # screenshots.update(self.r09_mainpath_create_dataset())
+        # screenshots.update(self.r10_mainpath_edit_dataset())
         print("Tests Complete")
+
+        #TODO: We may need to sort the screenshots by key if we have to add any out of order
+
         return screenshots
 
     #Written to allow calling these deletes directly for cleanup outside of the normal test run
@@ -81,9 +86,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
     def r01alt_mainpath_builtin_auth(self):
         results = {}
-        prefix = 'r01alt'
+        req = 'r01alt'
 
-        step = 1
+        part = '01'
 
         print(self.dv_url)
         self.sesh.get(f'{self.dv_url}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
@@ -94,7 +99,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
 
-        if self.screenshots: results['screenshot1'] = self.sesh.get_screenshot_as_base64()
+        #if self.screenshots: results['screenshot1'] = self.sesh.get_screenshot_as_base64()
 
         return results
 
@@ -107,19 +112,37 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         return {}
     
     def r03_mainpath_create_sub_dataverse(self):
+        results = {}
+        req = 'r03'
+        shot = 0
+
+        part = '01'
         self.sesh.get(self.dv_url)
         ### Main Landing Page ###
+
+        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=1)}'] = self.sesh.get_screenshot_as_base64()
+        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
+        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
+        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
+        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
+        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
+
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
+        part = '02'
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[1]/a').click() #click new dataverse
         
         ### Create Dataverse Page ###
+        part = '03'
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').clear()
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(self.dv_props["host_dataverse"])
         time.sleep(2) # wait for host list to load
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
         time.sleep(1) # wait after click for ui to be usable
         self.set_dataverse_metadata(add_string="create") #Metadata that is same for create/edit
-    
+        part = '04'
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
+        
+
         #time.sleep(99999999)
 
         ### Test Save ###
@@ -131,7 +154,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         
         ### Dataverse Page - Publish ###
-        
+        part = '05'
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/button').click() #click publish
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:j_idt431"]').click() #confirm publish
         
@@ -139,15 +162,21 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.dataverse_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
 
-        return {}
+        return results
 
     def r04_mainpath_edit_dataverse(self):
+        results = {}
+        req = 'r04'
+
+        part = '01'
+
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         time.sleep(self.default_wait)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
         
         self.set_dataverse_metadata()
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
         time.sleep(self.default_wait) # I think our code is picking up on the previous page div, so we wait before getting the div
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
 
@@ -158,9 +187,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         
         time.sleep(1) #wait before switching pages in r05
 
-        return {}
+        return results
     
     def r05_mainpath_create_metadata_template(self):
+        results = {}
+        req = 'r05'
+
+        part = '01'
+
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         time.sleep(self.default_wait)
     
@@ -210,9 +244,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.confirm_template_license(add_string='create')
 
-        return {}
+        return results
     
     def r06_mainpath_edit_metadata_template(self):
+        results = {}
+        req = 'r06'
+
+        part = '01'
+
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
         self.set_dataset_metadata_template_instructions(add_string='edit')
         #See note in R05 about the similar code
@@ -237,9 +276,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.confirm_template_license(add_string='edit')
 
-        return {}
+        return results
     
     def r09_mainpath_create_dataset(self):
+        results = {}
+        req = 'r09'
+
+        part = '01'
+        
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
@@ -269,9 +313,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         
         time.sleep(self.default_wait)
 
-        return {}
+        return results
     
     def r10_mainpath_edit_dataset(self):
+        results = {}
+        req = 'r10'
+
+        part = '01'
+        
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
     
@@ -292,4 +341,4 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
 
-        return {}
+        return results

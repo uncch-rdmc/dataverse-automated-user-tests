@@ -41,8 +41,6 @@ class DataverseTestingMixin(object):
         self.sesh.find_element('xpath','//*[@id="dataverseForm:description"]').clear()
         self.sesh.find_element('xpath','//*[@id="dataverseForm:description"]').send_keys(add_string + self.dv_props['description'])
 
-        self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
-
     def confirm_dataverse_metadata(self, add_string=''):
         #TODO: Do we really need this navigate?
         #      ... Also, we could have maybe just tested this content from the edit page after saving. But maybe this is better?

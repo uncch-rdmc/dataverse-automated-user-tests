@@ -4,22 +4,22 @@ text = {
 
     # tests
 
-    'r01_title': 'Logging in to Dataverse',
-    'r01_p01': 'On the Dataverse landing page, click on the Log In link located at the upper right-hand corner. ',
-    'r01_p02': 'Select https://sso.unc.edu/idp in the institution drop down list. ',
-    'r01_p03': 'Click the Continue button.',
-    'r01_p04': 'Follow the prompts for UNC SSO to enter login credentials.',
+    # 'r01_title': 'Logging in to Dataverse',
+    # 'r01_p01': 'On the Dataverse landing page, click on the Log In link located at the upper right-hand corner. ',
+    # 'r01_p02': 'Select https://sso.unc.edu/idp in the institution drop down list. ',
+    # 'r01_p03': 'Click the Continue button.',
+    # 'r01_p04': 'Follow the prompts for UNC SSO to enter login credentials.',
 
-    'r02_title': 'Assigning user/group roles',
-    'r02_p01': 'Click on the Edit button located at the upper right-hand side of the screen.',
-    'r02_p02': 'In the drop-down box that appears, select the Permissions option.',
-    'r02_p03': 'Click on the Roles section header to expand the section.',
-    'r02_p04': 'Review the definitions for the available role types listed. If a desired role type is not listed, see III. Adding a new user/group role.',
-    'r02_p05': 'Click on the Users/Groups section header to expand the section.',
-    'r02_p06': 'Click on the Assign Roles to Users/Groups button.',
-    'r02_p07': 'In the Assign Role dialogue box that appears, enter the user or group name in the Users/Groups field.',
-    'r02_p08': 'Select the appropriate role for the user/group by clicking on the radio button next to the desired Role option.',
-    'r02_p09': 'Click on the Save Changes button.',
+    # 'r02_title': 'Assigning user/group roles',
+    # 'r02_p01': 'Click on the Edit button located at the upper right-hand side of the screen.',
+    # 'r02_p02': 'In the drop-down box that appears, select the Permissions option.',
+    # 'r02_p03': 'Click on the Roles section header to expand the section.',
+    # 'r02_p04': 'Review the definitions for the available role types listed. If a desired role type is not listed, see III. Adding a new user/group role.',
+    # 'r02_p05': 'Click on the Users/Groups section header to expand the section.',
+    # 'r02_p06': 'Click on the Assign Roles to Users/Groups button.',
+    # 'r02_p07': 'In the Assign Role dialogue box that appears, enter the user or group name in the Users/Groups field.',
+    # 'r02_p08': 'Select the appropriate role for the user/group by clicking on the radio button next to the desired Role option.',
+    # 'r02_p09': 'Click on the Save Changes button.',
     
     # missing R02 part 2 (III)
 
