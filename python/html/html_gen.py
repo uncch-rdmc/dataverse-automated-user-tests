@@ -1,11 +1,31 @@
-import jinja2
-from text import * #Imports a text variable that stores our strings
-environment = jinja2.Environment(loader=jinja2.FileSystemLoader("python/html/")) #TODO: Figure out how to do paths better?
-template = environment.get_template("template.html")
+import jinja2, sys
+from python.html.text import *
+from ..tests import test_ingest_workflow_report as t
+#import html.text #Imports a text variable that stores our strings
 
-#print(template.render(**text))
+def main():
+    if sys.version_info < (3, 7):
+        print("Code requires Python 3.7 or later for ordered dictionaries")
+        print("Exiting...")
+        sys.exit(1)
 
-with open('output.html', 'w') as f:
-    f.write(template.render(**text))
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader("python/html/")) #TODO: Figure out how to do paths better?
+    template = environment.get_template("template.html")
 
-print("rendered")
+
+    ingest_test = t.IngestWorkflowReportTestCase(screenshots=True)
+    ingest_test.setUp()
+
+    test01_result = ingest_test.r01alt_mainpath_builtin_auth()
+
+    #print(template.render(**text))
+
+    with open('output.html', 'w') as f:
+        #f.write(template.render(**text))
+        f.write(template.render(text=text, screenshots=test01_result)) #we want them in the dictionary for template iteration
+
+    print("rendered")
+
+if __name__ == "__main__":
+    print(__package__)
+    main()

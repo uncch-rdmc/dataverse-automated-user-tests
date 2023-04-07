@@ -1,8 +1,8 @@
-import time, unittest, os, requests, re, base64, PIL  #NOTE: We import PIL for screenshots. It may be nice to not require this for everyone
+import time, unittest, os, requests, re#, base64, PIL  #NOTE: We import PIL for screenshots. It may be nice to not require this for everyone
 from io import BytesIO
 from urllib import parse
-from tests.mixins.dataverse_testing_mixin import *
-from tests.mixins.dataset_testing_mixin import *
+from python.tests.mixins.dataverse_testing_mixin import *
+from python.tests.mixins.dataset_testing_mixin import *
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -46,15 +46,17 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
     #TODO: Maybe add some options to these functions to slim down some of the tests. For example, dataset template instructions which take forever. 
     def test_requirements(self):
-        self.r01alt_mainpath_builtin_auth()
+        screenshots = {}
+        screenshots.update(self.r01alt_mainpath_builtin_auth())
         self.get_api_token()
-        self.r03_mainpath_create_sub_dataverse() 
-        self.r04_mainpath_edit_dataverse()
-        self.r05_mainpath_create_metadata_template()
-        self.r06_mainpath_edit_metadata_template()
-        self.r09_mainpath_create_dataset()
-        self.r10_mainpath_edit_dataset()
+        screenshots.update(self.r03_mainpath_create_sub_dataverse())
+        screenshots.update(self.r04_mainpath_edit_dataverse())
+        screenshots.update(self.r05_mainpath_create_metadata_template())
+        screenshots.update(self.r06_mainpath_edit_metadata_template())
+        screenshots.update(self.r09_mainpath_create_dataset())
+        screenshots.update(self.r10_mainpath_edit_dataset())
         print("Tests Complete")
+        return screenshots
 
     #Written to allow calling these deletes directly for cleanup outside of the normal test run
     def delete_dv_resources(self, ds_id=None, dv_id=None):
@@ -73,17 +75,17 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             except Exception as e:
                 print("Unable to delete dataverse on tearDown. Error: " + e)
 
-    def get_screenshot_as_pil(self):
-        if self.screenshots:
-            return PIL.Image.open(BytesIO(base64.b64decode(self.sesh.get_screenshot_as_base64())))
-
     ######################
     ### SUB-TEST CALLS ###
     ######################
 
     def r01alt_mainpath_builtin_auth(self):
         results = {}
+        prefix = 'r01alt'
 
+        step = 1
+
+        print(self.dv_url)
         self.sesh.get(f'{self.dv_url}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:0:credValue"]').send_keys(self.username)
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:1:sCredValue"]').send_keys(self.password)
@@ -92,7 +94,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
 
-        if self.screenshots: results['screenshot1'] = self.get_screenshot_as_pil() #self.sesh.get_screenshot_as_base64()#get_screenshot_as_png()
+        if self.screenshots: results['screenshot1'] = self.sesh.get_screenshot_as_base64()
 
         return results
 
