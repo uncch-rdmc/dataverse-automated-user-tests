@@ -13,7 +13,7 @@ def main():
     template = environment.get_template("template.html")
 
 
-    ingest_test = t.IngestWorkflowReportTestCase(screenshots=True)
+    ingest_test = t.IngestWorkflowReportTestCase(capture=True)
     ingest_test.setUp()
     result = ingest_test.test_requirements()
     ingest_test.tearDown()

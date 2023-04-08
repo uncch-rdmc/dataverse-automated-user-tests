@@ -16,7 +16,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 #Note: I was seeing duplicate templates early into porting the code. I think its resolved but be aware
 class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, DatasetTestingMixin):
     def __init__(self, *args, **kwargs):
-        self.screenshots = kwargs.pop('screenshots', False)
+        self.capture = kwargs.pop('capture', False)
         super(IngestWorkflowReportTestCase, self).__init__( *args, **kwargs)
 
     def setUp(self):
@@ -30,7 +30,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
         self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-        if self.screenshots:
+        if self.capture:
             self.sesh.set_window_size(1200,827) #675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
         
         # #after starting, open a new one to an old one https://stackoverflow.com/questions/8344776/
@@ -117,48 +117,50 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         shot = 0
 
         part = '01'
-        self.sesh.get(self.dv_url)
-        ### Main Landing Page ###
 
-        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=1)}'] = self.sesh.get_screenshot_as_base64()
-        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
-        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
-        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
-        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
-        # if self.screenshots: results[f'{req}_p{part}_s{"%02d" % (shot:=shot+1)}'] = self.sesh.get_screenshot_as_base64()
+        ### Main Landing Page ###
+        self.sesh.get(self.dv_url)
 
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
         part = '02'
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[1]/a').click() #click new dataverse
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
         ### Create Dataverse Page ###
         part = '03'
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').clear()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(self.dv_props["host_dataverse"])
         time.sleep(2) # wait for host list to load
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
         time.sleep(1) # wait after click for ui to be usable
         self.set_dataverse_metadata(add_string="create") #Metadata that is same for create/edit
+        if self.capture:
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i*500})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         part = '04'
         self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
-        
-
-        #time.sleep(99999999)
 
         ### Test Save ###
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
-        #print("requirement_test self.dataverse_name:" + self.dataverse_name)
         self.assertEqual(self.dv_url+'/dataverse/'+self.dataverse_name+'/', self.sesh.current_url) #confirm page
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
         self.confirm_dataverse_metadata(add_string="create")
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         
         ### Dataverse Page - Publish ###
         part = '05'
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/button').click() #click publish
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:j_idt431"]').click() #confirm publish
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
 
         self.dataverse_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
 
@@ -342,3 +344,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
 
         return results
+
+#NOTE: Maybe this should be switched back to a class function, but I find it a bit more readable in the code to be separate. 
+def take_screenshot(enable, sesh, dict, req, part, shot):
+    if enable: 
+        dict[f'{req}_p{part}_s{"%02d" % (shot)}'] = sesh.get_screenshot_as_base64()
+
