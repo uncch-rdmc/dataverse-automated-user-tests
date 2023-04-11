@@ -24,6 +24,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.password = os.getenv('DATAVERSE_TEST_USER_PASSWORD_BUILTIN')
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.default_wait = 2
+        self.scroll_height=600 #For scrolling with screenshots
         #self.failed = False #TODO: Delete?
         self.api_token = None
 
@@ -41,7 +42,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         # print(f"Selenium command_executor url: {self.sesh.command_executor._url}")
         # print(f"Selenium session id: {self.sesh.session_id}")
 
-        self.sesh.implicitly_wait(20) #Set high for dataset publish. Maybe we should keep it low normally and set it up when needed?
+        self.sesh.implicitly_wait(30) #Set high for dataset publish. Maybe we should keep it low normally and set it up when needed?
 
     def tearDown(self):
         self.delete_dv_resources(self.dataset_id, self.dataverse_id)
@@ -52,11 +53,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         screenshots.update(self.r01alt_mainpath_builtin_auth())
         self.get_api_token()
         screenshots.update(self.r03_mainpath_create_sub_dataverse())
-        # screenshots.update(self.r04_mainpath_edit_dataverse())
-        # screenshots.update(self.r05_mainpath_create_metadata_template())
-        # screenshots.update(self.r06_mainpath_edit_metadata_template())
-        # screenshots.update(self.r09_mainpath_create_dataset())
-        # screenshots.update(self.r10_mainpath_edit_dataset())
+        screenshots.update(self.r04_mainpath_edit_dataverse())
+        screenshots.update(self.r05_mainpath_create_metadata_template())
+        screenshots.update(self.r06_mainpath_edit_metadata_template())
+        screenshots.update(self.r09_mainpath_create_dataset())
+        screenshots.update(self.r10_mainpath_edit_dataset())
         print("Tests Complete")
 
         #TODO: We may need to sort the screenshots by key if we have to add any out of order
@@ -138,8 +139,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1) # wait after click for ui to be usable
         self.set_dataverse_metadata(add_string="create") #Metadata that is same for create/edit
         if self.capture:
+            shot = 0
             for i in range(3):
-                self.sesh.execute_script(f"window.scrollTo(0, {i*500})") 
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         part = '04'
         self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
@@ -171,16 +173,27 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         req = 'r04'
 
         part = '01'
-
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         time.sleep(self.default_wait)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
+        part = '02'
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
-        
+
+        part = '03'
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.set_dataverse_metadata()
+        if self.capture:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        part = '10'
         self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
         time.sleep(self.default_wait) # I think our code is picking up on the previous page div, so we wait before getting the div
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
 
         #print(self.dv_url + '/dataverse/' + self.dataverse_name + '/')
         # self.sesh.get(self.dv_url + '/dataverse/' + self.dataverse_name + '/')
@@ -196,17 +209,29 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         req = 'r05'
 
         part = '01'
-
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
         time.sleep(self.default_wait)
-    
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:manageTemplates"]').click() #click manage templates
         time.sleep(self.default_wait)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        part = '02'
         self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm"]/div[1]/div/a').click() #click create dataset template
         time.sleep(self.default_wait)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        part = '03'
         self.sesh.find_element('xpath', '//*[@id="templateForm:templateName"]').send_keys("test template create") #Create template title
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        part = '05'
+        part = '06'
         self.set_dataset_metadata_template_instructions(add_string='create')
+        if self.capture:
+            shot = 0
+            for i in range(9):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         #This chunk of code is weird. We were having issues with a page click being intercepted, so to handle that we are clicking a dropdown twice
         #We use javascript for this as it allows us to not care about the click interception.
         #I've tried clicking non dropdown elements and it doesn't clear the capture
@@ -215,9 +240,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1)
         self.sesh.execute_script('document.evaluate(\'//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]/div[3]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
         time.sleep(1)
+        part = '04'
         #self.sesh.find_element('xpath', '//*[@id="templateForm:editMetadataFragement"]').click() #click background to clear any open dropdowns
         self.set_dataset_metadata_edit(add_string='create', xpath_dict=self.ds_template_xpaths)
-
+        if self.capture:
+            shot = 0
+            for i in range(9):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         # self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt892"]').click()
         # time.sleep(.2)
         # #TODO: What?
@@ -225,18 +255,30 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         # time.sleep(999999)
         
         #TODO: I think here it where I was setting license but didn't finish?
-        
+
+        part = '07'
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt892"]').click() #click "Save + Add Terms"
-    
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
         #TODO: Replace param_get with a new way to get the query params from a url
         self.template_id = parse.parse_qs(parse.urlparse(self.sesh.current_url).query)['id'][0]#<<- param_get(self.sesh.current_url, "id")
     
+        part = '08'
+        #TODO: show selected terms in a screenshot later?
+        part = '09'
         self.set_template_license(add_string='create')
+        if self.capture:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '10'
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Dataset Template" (which actually just saves the license)
         
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
         
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
@@ -253,23 +295,44 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         req = 'r06'
 
         part = '01'
-
+        part = '02'
+        #TODO: probably change this to actually click the buttons. Put some above in part 1
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
+        time.sleep(self.default_wait) #added for screenshot
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        part = '04'
+        part = '05'
         self.set_dataset_metadata_template_instructions(add_string='edit')
+        if self.capture:
+            shot = 0
+            for i in range(9):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         #See note in R05 about the similar code
         time.sleep(1)
         self.sesh.execute_script('document.evaluate(\'//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]/div[3]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
         time.sleep(1)
         self.sesh.execute_script('document.evaluate(\'//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]/div[3]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
-        time.sleep(1)        
+        time.sleep(1)    
+        part = '03'    
         self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_template_xpaths)
+        if self.capture:
+            shot = 0
+            for i in range(9):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save + Add Terms"
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+#TODO: Are we suppose to be doing screenshots editing the license template
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.set_template_license(add_string='edit')
+
+        part = '06'  
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
         time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
         self.confirm_dataset_metadata(add_string='edit', xpath_dict=self.ds_template_xpaths)
@@ -280,25 +343,39 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return results
     
+    #TODO: Rename because this is multiple requirements
     def r09_mainpath_create_dataset(self):
         results = {}
         req = 'r09'
 
         part = '01'
-        
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
-        
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '02'
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[2]/a').click() #click new dataset
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        #TODO: set host dataverse (part 3) first
+        req = 'r11'
+        part = '01'
         self.set_dataset_metadata_create(add_string='create')
-        
+        if self.capture:
+            shot = 0
+            for i in range(4):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1) #TODO: probalby a different R#, check shot+1
+
         ### Get dataset id from permissions page url for later uses ###
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
         # print(dataset_id)
         
+        #TODO: Add screenshots to code below after adding other requirements
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
     
         self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
@@ -319,16 +396,32 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     
     def r10_mainpath_edit_dataset(self):
         results = {}
+        #It seems like there are no actual screenshots for r10?
         req = 'r10'
+        req = 'r12'
 
         part = '01'
-        
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
-    
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
+        time.sleep(self.default_wait) #added for screenshot
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '02'
         self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_edit_xpaths)
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to create dataset
+        if self.capture:
+            shot = 0
+            for i in range(8):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '03'
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to save dataset
+        time.sleep(self.default_wait) #added for screenshot
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
     
+        #TODO: Add screenshots to code below after adding other requirements
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
     
         self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm

@@ -34,12 +34,12 @@ text = {
     'r04_p01': 'Click on the Edit button at the upper-right hand side of the dataverse landing page.',
     'r04_p02': 'In the drop-down list that appears, select the General Information option.',
     'r04_p03': 'Edit the dataverse properties by entering the appropriate information into the text fields or by selecting options from the given drop-down list for each of the corresponding fields.',
-    'r04_p04': 'If the dataverse requires that datasets in the dataverse include metadata elements that are not included in the default metadata elements (i.e., metadata fields from Root), click on the pre-selected Use metadata fields from Root checkbox to deselect this option.',
-    'r04_p05': 'Select from the options listed in the Metadata Fields section by clicking on the box(es) corresponding to the appropriate metadata type(s).',
-    'r04_p06': 'If the dataverse requires browse/search facets beyond the default facets (i.e., browse/search facets from Root), click on the preselected Use browse/search facets from Root checkbox to deselect this option. ',
-    'r04_p07': 'Click on the dropdown box below to select the metadata type that includes the metadata fields to be used for facets OR leave the All Metadata Fields option to allow selection of metadata fields from any available metadata type.',
-    'r04_p08': 'In the list box, select the metadata field to be used as a browse/search facet.',
-    'r04_p09': 'Click on the right arrow button --> to add the metadata field to the list of selected fields.  Repeat for each metadata field to be used as a browse/search facet for the dataverse.',
+    # 'r04_p04': 'If the dataverse requires that datasets in the dataverse include metadata elements that are not included in the default metadata elements (i.e., metadata fields from Root), click on the pre-selected Use metadata fields from Root checkbox to deselect this option.',
+    # 'r04_p05': 'Select from the options listed in the Metadata Fields section by clicking on the box(es) corresponding to the appropriate metadata type(s).',
+    # 'r04_p06': 'If the dataverse requires browse/search facets beyond the default facets (i.e., browse/search facets from Root), click on the preselected Use browse/search facets from Root checkbox to deselect this option. ',
+    # 'r04_p07': 'Click on the dropdown box below to select the metadata type that includes the metadata fields to be used for facets OR leave the All Metadata Fields option to allow selection of metadata fields from any available metadata type.',
+    # 'r04_p08': 'In the list box, select the metadata field to be used as a browse/search facet.',
+    # 'r04_p09': 'Click on the right arrow button --> to add the metadata field to the list of selected fields.  Repeat for each metadata field to be used as a browse/search facet for the dataverse.',
     'r04_p10': 'Click on the Save Changes button.',
 
     'r05_title': 'Creating a metadata template',
@@ -65,7 +65,7 @@ text = {
     'r09_title': 'Creating a dataset',
     'r09_p01': 'Click on the Add Data button located at the upper-right hand side of the dataverse landing page.',
     'r09_p02': 'In the drop-down list that appears, select the New Dataset option.',
-    'r09_p03': 'In the dataset metadata page, select the Host Dataverse from the drop-down list provided.',
+    # 'r09_p03': 'In the dataset metadata page, select the Host Dataverse from the drop-down list provided.',
 
     #We don't actually have any requirements for r10
     'r10_title': 'Editing a dataset',

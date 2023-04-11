@@ -401,7 +401,6 @@ class DatasetTestingMixin(object):
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').send_keys(self.ds_props['deposit_date'])
         
         #TODO: Upload files here?
-        self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
 
     #also supports dataset template
     def set_dataset_metadata_edit(self, add_string='', xpath_dict=None):
