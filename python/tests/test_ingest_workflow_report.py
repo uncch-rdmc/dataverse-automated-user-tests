@@ -47,6 +47,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     def tearDown(self):
         self.delete_dv_resources(self.dataset_id, self.dataverse_id)
 
+
     #TODO: Maybe add some options to these functions to slim down some of the tests. For example, dataset template instructions which take forever. 
     def test_requirements(self):
         screenshots = {}
@@ -104,13 +105,21 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return results
 
+    def r01_two_factor_auth(self):
+        # TODO: Current thought is to load a page and then set an implicit wait for what we expect after two-factor completes.
+        #       There will be a very long wait on this to allow user input.
+        pass
+
     def get_api_token(self):
         #Note: This code assumes you have already clicked "Create Token" with this account.
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=apiTokenTab')
         self.api_token = self.sesh.find_element('xpath', '//*[@id="apiToken"]/pre/code').text
 
-
         return {}
+
+    def r02_mainpath_add_user_group_role(self):
+        # Do we need a second test user to add/remove perms from?
+        pass
     
     def r03_mainpath_create_sub_dataverse(self):
         results = {}
@@ -139,7 +148,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1) # wait after click for ui to be usable
         self.set_dataverse_metadata(add_string="create") #Metadata that is same for create/edit
         if self.capture:
-            shot = 0
+            #shot = 1
             for i in range(3):
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
@@ -184,22 +193,82 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         part = '03'
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         self.set_dataverse_metadata()
-        if self.capture:
-            shot = 0
-            for i in range(3):
-                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
-                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        ## For some reason this scroll is breaking our find_element (back when part 4 was after this) call. I switched to taking a single screenshot as all the metadata fits on there.
+        # if self.capture:
+        #     #shot = 1
+        #     for i in range(3):
+        #         self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+        #         take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #save dataverse
+
+        # We do part 10 before the other parts because we don't want any of the facet/search changes to stick
         part = '10'
-        self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
         time.sleep(self.default_wait) # I think our code is picking up on the previous page div, so we wait before getting the div
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
-
+        
         #print(self.dv_url + '/dataverse/' + self.dataverse_name + '/')
         # self.sesh.get(self.dv_url + '/dataverse/' + self.dataverse_name + '/')
         # time.sleep(self.default_wait)
+        time.sleep(1)
         self.confirm_dataverse_metadata()
-        
+
+        part = '04' #Select metadata facets
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
+        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
+        self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
+        #time.sleep(1)
+        #We force a click here to handle another element intercepting
+        #self.sesh.execute_script('document.evaluate(\'//*[@id="dataverseForm:description"]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
+
+        self.sesh.execute_script(f"window.scrollTo(0, {2*self.scroll_height})") #scroll down some so we can see our changes better
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:metadataRoot"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        time.sleep(1)
+
+        part = '05'
+        self.sesh.find_element('xpath','//*[@id="2"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        time.sleep(.5)
+        self.sesh.find_element('xpath','//*[@id="3"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        time.sleep(.5)
+        self.sesh.find_element('xpath','//*[@id="4"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        time.sleep(.5)
+        self.sesh.find_element('xpath','//*[@id="5"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        time.sleep(.5)
+        self.sesh.find_element('xpath','//*[@id="6"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        time.sleep(.5)
+
+        part = '06'
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:facetsRoot"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        time.sleep(.5)
+
+        part = '07' #Browse/search facets
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:j_idt330"]').click()
+        time.sleep(.2)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        time.sleep(.5)
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:j_idt330_1"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        time.sleep(.5)
+
+        part = '08'
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:facetPickListCreate"]/div[1]/ul/li[4]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '09'
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:facetPickListCreate"]/div[2]/div/button[1]').click()
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:facetPickListCreate"]/div[1]/ul/li[6]').click()
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:facetPickListCreate"]/div[2]/div/button[1]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        self.sesh.find_element('xpath','//*[@id="dataverseForm:cancel"]/span').click()
+
         time.sleep(1) #wait before switching pages in r05
 
         return results
@@ -277,6 +346,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         part = '10'
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Dataset Template" (which actually just saves the license)
         
+        time.sleep(self.default_wait) #For some reason we are getting a reference error below without waiting. Maybe its getting the div for the previous page?
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
         time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
@@ -343,7 +413,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return results
     
-    #TODO: Rename because this is multiple requirements
+    #TODO: Rename this and r10 because this is multiple requirements. Or break it up.
     def r09_mainpath_create_dataset(self):
         results = {}
         req = 'r09'
@@ -438,8 +508,32 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return results
 
+    def r14_mainpath_review_data_set(self):
+        # We need to take the existing "confirm_dataset_metadata" and make it work for the citation metadata tab (instead of the edit page)
+        # ... Well because tab versions of the fields combine other ones, I need to rewrite the asserts. So I probably need a new method
+        pass
+
+    def r21_mainpath_search_dataset(self):
+        # We need to do a simple search and an advanced search
+        # Can we just do ONE advanced search with all the metadata fields or what?
+        # I could construct a string for the search field to do the advanced search (instead of ui interaction). But I probably shouldn't
+        # ...
+        # So advanced search is an OR statement with the fields. So if we have to exercise ALL the search fields its going to be very painful.
+        # Searching multiple words is also painful because they are also ORed
+        # ... We can probably avoid the pain by using long custom single words (that no other dataset will have)
+        pass
+
+    def r24_mainpath_browse_datasets(self):
+        # Need to test the previous/next buttons
+        # Need to select facets and click a dataset? (Maybe we can avoid clicking?)
+        pass
+
 #NOTE: Maybe this should be switched back to a class function, but I find it a bit more readable in the code to be separate. 
 def take_screenshot(enable, sesh, dict, req, part, shot):
     if enable: 
-        dict[f'{req}_p{part}_s{"%02d" % (shot)}'] = sesh.get_screenshot_as_base64()
+        dict_key = f'{req}_p{part}_s{"%02d" % (shot)}'
+        #print(dict[dict_key])
+        if dict_key in dict.keys():
+            raise Exception("Duplicate screenshot key encountered. Check test code.")
+        dict[dict_key] = sesh.get_screenshot_as_base64()
 
