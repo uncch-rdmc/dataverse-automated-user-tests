@@ -12,8 +12,7 @@ def main():
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader("python/html/")) #TODO: Figure out how to do paths better?
     template = environment.get_template("template.html")
 
-
-    ingest_test = t.IngestWorkflowReportTestCase(capture=True)
+    ingest_test = t.IngestWorkflowReportTestCase(capture=True, test_files=True)
     ingest_test.setUp()
     result = ingest_test.test_requirements()
     ingest_test.tearDown()

@@ -17,6 +17,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, DatasetTestingMixin):
     def __init__(self, *args, **kwargs):
         self.capture = kwargs.pop('capture', False)
+        self.test_files = kwargs.pop('test_files', True)
         super(IngestWorkflowReportTestCase, self).__init__( *args, **kwargs)
 
     def setUp(self):
@@ -24,9 +25,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.password = os.getenv('DATAVERSE_TEST_USER_PASSWORD_BUILTIN')
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.default_wait = 2
-        self.scroll_height=600 #For scrolling with screenshots
+        self.scroll_height = 600 #For scrolling with screenshots
         #self.failed = False #TODO: Delete?
         self.api_token = None
+
+        self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
+        self.test_file_2_md5 = 'MD5: c7803e4497be4984e41102e1b2ef64cc'
 
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
@@ -437,6 +441,42 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
 
+        if self.test_files:
+            req = 'r13'
+            part = '01' #click add button
+
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '02' #file system dialog
+            # NOTE: We can't screenshot the file dialog via selenium because its not actually in the browser.
+            #       Instead we do a find element that will show up after upload and wait for the test-user to do the upload
+            #       We may be able to do this via robot later https://robotframework.org/robotframework/latest/libraries/Screenshot.html#Take%20Screenshot
+            self.sesh.implicitly_wait(3600)
+            self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
+            self.sesh.implicitly_wait(30)
+            print("upload completed")
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            # part = '03' # We do not currently test drag & Drop
+
+            req = 'r20'
+            part = '01' #confirm md5
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_1_md5)
+
+            part = '02' #update name and path
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_updated.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder/')
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '03' #add description
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description')
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
         self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1) #TODO: probalby a different R#, check shot+1
@@ -444,9 +484,13 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         ### Get dataset id from permissions page url for later uses ###
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
         # print(dataset_id)
+
+#TODO: Add screenshots to code below after adding other requirements
+        if self.test_files:
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
+        else:
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
         
-        #TODO: Add screenshots to code below after adding other requirements
-        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
     
         self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
     
@@ -466,7 +510,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     
     def r10_mainpath_edit_dataset(self):
         results = {}
-        #It seems like there are no actual screenshots for r10?
+        #It seems like there are no actual screenshots or steps for r10?
         req = 'r10'
         req = 'r12'
 
@@ -491,8 +535,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(self.default_wait) #added for screenshot
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
     
-        #TODO: Add screenshots to code below after adding other requirements
-        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
+#TODO: Add screenshots to code below after adding other requirements
+        if self.test_files:
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
+        else:
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
     
         self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
         
@@ -507,6 +554,20 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
 
         return results
+
+    # This test of file upload requires manual interaction by the user, as automating selecting file via toe OS file picker is super painful
+    # We may try to automate the file picker someday.
+    # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
+    # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
+
+    # def r13_mainpath_upload_dataset_files(self):
+    #     results = {}
+    #     req = 'r13'
+
+    #     part = '01'
+
+    #     part = '02'
+    #     # Select files
 
     def r14_mainpath_review_data_set(self):
         # We need to take the existing "confirm_dataset_metadata" and make it work for the citation metadata tab (instead of the edit page)

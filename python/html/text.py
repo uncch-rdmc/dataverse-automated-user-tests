@@ -77,5 +77,15 @@ text = {
     'r12_p01': 'Click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
     'r12_p02': 'In each section of the metadata form, edit descriptive information about the dataset by entering the updated information into the text fields provided or by selecting alternative options from the given drop-down list for each of the corresponding metadata fields.',
     'r12_p03': 'Click on the Save Changes button.',
+
+    'r13_title': 'Upload dataset files',
+    'r13_p01': 'Upload dataset files in the Upload with HTTP via your browser section of the page by clicking on the Select Files to Add button.',
+    'r13_p02': 'In the file explorer box that appears, navigate to and select each file to be included in the dataset.',
+    #'r13_p03': 'Alternatively, drag and drop each dataset file into the Drag and drop files here box.  A list of uploaded files will appear with an MD5 and editable file-level metadata fields for each file.',
+
+    'r20_title': 'Publish the dataset/study verify that they have compared the pre and post publishing checksum of the file',
+    'r20_p01': 'Confirm that the MD5 matches the pre-dataverse ingest MD5 for each file.',
+    'r20_p02': 'If necessary, update the file name and define the file path in the corresponding metadata fields for each uploaded file.',
+    'r20_p03': 'Add a file description in the Description text field for each uploaded file.',
 }
 
