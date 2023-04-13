@@ -61,8 +61,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         screenshots.update(self.r04_mainpath_edit_dataverse())
         screenshots.update(self.r05_mainpath_create_metadata_template())
         screenshots.update(self.r06_mainpath_edit_metadata_template())
-        screenshots.update(self.r09_mainpath_create_dataset())
-        screenshots.update(self.r10_mainpath_edit_dataset())
+        screenshots.update(self.r09r11r13r20_mainpath_create_dataset())
+        screenshots.update(self.r10r12r15r16r17_mainpath_edit_dataset())
         print("Tests Complete")
 
         #TODO: We may need to sort the screenshots by key if we have to add any out of order
@@ -321,11 +321,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             for i in range(9):
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
-        # self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt892"]').click()
-        # time.sleep(.2)
-        # #TODO: What?
-        # self.sesh.switch_to.active_element.send_keys("test"+"WOWOWOWOW")
-        # time.sleep(999999)
         
         #TODO: I think here it where I was setting license but didn't finish?
 
@@ -340,7 +335,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         part = '08'
         #TODO: show selected terms in a screenshot later?
         part = '09'
-        self.set_template_license(add_string='create')
+
+        self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
+        time.sleep(.2)
+        self.sesh.find_element('xpath','//*[@id="templateForm:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
+        time.sleep(.2)
+        self.set_license(add_string='create', xpath_dict=self.ds_license_template_xpaths)
         if self.capture:
             shot = 0
             for i in range(3):
@@ -360,7 +360,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.confirm_dataset_metadata_template_instructions(add_string='create')
 
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
-        self.confirm_template_license(add_string='create')
+        self.confirm_license(add_string='create', xpath_dict=self.ds_license_template_xpaths)
 
         return results
     
@@ -401,7 +401,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
 #TODO: Are we suppose to be doing screenshots editing the license template
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
-        self.set_template_license(add_string='edit')
+
+        self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
+        time.sleep(.2)
+        self.sesh.find_element('xpath','//*[@id="templateForm:licenses_0"]').click() #click "cc-by 1.0" inside dropdown
+        time.sleep(.2)
+        self.set_license(add_string='edit', xpath_dict=self.ds_license_template_xpaths)
 
         part = '06'  
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
@@ -413,12 +418,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.confirm_dataset_metadata_template_instructions(add_string='edit')
 
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
-        self.confirm_template_license(add_string='edit')
+        self.confirm_license(add_string='edit', xpath_dict=self.ds_license_template_xpaths)
 
         return results
     
     #TODO: Rename this and r10 because this is multiple requirements. Or break it up.
-    def r09_mainpath_create_dataset(self):
+    def r09r11r13r20_mainpath_create_dataset(self): #
         results = {}
         req = 'r09'
 
@@ -508,10 +513,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return results
     
-    def r10_mainpath_edit_dataset(self):
+    def r10r12r15r16r17_mainpath_edit_dataset(self):
         results = {}
-        #It seems like there are no actual screenshots or steps for r10?
-        req = 'r10'
+        # It seems like there are no actual screenshots or steps for r10?
+        # I think we are using this as a catch-all for the editing that is not covered by other requirements
         req = 'r12'
 
         part = '01'
@@ -534,7 +539,70 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to save dataset
         time.sleep(self.default_wait) #added for screenshot
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        req = 'r10'
+
+        if self.test_files:
+            # File-level metadata
+            part = '01'
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr/td[1]/div').click()
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+            part = '02'
+            time.sleep(.5)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1295"]/span/div/button').click()
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+            time.sleep(.5)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1300"]').click()
+            time.sleep(1)
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+            part = '03'
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_updated_again.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder_updated/')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description_updated')
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '04'
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:savebutton"]').click()
+            time.sleep(2)
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success")
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
     
+        # Dataset-terms
+        part = '05'
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '06'
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1722"]').click()
+
+        part = '07'
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:licenses"]').click() #click license dropdown
+        time.sleep(.2)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+        self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
+        time.sleep(.2)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '08'
+        self.set_license(add_string='edit', xpath_dict=self.ds_license_edit_xpaths)
+        if self.capture:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '09'
+        self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottomTerms"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
 #TODO: Add screenshots to code below after adding other requirements
         if self.test_files:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish

@@ -293,7 +293,7 @@ class DatasetTestingMixin(object):
         'doc_to_sources': 'instructions doc'
     }
 
-    ds_license_xpaths = {
+    ds_license_template_xpaths = {
         'terms_restricted': '//*[@id="templateForm:metadata_TermsAccess"]',
         'access_place': '//*[@id="templateForm:dataAccessPlace"]',
         'original_archive': '//*[@id="templateForm:originalArchive"]',
@@ -301,6 +301,15 @@ class DatasetTestingMixin(object):
         'access_contact': '//*[@id="templateForm:contactForAccess"]',
         'collection_size': '//*[@id="templateForm:sizeOfCollection"]',
         'study_completion': '//*[@id="templateForm:studyCompletion"]'
+    }
+
+    ds_license_edit_xpaths = {
+        'access_place': '//*[@id="datasetForm:tabView:dataAccessPlace"]',
+        'original_archive': '//*[@id="datasetForm:tabView:originalArchive"]',
+        'available_status': '//*[@id="datasetForm:tabView:availabilityStatus"]',
+        'access_contact': '//*[@id="datasetForm:tabView:contactForAccess"]',
+        'collection_size': '//*[@id="datasetForm:tabView:sizeOfCollection"]',
+        'study_completion': '//*[@id="datasetForm:tabView:studyCompletion"]'
     }
 
     ds_license_props = {
@@ -317,37 +326,33 @@ class DatasetTestingMixin(object):
     ### Dataset Test Additional Functions ###
     #########################################
 
-
     #TODO: move?
-    def set_template_license(self, add_string=''):
-        self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
-        time.sleep(.2)
-        self.sesh.find_element('xpath','//*[@id="templateForm:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
-        time.sleep(.2)
-        
-        self.sesh.find_element('xpath',self.ds_license_xpaths['terms_restricted']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['terms_restricted']).send_keys(add_string + self.ds_license_props['terms_restricted'])
-        self.sesh.find_element('xpath',self.ds_license_xpaths['access_place']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['access_place']).send_keys(add_string + self.ds_license_props['access_place'])
-        self.sesh.find_element('xpath',self.ds_license_xpaths['original_archive']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['original_archive']).send_keys(add_string + self.ds_license_props['original_archive'])
-        self.sesh.find_element('xpath',self.ds_license_xpaths['available_status']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['available_status']).send_keys(add_string + self.ds_license_props['available_status'])
-        self.sesh.find_element('xpath',self.ds_license_xpaths['access_contact']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['access_contact']).send_keys(add_string + self.ds_license_props['access_contact'])
-        self.sesh.find_element('xpath',self.ds_license_xpaths['collection_size']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['collection_size']).send_keys(add_string + self.ds_license_props['collection_size'])
-        self.sesh.find_element('xpath',self.ds_license_xpaths['study_completion']).clear()
-        self.sesh.find_element('xpath',self.ds_license_xpaths['study_completion']).send_keys(add_string + self.ds_license_props['study_completion'])
+    def set_license(self, add_string='', xpath_dict=None):        
+        if xpath_dict != self.ds_license_edit_xpaths:
+            self.sesh.find_element('xpath',xpath_dict['terms_restricted']).clear()
+            self.sesh.find_element('xpath',xpath_dict['terms_restricted']).send_keys(add_string + self.ds_license_props['terms_restricted'])
+        self.sesh.find_element('xpath',xpath_dict['access_place']).clear()
+        self.sesh.find_element('xpath',xpath_dict['access_place']).send_keys(add_string + self.ds_license_props['access_place'])
+        self.sesh.find_element('xpath',xpath_dict['original_archive']).clear()
+        self.sesh.find_element('xpath',xpath_dict['original_archive']).send_keys(add_string + self.ds_license_props['original_archive'])
+        self.sesh.find_element('xpath',xpath_dict['available_status']).clear()
+        self.sesh.find_element('xpath',xpath_dict['available_status']).send_keys(add_string + self.ds_license_props['available_status'])
+        self.sesh.find_element('xpath',xpath_dict['access_contact']).clear()
+        self.sesh.find_element('xpath',xpath_dict['access_contact']).send_keys(add_string + self.ds_license_props['access_contact'])
+        self.sesh.find_element('xpath',xpath_dict['collection_size']).clear()
+        self.sesh.find_element('xpath',xpath_dict['collection_size']).send_keys(add_string + self.ds_license_props['collection_size'])
+        self.sesh.find_element('xpath',xpath_dict['study_completion']).clear()
+        self.sesh.find_element('xpath',xpath_dict['study_completion']).send_keys(add_string + self.ds_license_props['study_completion'])
 
-    def confirm_template_license(self, add_string=''):
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['terms_restricted']).get_attribute('value'), add_string+self.ds_license_props['terms_restricted'])
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['access_place']).get_attribute('value'), add_string+self.ds_license_props['access_place'])
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['original_archive']).get_attribute('value'), add_string+self.ds_license_props['original_archive'])
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['available_status']).get_attribute('value'), add_string+self.ds_license_props['available_status'])
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['access_contact']).get_attribute('value'), add_string+self.ds_license_props['access_contact'])
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['collection_size']).get_attribute('value'), add_string+self.ds_license_props['collection_size'])
-        self.assertEqual(self.sesh.find_element('xpath',self.ds_license_xpaths['study_completion']).get_attribute('value'), add_string+self.ds_license_props['study_completion'])
+    def confirm_license(self, add_string='', xpath_dict=None):
+        if xpath_dict != self.ds_license_edit_xpaths:
+            self.assertEqual(self.sesh.find_element('xpath', xpath_dict['terms_restricted']).get_attribute('value'), add_string+self.ds_license_props['terms_restricted'])
+        self.assertEqual(self.sesh.find_element('xpath', xpath_dict['access_place']).get_attribute('value'), add_string+self.ds_license_props['access_place'])
+        self.assertEqual(self.sesh.find_element('xpath', xpath_dict['original_archive']).get_attribute('value'), add_string+self.ds_license_props['original_archive'])
+        self.assertEqual(self.sesh.find_element('xpath', xpath_dict['available_status']).get_attribute('value'), add_string+self.ds_license_props['available_status'])
+        self.assertEqual(self.sesh.find_element('xpath', xpath_dict['access_contact']).get_attribute('value'), add_string+self.ds_license_props['access_contact'])
+        self.assertEqual(self.sesh.find_element('xpath', xpath_dict['collection_size']).get_attribute('value'), add_string+self.ds_license_props['collection_size'])
+        self.assertEqual(self.sesh.find_element('xpath', xpath_dict['study_completion']).get_attribute('value'), add_string+self.ds_license_props['study_completion'])
 
     # We have different functions for create / edit as the xpath changes between the two, and there is no other way to get the fields
     def set_dataset_metadata_create(self, add_string=''):

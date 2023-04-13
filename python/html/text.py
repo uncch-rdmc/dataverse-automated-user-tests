@@ -69,6 +69,15 @@ text = {
 
     #We don't actually have any requirements for r10
     'r10_title': 'Editing a dataset',
+    'r10_p01': 'Click the checkbox next to the file(s) that require(s) editing.',
+    'r10_p02': 'Click on the Edit Files button above the file list and select the Metadata option.',
+    'r10_p03': 'Update the file name, file path, and description in the corresponding metadata fields for each file as needed.',
+    'r10_p04': 'Click on the Save Changes button.',
+    'r10_p05': 'Click on the Terms tab on the dataset landing page.',
+    'r10_p06': 'Click on the Edit Terms Requirements button.',
+    'r10_p07': 'In the Dataset Terms section, select the appropriate terms by selecting from the License/Data Use Agreement drop-down list provided.',
+    'r10_p08': 'Enter and/or update custom dataset terms, information about restricted files and terms of access in the fields provided.',
+    'r10_p09': 'Click on the Save Changes button.',
 
     'r11_title': 'Creating citation metadata',
     'r11_p01': 'Complete the metadata form in the Citation Metadata section of the page by entering the appropriate information into the text fields provided or by selecting options from the given drop-down list for each of the corresponding citation metadata fields.',
