@@ -112,6 +112,9 @@ text = {
     'r16_p07': 'Add a file description in the Description text field for the new file.',
     'r16_p08': 'Click on the Done button.',
 
+    'r17_title': 'Add version notes',
+    'r17_p01': 'Add version change notes to the Notes metadata field.',
+
     'r20_title': 'Publish the dataset/study verify that they have compared the pre and post publishing checksum of the file',
     'r20_p01': 'Confirm that the MD5 matches the pre-dataverse ingest MD5 for each file.',
     'r20_p02': 'If necessary, update the file name and define the file path in the corresponding metadata fields for each uploaded file.',

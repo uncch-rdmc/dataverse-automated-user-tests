@@ -536,6 +536,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
 
+        req = 'r17'
+        part = '01'
+        self.sesh.execute_script(f"window.scrollTo(0, {3 * self.scroll_height})") 
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        req = 'r12' #We switch back and forth between reqs
         part = '03'
         self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to save dataset
         time.sleep(self.default_wait) #added for screenshot

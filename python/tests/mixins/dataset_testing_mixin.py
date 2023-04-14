@@ -29,7 +29,7 @@ class DatasetTestingMixin(object):
         #'related_pub_id_type': 'lissn',
         'related_pub_id': 'pub_id',
         'related_pub_url': 'https://odum.unc.edu/',
-        'notes': 'this is a test note',
+        'notes': 'These are release notes for this version',
         'depositor': 'a depositor',
         'deposit_date': '2020-01-01',
         
@@ -399,7 +399,7 @@ class DatasetTestingMixin(object):
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').clear()
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').send_keys(self.ds_props['related_pub_url']+add_string)
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').send_keys(add_string + self.ds_props['notes'])
+        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').send_keys(self.ds_props['notes'])
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').clear()
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').send_keys(add_string + self.ds_props['depositor'])
         self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').clear()
@@ -495,7 +495,7 @@ class DatasetTestingMixin(object):
         self.sesh.find_element('xpath',xpath_dict['related_pub_url']).clear()
         self.sesh.find_element('xpath',xpath_dict['related_pub_url']).send_keys(self.ds_props['related_pub_url']+add_string)
         self.sesh.find_element('xpath',xpath_dict['notes']).clear()
-        self.sesh.find_element('xpath',xpath_dict['notes']).send_keys(add_string + self.ds_props['notes'])
+        self.sesh.find_element('xpath',xpath_dict['notes']).send_keys(self.ds_props['notes'])
         self.sesh.find_element('xpath',xpath_dict['depositor']).clear()
         self.sesh.find_element('xpath',xpath_dict['depositor']).send_keys(add_string + self.ds_props['depositor'])
         self.sesh.find_element('xpath',xpath_dict['deposit_date']).clear()
@@ -611,7 +611,7 @@ class DatasetTestingMixin(object):
         #TODO: I think this doesn't work because it needs the above set... but weirdly I thought it worked before???? Well it doesn't work now
         self.assertEqual(self.sesh.find_element('xpath',xpath_dict['related_pub_id']).get_attribute('value'), add_string+self.ds_props['related_pub_id'])
         self.assertEqual(self.sesh.find_element('xpath',xpath_dict['related_pub_url']).get_attribute('value'), self.ds_props['related_pub_url']+add_string)
-        self.assertEqual(self.sesh.find_element('xpath',xpath_dict['notes']).get_attribute('value'), add_string+self.ds_props['notes'])
+        self.assertEqual(self.sesh.find_element('xpath',xpath_dict['notes']).get_attribute('value'), self.ds_props['notes'])
         self.assertEqual(self.sesh.find_element('xpath',xpath_dict['depositor']).get_attribute('value'), add_string+self.ds_props['depositor'])
         self.assertEqual(self.sesh.find_element('xpath',xpath_dict['deposit_date']).get_attribute('value'), self.ds_props['deposit_date'])
         
