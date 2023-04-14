@@ -30,6 +30,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.api_token = None
 
         self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
+        self.test_file_1_replace_md5 = 'MD5: 07436de69e3283065a2453322ee22ba3'
         self.test_file_2_md5 = 'MD5: c7803e4497be4984e41102e1b2ef64cc'
 
         options = Options()
@@ -472,7 +473,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             part = '02' #update name and path
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_updated.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_renamed.txt')
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder/')
             take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
@@ -560,11 +561,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             part = '03'
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_updated_again.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_renamed_again.txt')
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder_updated/')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder_renamed/')
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').clear()
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description_updated')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description_renamed')
             take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
 
             part = '04'
@@ -602,6 +603,95 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         part = '09'
         self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottomTerms"]').click()
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        time.sleep(1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        if self.test_files:
+            req = 'r15' # replace file
+
+            part = '01'
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[1]/a').click() 
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+            part = '02'
+            self.sesh.find_element('xpath', '//*[@id="editFile"]').click()
+            time.sleep(.2)
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/ul/li[3]/a').click()
+
+            part = '03'
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
+            self.sesh.implicitly_wait(3600)
+            self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
+            self.sesh.implicitly_wait(30)
+            print("replace completed")
+
+            part = '04'
+            # part = '05'
+
+            part = '06'
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '07'
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_1_replace_md5)
+
+            part = '08'
+            time.sleep(1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_replace_renamed.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testreplacefolder/')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_replace_description')
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '09'
+            self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #save
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1) 
+            self.sesh.find_element('xpath','//*[@id="breadcrumbLnk2"]').click() #Go back to dataset page
+
+            req = 'r16' # Add new file
+
+            part = '01'
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click() #save
+
+            part = '02'
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1) 
+            self.sesh.find_element('xpath','//*[@id="datasetForm:fileUpload"]/div[1]/span').click() #save
+            self.sesh.implicitly_wait(3600)
+            self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
+            self.sesh.implicitly_wait(30)
+            print("upload completed")
+
+            part = '03'
+            # part = '04'
+
+            part = '05'
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_2_md5)
+
+            part = '06'
+            time.sleep(1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_2_renamed.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder2/')
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '07'
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').clear()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description2')
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+            part = '08'
+            self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #save changes
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+            take_screenshot(self.capture, self.sesh, results, req, part, shot:=1) 
 
 #TODO: Add screenshots to code below after adding other requirements
         if self.test_files:
@@ -612,7 +702,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
         
         self.sesh.find_element('class name', 'label-default') #Find element to wait for load. May trigger prematurely with files added.
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
+        if self.test_files:
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 2.0") #Test dataset published
+        else:
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
         
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset

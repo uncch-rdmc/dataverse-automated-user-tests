@@ -67,7 +67,6 @@ text = {
     'r09_p02': 'In the drop-down list that appears, select the New Dataset option.',
     # 'r09_p03': 'In the dataset metadata page, select the Host Dataverse from the drop-down list provided.',
 
-    #We don't actually have any requirements for r10
     'r10_title': 'Editing a dataset',
     'r10_p01': 'Click the checkbox next to the file(s) that require(s) editing.',
     'r10_p02': 'Click on the Edit Files button above the file list and select the Metadata option.',
@@ -91,6 +90,27 @@ text = {
     'r13_p01': 'Upload dataset files in the Upload with HTTP via your browser section of the page by clicking on the Select Files to Add button.',
     'r13_p02': 'In the file explorer box that appears, navigate to and select each file to be included in the dataset.',
     #'r13_p03': 'Alternatively, drag and drop each dataset file into the Drag and drop files here box.  A list of uploaded files will appear with an MD5 and editable file-level metadata fields for each file.',
+
+    'r15_title': 'Ingest new version of an existing file',
+    'r15_p01': 'Click on the file name to navigate to the file landing page.',
+    'r15_p02': 'Click on the Edit File button to the right of the file citation and select the Replace option.',
+    'r15_p03': 'Upload the new version of the file in the Upload with HTTP via your browser section of the page by clicking on the Select Files to Add button.',
+    'r15_p04': 'In the file explorer box that appears, navigate to and select each file to be included in the dataset.',
+    # 'r15_p05': 'Alternatively, drag and drop each dataset file into the Drag and drop files here box.',
+    'r15_p06': 'The new file will appear with an MD5 and editable file-level metadata fields. ',
+    'r15_p07': 'Confirm that the MD5 matches the pre-dataverse ingest MD5.',
+    'r15_p08': 'If necessary, update the file name, file path, and description in the corresponding metadata fields.',
+    'r15_p09': 'Click on the Save Changes button.',
+
+    'r16_title': 'Add a new file',
+    'r16_p01': 'Click on the Upload Files button above the file list.',
+    'r16_p02': 'Upload the new file in the Upload with HTTP via your browser section of the page by clicking on the Select Files to Add button.',
+    'r16_p03': 'In the file explorer box that appears, navigate to and select the new file to be included in the dataset.',
+    'r16_p04': 'Alternatively, drag and drop the new file into the Drag and drop files here box.  The new file uploaded files will appear with an MD5 and editable file-level metadata fields. ',
+    'r16_p05': 'Confirm that the MD5 matches the pre-dataverse ingest MD5.',
+    'r16_p06': 'If necessary, update the file name and define the file path in the corresponding metadata fields.',
+    'r16_p07': 'Add a file description in the Description text field for the new file.',
+    'r16_p08': 'Click on the Done button.',
 
     'r20_title': 'Publish the dataset/study verify that they have compared the pre and post publishing checksum of the file',
     'r20_p01': 'Confirm that the MD5 matches the pre-dataverse ingest MD5 for each file.',
