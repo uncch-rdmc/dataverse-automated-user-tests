@@ -24,6 +24,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.username = os.getenv('DATAVERSE_TEST_USER_USERNAME_BUILTIN')
         self.password = os.getenv('DATAVERSE_TEST_USER_PASSWORD_BUILTIN')
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
+        self.perm_test_username = os.getenv('DATAVERSE_USERNAME_FOR_PERM_TEST')
         self.default_wait = 2
         self.scroll_height = 600 #For scrolling with screenshots
         #self.failed = False #TODO: Delete?
@@ -32,6 +33,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
         self.test_file_1_replace_md5 = 'MD5: 07436de69e3283065a2453322ee22ba3'
         self.test_file_2_md5 = 'MD5: c7803e4497be4984e41102e1b2ef64cc'
+
+        self.role_alias = "test_role_auto"
 
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
@@ -50,7 +53,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.implicitly_wait(30) #Set high for dataset publish. Maybe we should keep it low normally and set it up when needed?
 
     def tearDown(self):
-        self.delete_dv_resources(self.dataset_id, self.dataverse_id)
+        self.delete_dv_resources(self.dataset_id, self.dataverse_id, self.role_alias)
 
 
     #TODO: Maybe add some options to these functions to slim down some of the tests. For example, dataset template instructions which take forever. 
@@ -58,6 +61,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         screenshots = {}
         screenshots.update(self.r01alt_mainpath_builtin_auth())
         self.get_api_token()
+        screenshots.update(self.r02_mainpath_add_user_group_role())
         screenshots.update(self.r03_mainpath_create_sub_dataverse())
         screenshots.update(self.r04_mainpath_edit_dataverse())
         screenshots.update(self.r05_mainpath_create_metadata_template())
@@ -71,7 +75,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         return screenshots
 
     #Written to allow calling these deletes directly for cleanup outside of the normal test run
-    def delete_dv_resources(self, ds_id=None, dv_id=None):
+    def delete_dv_resources(self, ds_id=None, dv_id=None, role_alias=None):
         headers = {'X-Dataverse-key': self.api_token}
         if ds_id is not None:
             try:
@@ -86,6 +90,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 # print(resp_dv_delete)
             except Exception as e:
                 print("Unable to delete dataverse on tearDown. Error: " + e)
+        if role_alias is not None:
+            try:
+                resp_role_delete = requests.delete(f'{self.dv_url}/api/roles/:alias?alias={role_alias}', headers=headers)
+                print(resp_dv_delete)
+            except Exception as e:
+                print("Unable to delete role on tearDown. Error: " + e)
 
     ######################
     ### SUB-TEST CALLS ###
@@ -122,9 +132,80 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return {}
 
+    #TODO: Maybe make this test act upon our created sub-dataverse instead. Clean up is slightly easier, but then the test relies on other tests
     def r02_mainpath_add_user_group_role(self):
-        # Do we need a second test user to add/remove perms from?
-        pass
+        results = {}
+        req = 'r02'
+        shot = 0
+
+        part = '01'
+        self.sesh.get(f'{self.dv_url}')
+        time.sleep(1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div[2]/div[2]/div/button').click() #click edit
+        time.sleep(.5)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
+
+        part = '02'
+        self.sesh.find_element('xpath', '//*[@id="dataverseForm:managePermissions"]').click()
+        time.sleep(1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '03'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm"]/div[1]/div[3]').click()
+        time.sleep(.5)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '04'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:rolesAdd"]').click()
+        time.sleep(1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '05'
+        self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleName"]').send_keys("Test Role Automated")
+        self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleAlias"]').send_keys(self.role_alias)
+        self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleDescription"]').send_keys("This is an automated test role.")
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '06'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:0"]').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:1"]').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:2"]').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:3"]').click()
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '07'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt409"]').click()
+        time.sleep(1)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:roleMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '08'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm"]/div[1]/div[2]/div[1]').click()
+        time.sleep(.5)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '09'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:userGroupsAdd"]').click()
+        time.sleep(1.5)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '10'
+        self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:userGroupNameAssign_input"]').send_keys(self.perm_test_username)
+        time.sleep(2)
+        self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:userGroupNameAssign_input"]').send_keys(Keys.RETURN)
+
+        part = '11'
+        self.sesh.find_element('xpath', "//label[text()='Test Role Automated']").click()
+        time.sleep(1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '12'
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt385"]/span').click()
+        time.sleep(1)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignmentMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        return results
     
     def r03_mainpath_create_sub_dataverse(self):
         results = {}
