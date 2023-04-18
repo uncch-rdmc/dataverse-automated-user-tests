@@ -4,11 +4,11 @@ text = {
 
     # tests
 
-    # 'r01_title': 'Logging in to Dataverse',
-    # 'r01_p01': 'On the Dataverse landing page, click on the Log In link located at the upper right-hand corner. ',
-    # 'r01_p02': 'Select https://sso.unc.edu/idp in the institution drop down list. ',
-    # 'r01_p03': 'Click the Continue button.',
-    # 'r01_p04': 'Follow the prompts for UNC SSO to enter login credentials.',
+    'r01_title': 'Logging in to Dataverse',
+    'r01_p01': 'On the Dataverse landing page, click on the Log In link located at the upper right-hand corner. ',
+    'r01_p02': 'Select https://sso.unc.edu/idp in the institution drop down list. ',
+    'r01_p03': 'Click the Continue button.',
+    'r01_p04': 'Follow the prompts for UNC SSO to enter login credentials.',
 
     'r02_title': 'Ability to define groups, define user roles, and assign user roles to groups',
     'r02_p01': 'Click on the Edit button located at the upper right-hand side of the dataverse landing page.',

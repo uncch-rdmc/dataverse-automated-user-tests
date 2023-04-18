@@ -25,6 +25,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.password = os.getenv('DATAVERSE_TEST_USER_PASSWORD_BUILTIN')
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.perm_test_username = os.getenv('DATAVERSE_USERNAME_FOR_PERM_TEST')
+        self.sso_option_value = os.getenv('DATAVERSE_SSO_OPTION_VALUE')
         self.default_wait = 2
         self.scroll_height = 600 #For scrolling with screenshots
         #self.failed = False #TODO: Delete?
@@ -101,13 +102,43 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     ### SUB-TEST CALLS ###
     ######################
 
+    def r01_mainpath_test_sso_auth(self):
+        results = {}
+        req = 'r01'
+        shot = 0
+
+        part = '01'
+        self.sesh.get(f'{self.dv_url}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
+        self.sesh.find_element('xpath', '//*[@id="idpSelectIdPListTile"]/a')
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '02'
+        #self.sesh.find_element('xpath', '//*[@id="idpSelectSelector"]/option[2]').click()
+        print(self.sso_option_value)
+        self.sesh.find_element('xpath', f"//option[@value='{self.sso_option_value}']").click() 
+        #time.sleep(.1)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+        
+        part = '03'
+        self.sesh.find_element('xpath', '//*[@id="idpSelectListButton"]').click()
+        time.sleep(2)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        part = '04'
+        self.sesh.implicitly_wait(3600)
+        self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait login to complete
+        self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
+        take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
+
+        return results
+    
     def r01alt_mainpath_builtin_auth(self):
         results = {}
         req = 'r01alt'
 
         part = '01'
 
-        print(self.dv_url)
+        #print(self.dv_url)
         self.sesh.get(f'{self.dv_url}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:0:credValue"]').send_keys(self.username)
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:1:sCredValue"]').send_keys(self.password)
@@ -115,8 +146,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
-
-        #if self.screenshots: results['screenshot1'] = self.sesh.get_screenshot_as_base64()
 
         return results
 
