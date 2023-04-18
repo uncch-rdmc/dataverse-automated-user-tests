@@ -52,7 +52,7 @@ text = {
     'r05_p02': 'Click on the Create Dataset Template button.',
     'r05_p03': 'Enter a descriptive name in the Template Name field.',
     'r05_p04': 'In the Citation Metadata form, enter information that is standard across all datasets in the dataset into the applicable metadata fields.',
-    'r05_p05': 'To provide instructions on how to complete a metadata field, click on the (None – click to add) link above the metadata text field.',
+    'r05_p05': 'To provide instructions on how to complete a metadata field, click on the (None - click to add) link above the metadata text field.',
     'r05_p06': 'Enter the metadata field instructions in the Custom instructions field that appears, then click on the check button.',
     'r05_p07': 'Click on the Save + Add Terms button.',
     'r05_p08': 'In the Dataset Terms section, select the appropriate terms for the datasets in the dataverse by selecting from the License/Data Use Agreement drop-down list provided.',
@@ -63,7 +63,7 @@ text = {
     'r06_p01': 'On the dataverse landing page, click on the Edit button and select the Dataset Templates option from the drop-down list.',
     'r06_p02': 'Click on the Edit Template button and select the Metadata option in the drop-down list that appears.',
     'r06_p03': 'In the Citation Metadata form, enter updated information that is standard across all datasets in the dataset into the applicable metadata fields.',
-    'r06_p04': 'To add or update instructions on how to complete a metadata field, click on the (None – click to add) link above the text field for the metadata element.',
+    'r06_p04': 'To add or update instructions on how to complete a metadata field, click on the (None - click to add) link above the text field for the metadata element.',
     'r06_p05': 'Enter the metadata field instructions in the Custom instructions field that appears, then click on the check button.',
     'r06_p06': 'Click on the Save Changes button.',
 
