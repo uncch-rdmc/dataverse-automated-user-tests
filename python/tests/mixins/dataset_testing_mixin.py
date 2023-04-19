@@ -430,18 +430,16 @@ class DatasetTestingMixin(object):
         # We clear all the elements for when this code is called during edit and there are already contents
 
         # The xpath is different if you have a dataset template or not. So we check for one and if it errors do the other
-        self.sesh.implicitly_wait(3)
+        self.sesh.implicitly_wait(2)
         xpath_prefix_1 = 'datasetForm:j_idt573:0:j_idt576'
         xpath_prefix_2 = 'j_idt630:0:j_idt632'
         try: #Without dataset template
             self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]')
-            print("WITHOUT")
         except Exception: #With dataset template
-            print("WITH")
             xpath_prefix_1 = 'datasetForm:j_idt570:0:j_idt573'
             xpath_prefix_2 = 'j_idt627:0:j_idt629'
-            self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]') #TODO DELETE
-        self.sesh.implicitly_wait(30)
+            self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]')
+        self.sesh.implicitly_wait(5)
 
         self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]').clear()
         self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]').send_keys(add_string + self.ds_props['title'])

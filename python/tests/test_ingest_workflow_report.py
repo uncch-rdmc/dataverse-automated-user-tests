@@ -30,6 +30,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.scroll_height = 600 #For scrolling with screenshots
         #self.failed = False #TODO: Delete?
         self.api_token = None
+        self.templates_exist = False
 
         self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
         self.test_file_1_replace_md5 = 'MD5: 07436de69e3283065a2453322ee22ba3'
@@ -622,13 +623,13 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
 
-#TODO: CATCH CORRECT ERROR BETTER THROUGHOUT
+        self.sesh.implicitly_wait(22)
         try: 
-            print("NO")
             self.confirm_dataset_metadata(add_string='create', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
         except Exception:
-            print("YES")
+            self.templates_exist = True
             self.confirm_dataset_metadata(add_string='create', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
+        self.sesh.implicitly_wait(5)
         
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
         
@@ -652,11 +653,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         part = '02'
 
-        try: 
-            print("NO")
+        if not self.templates_exist:
             self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_edit_xpaths_notemplate)
-        except Exception:
-            print("YES")
+        else:
             self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_edit_xpaths_yestemplate)
 
         if self.capture:
@@ -687,15 +686,15 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             part = '02'
             time.sleep(.5)
-            try: 
+            if not self.templates_exist:
                 self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1295"]/span/div/button').click()
-            except Exception:
+            else:
                 self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1292"]/span/div/button').click()
             take_screenshot(self.capture, self.sesh, results, req, part, shot:=1)
             time.sleep(.5)
-            try: 
+            if not self.templates_exist:
                 self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1300"]').click()
-            except Exception:
+            else:
                 self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1297"]').click()
             time.sleep(1)
             take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
@@ -722,9 +721,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         take_screenshot(self.capture, self.sesh, results, req, part, shot:=shot+1)
 
         part = '06'
-        try: 
+        if not self.templates_exist:
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1722"]').click()
-        except Exception:
+        else:
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1719"]').click()
 
         part = '07'
@@ -843,9 +842,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         else:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
         
-        try:
+        if not self.templates_exist:
             self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
-        except Exception:
+        else:
             self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2544"]').click() #click publish confirm
         
         self.sesh.implicitly_wait(30)
@@ -859,10 +858,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
 
-        try: 
+        if not self.templates_exist:
             print("NO")
             self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate) 
-        except Exception:
+        else:
             print("YES")
             self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_yestemplate) 
     
