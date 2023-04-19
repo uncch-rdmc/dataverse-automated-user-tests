@@ -77,8 +77,8 @@ class DatasetTestingMixin(object):
         'doc_to_sources': 'doc_to_sources'
     }
 
-    # Used both for editing and seeing results of create/edit
-    ds_edit_xpaths = {
+    # Used both for editing and seeing results of create/edit. This works when there are no templates stored on dataverse (it alters the xpaths)
+    ds_edit_xpaths_notemplate = {
         #'host_dataverse': '',
         'title': '//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:0:fieldvaluelist:0:inputText"]',
         'author_name': '//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:0:inputText"]',
@@ -144,6 +144,77 @@ class DatasetTestingMixin(object):
         'origin_hist_sources': '//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:32:fieldvaluelist:0:description"]',
         'character_of_sources': '//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:33:fieldvaluelist:0:description"]',
         'doc_to_sources': '//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:34:fieldvaluelist:0:description"]'
+    }
+
+    # Used both for editing and seeing results of create/edit. This works when there are templates stored on dataverse (it alters the xpaths)
+    ds_edit_xpaths_yestemplate = {
+        #'host_dataverse': '',
+        #         //*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:0:fieldvaluelist:0:inputText"]
+        'title': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:0:fieldvaluelist:0:inputText"]',
+        #               //*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:0:inputText"]
+        'author_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:0:inputText"]',
+        'author_affiliation': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:1:inputText"]',
+        #'author_id_type': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:2:cvv_label"]',
+        'author_id': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:3:inputText"]',
+        'contact_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:6:j_idt1676:0:j_idt1678:0:inputText"]',
+        'contact_affiliation': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:6:j_idt1676:0:j_idt1678:1:inputText"]',
+        'contact_email': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:6:j_idt1676:0:j_idt1678:2:inputText"]',
+        'description': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:7:j_idt1676:0:j_idt1678:0:description"]',
+        'date': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:7:j_idt1676:0:j_idt1678:1:inputText"]',
+        #'subject': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:8:unique2"]/ul/li/span[1]', #This probably won't work due to the weirdness of the dropdown. Definitely not for create
+        'keyword_term': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:9:j_idt1676:0:j_idt1678:0:inputText"]',
+        'keyword_cv_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:9:j_idt1676:0:j_idt1678:1:inputText"]',
+        'keyword_cv_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:9:j_idt1676:0:j_idt1678:2:inputText"]',
+        'related_pub_citation': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:0:description"]',
+        #'related_pub_id_type': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:1:cvv_label"]', #Also might not work
+        'related_pub_id': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:2:inputText"]',
+        'related_pub_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:3:inputText"]',
+        'notes': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:12:fieldvaluelist:0:description"]',
+        'depositor': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:21:fieldvaluelist:0:inputText"]',
+        'deposit_date': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:22:fieldvaluelist:0:inputText"]',
+        
+        'subtitle': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:1:fieldvaluelist:0:inputText"]',
+        'alternative_title': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:2:fieldvaluelist:0:inputText"]',
+        'alternative_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:3:fieldvaluelist:0:inputText"]',
+        'other_id_agency': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:4:j_idt1676:0:j_idt1678:0:inputText"]',
+        'other_id_id': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:4:j_idt1676:0:j_idt1678:1:inputText"]',
+        'topic_class_term': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:10:j_idt1676:0:j_idt1678:0:inputText"]',
+        'topic_class_cv_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:10:j_idt1676:0:j_idt1678:1:inputText"]',
+        'topic_class_cv_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:10:j_idt1676:0:j_idt1678:2:inputText"]',
+        #'language': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:13:unique2"]/ul/li/span[2]', #This probably doesn't work, like subject
+        'producer_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:14:j_idt1676:0:j_idt1678:0:inputText"]',
+        'producer_affiliation': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:14:j_idt1676:0:j_idt1678:1:inputText"]',
+        'producer_abbrev_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:14:j_idt1676:0:j_idt1678:2:inputText"]',
+        'producer_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:14:j_idt1676:0:j_idt1678:3:inputText"]',
+        'producer_logo_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:14:j_idt1676:0:j_idt1678:4:inputText"]',
+        'producer_date': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:15:fieldvaluelist:0:inputText"]',
+        'producer_location': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:16:fieldvaluelist:0:inputText"]',
+        #'contributor_type': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:17:j_idt1676:0:j_idt1678:0:cvv_label"]',
+        'contributor_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:17:j_idt1676:0:j_idt1678:1:inputText"]',
+        'funding_info_agency': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:18:j_idt1676:0:j_idt1678:0:inputText"]',
+        'funding_info_id': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:18:j_idt1676:0:j_idt1678:1:inputText"]',
+        'distributor_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:19:j_idt1676:0:j_idt1678:0:inputText"]',
+        'distributor_affiliation': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:19:j_idt1676:0:j_idt1678:1:inputText"]',
+        'distributor_abbrev_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:19:j_idt1676:0:j_idt1678:2:inputText"]',
+        'distributor_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:19:j_idt1676:0:j_idt1678:3:inputText"]',
+        'distributor_logo_url': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:19:j_idt1676:0:j_idt1678:4:inputText"]',
+        'distribution_date': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:20:fieldvaluelist:0:inputText"]',
+        'time_period_start': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:23:j_idt1676:0:j_idt1678:0:inputText"]',
+        'time_period_end': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:23:j_idt1676:0:j_idt1678:1:inputText"]',
+        'date_of_collection_start': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:24:j_idt1676:0:j_idt1678:0:inputText"]',
+        'date_of_collection_end': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:24:j_idt1676:0:j_idt1678:1:inputText"]',
+        'data_type': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:25:fieldvaluelist:0:inputText"]',
+        'series_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:26:j_idt1676:0:j_idt1678:0:inputText"]',
+        'series_info': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:26:j_idt1676:0:j_idt1678:1:description"]',
+        'software_name': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:27:j_idt1676:0:j_idt1678:0:inputText"]',
+        'software_version': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:27:j_idt1676:0:j_idt1678:1:inputText"]',
+        'related_material': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:28:fieldvaluelist:0:description"]',
+        'related_dataset': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:29:fieldvaluelist:0:description"]',
+        'other_reference': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:30:fieldvaluelist:0:inputText"]',
+        'data_source': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:31:fieldvaluelist:0:description"]',
+        'origin_hist_sources': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:32:fieldvaluelist:0:description"]',
+        'character_of_sources': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:33:fieldvaluelist:0:description"]',
+        'doc_to_sources': '//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:34:fieldvaluelist:0:description"]'
     }
 
     ds_template_xpaths = {
@@ -357,60 +428,74 @@ class DatasetTestingMixin(object):
     # We have different functions for create / edit as the xpath changes between the two, and there is no other way to get the fields
     def set_dataset_metadata_create(self, add_string=''):
         # We clear all the elements for when this code is called during edit and there are already contents
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:0:fieldvaluelist:0:inputText"]').send_keys(add_string + self.ds_props['title'])
-        
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + self.ds_props['author_name'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + self.ds_props['author_affiliation'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_label"]').click() #click author identifier type dropdown
+
+        # The xpath is different if you have a dataset template or not. So we check for one and if it errors do the other
+        self.sesh.implicitly_wait(3)
+        xpath_prefix_1 = 'datasetForm:j_idt573:0:j_idt576'
+        xpath_prefix_2 = 'j_idt630:0:j_idt632'
+        try: #Without dataset template
+            self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]')
+            print("WITHOUT")
+        except Exception: #With dataset template
+            print("WITH")
+            xpath_prefix_1 = 'datasetForm:j_idt570:0:j_idt573'
+            xpath_prefix_2 = 'j_idt627:0:j_idt629'
+            self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]') #TODO DELETE
+        self.sesh.implicitly_wait(30)
+
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:0:fieldvaluelist:0:inputText"]').send_keys(add_string + self.ds_props['title'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:0:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:0:inputText"]').send_keys(add_string + self.ds_props['author_name'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:1:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:1:inputText"]').send_keys(add_string + self.ds_props['author_affiliation'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:2:cvv_label"]').click() #click author identifier type dropdown
         time.sleep(.2)
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:2:cvv_2"]').click() #click "ISNI" inside dropdown
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:5:j_idt630:0:j_idt632:3:inputText"]').send_keys(add_string + self.ds_props['author_id'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + self.ds_props['contact_name'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + self.ds_props['contact_affiliation'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:6:j_idt630:0:j_idt632:2:inputText"]').send_keys(add_string + self.ds_props['contact_email'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:0:description"]').send_keys(add_string + self.ds_props['description'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:7:j_idt630:0:j_idt632:1:inputText"]').send_keys(self.ds_props['date'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:2:cvv_2"]').click() #click "ISNI" inside dropdown
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:3:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:5:{xpath_prefix_2}:3:inputText"]').send_keys(add_string + self.ds_props['author_id'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:6:{xpath_prefix_2}:0:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:6:{xpath_prefix_2}:0:inputText"]').send_keys(add_string + self.ds_props['contact_name'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:6:{xpath_prefix_2}:1:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:6:{xpath_prefix_2}:1:inputText"]').send_keys(add_string + self.ds_props['contact_affiliation'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:6:{xpath_prefix_2}:2:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:6:{xpath_prefix_2}:2:inputText"]').send_keys(add_string + self.ds_props['contact_email'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:7:{xpath_prefix_2}:0:description"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:7:{xpath_prefix_2}:0:description"]').send_keys(add_string + self.ds_props['description'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:7:{xpath_prefix_2}:1:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:7:{xpath_prefix_2}:1:inputText"]').send_keys(self.ds_props['date'])
         #TODO: add a clear for the select thing?
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2"]').click() #click subject dropdown
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:8:unique2"]').click() #click subject dropdown
         time.sleep(.2)
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:8:unique2_panel"]/div[2]/ul/li[14]/div').click() #click "other" inside dropdown
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:0:inputText"]').send_keys(add_string + self.ds_props['keyword_term'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:1:inputText"]').send_keys(add_string + self.ds_props['keyword_cv_name'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:9:j_idt630:0:j_idt632:2:inputText"]').send_keys(self.ds_props['keyword_cv_url']+add_string)
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:0:description"]').send_keys(add_string + self.ds_props['related_pub_citation'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_label"]').click() #click related pub id type dropdown
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:8:unique2_panel"]/div[2]/ul/li[14]/div').click() #click "other" inside dropdown
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:9:{xpath_prefix_2}:0:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:9:{xpath_prefix_2}:0:inputText"]').send_keys(add_string + self.ds_props['keyword_term'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:9:{xpath_prefix_2}:1:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:9:{xpath_prefix_2}:1:inputText"]').send_keys(add_string + self.ds_props['keyword_cv_name'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:9:{xpath_prefix_2}:2:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:9:{xpath_prefix_2}:2:inputText"]').send_keys(self.ds_props['keyword_cv_url']+add_string)
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:0:description"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:0:description"]').send_keys(add_string + self.ds_props['related_pub_citation'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:1:cvv_label"]').click() #click related pub id type dropdown
         time.sleep(.2)
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:1:cvv_4"]').click() #click "doi" inside dropdown
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:2:inputText"]').send_keys(add_string + self.ds_props['related_pub_id'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:11:j_idt630:0:j_idt632:3:inputText"]').send_keys(self.ds_props['related_pub_url']+add_string)
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:12:fieldvaluelist:0:description"]').send_keys(self.ds_props['notes'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:21:fieldvaluelist:0:inputText"]').send_keys(add_string + self.ds_props['depositor'])
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').clear()
-        self.sesh.find_element('xpath','//*[@id="datasetForm:j_idt573:0:j_idt576:22:fieldvaluelist:0:inputText"]').send_keys(self.ds_props['deposit_date'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:1:cvv_4"]').click() #click "doi" inside dropdown
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:2:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:2:inputText"]').send_keys(add_string + self.ds_props['related_pub_id'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:3:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:11:{xpath_prefix_2}:3:inputText"]').send_keys(self.ds_props['related_pub_url']+add_string)
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:12:fieldvaluelist:0:description"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:12:fieldvaluelist:0:description"]').send_keys(self.ds_props['notes'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:21:fieldvaluelist:0:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:21:fieldvaluelist:0:inputText"]').send_keys(add_string + self.ds_props['depositor'])
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:22:fieldvaluelist:0:inputText"]').clear()
+        self.sesh.find_element('xpath', f'//*[@id="{xpath_prefix_1}:22:fieldvaluelist:0:inputText"]').send_keys(self.ds_props['deposit_date'])
         
         #TODO: Upload files here?
 
     #also supports dataset template
     def set_dataset_metadata_edit(self, add_string='', xpath_dict=None):
         #NOTE: For some reason moving some of these dropdown tests to the bottom of this files causes it to fail. Is it because they are too far off the page or... I have no idea what?
-        if xpath_dict == self.ds_edit_xpaths:
+        if xpath_dict == self.ds_edit_xpaths_notemplate:
             self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv"]').click() #click author identifier type dropdown
             time.sleep(1)
             self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:5:j_idt1679:0:j_idt1681:2:cvv_4"]').click() #click "VIAF" inside dropdown
@@ -439,6 +524,38 @@ class DatasetTestingMixin(object):
             self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1622:0:j_idt1625:17:j_idt1679:0:j_idt1681:0:cvv_3"]').click() #click "Data Manager" inside dropdown
             
             # self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
+
+        elif xpath_dict == self.ds_edit_xpaths_yestemplate:
+            #                               //*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:2:cvv"]
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:2:cvv"]').click() #click author identifier type dropdown
+            time.sleep(1)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:2:cvv_4"]').click() #click "VIAF" inside dropdown
+            time.sleep(2)
+            # self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:5:j_idt1676:0:j_idt1678:2:cvv"]').click() #click author identifier type dropdown to close
+
+            # time.sleep(1)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:8:unique2"]/ul/li/span[2]').click() #Delete existing field "Other"
+            time.sleep(1)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:8:unique2"]').click() #click subject dropdown
+            time.sleep(1)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:8:unique2_panel"]/div[2]/ul/li[10]/div').click() #click "mathematical science" inside dropdown
+            #self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:1:cvv"]/div[3]').click() #click related pub id type dropdown
+            
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:1:cvv"]').click() #click related pub id type dropdown
+            time.sleep(.5)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:11:j_idt1676:0:j_idt1678:1:cvv_4"]').click() #click "DOI" inside dropdown
+            
+            time.sleep(.5)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:13:unique2"]/div[3]').click() #click language dropdown
+            time.sleep(.5)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:13:unique2_panel"]/div[2]/ul/li[2]').click() #click "Afar" inside dropdown
+            
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:17:j_idt1676:0:j_idt1678:0:cvv"]').click() #click contributor type dropdown
+            time.sleep(.5)
+            self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:j_idt1619:0:j_idt1622:17:j_idt1676:0:j_idt1678:0:cvv_3"]').click() #click "Data Manager" inside dropdown
+            
+            # self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
+
         elif xpath_dict == self.ds_template_xpaths:
             self.sesh.find_element('xpath','//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]').click() #click author identifier type dropdown
             time.sleep(1)
