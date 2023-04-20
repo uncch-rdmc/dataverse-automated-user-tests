@@ -21,7 +21,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         super(IngestWorkflowReportTestCase, self).__init__( *args, **kwargs)
 
     def setUp(self):
-        self.username = os.getenv('DATAVERSE_TEST_USER_USERNAME_BUILTIN')
+        self.username = os.getenv('DATAVERSE_TEST_USER_USERNAME')
         self.password = os.getenv('DATAVERSE_TEST_USER_PASSWORD_BUILTIN')
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.perm_test_username = os.getenv('DATAVERSE_USERNAME_FOR_PERM_TEST')
@@ -31,6 +31,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         #self.failed = False #TODO: Delete?
         self.api_token = None
         self.templates_exist = False
+        self.browser_type = "Chrome"
 
         self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
         self.test_file_1_replace_md5 = 'MD5: 07436de69e3283065a2453322ee22ba3'
@@ -40,7 +41,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
-        self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        if self.browser_type == "Chrome":
+            self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         if self.capture:
             self.sesh.set_window_size(1200,827) #675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
         
@@ -61,21 +63,22 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     #TODO: Maybe add some options to these functions to slim down some of the tests. For example, dataset template instructions which take forever. 
     def test_requirements(self):
         screenshots = {}
-        screenshots.update(self.r01_mainpath_test_sso_auth())
-        #screenshots.update(self.r01alt_mainpath_builtin_auth())
+        # screenshots.update(self.r01_mainpath_test_sso_auth())
+        screenshots.update(self.r01alt_mainpath_builtin_auth())
         self.get_api_token()
         #screenshots.update(self.r02_mainpath_add_user_group_role())
-        screenshots.update(self.r03_mainpath_create_sub_dataverse())
-        screenshots.update(self.r04_mainpath_edit_dataverse())
-        screenshots.update(self.r05_mainpath_create_metadata_template())
-        screenshots.update(self.r06_mainpath_edit_metadata_template())
-        screenshots.update(self.r09r11r13r20_mainpath_create_dataset())
-        screenshots.update(self.r10r12r15r16r17_mainpath_edit_dataset())
+        # screenshots.update(self.r03_mainpath_create_sub_dataverse())
+        # screenshots.update(self.r04_mainpath_edit_dataverse())
+        # screenshots.update(self.r05_mainpath_create_metadata_template())
+        # screenshots.update(self.r06_mainpath_edit_metadata_template())
+        # screenshots.update(self.r09r11r13r20_mainpath_create_dataset())
+        # screenshots.update(self.r10r12r15r16r17_mainpath_edit_dataset())
+        info = self.get_testing_info()
         print("Tests Complete")
-
+        
         #TODO: We may need to sort the screenshots by key if we have to add any out of order
 
-        return screenshots
+        return screenshots, info
 
     #Written to allow calling these deletes directly for cleanup outside of the normal test run
     def delete_dv_resources(self, ds_id=None, dv_id=None, role_alias=None):
@@ -100,9 +103,27 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             except Exception as e:
                 print("Unable to delete role on tearDown. Error: " + e)
 
+    def get_dataverse_version(self):
+        # $ curl http://localhost:8080/api/info/version
+        # {"status":"OK","data":{"version":"5.13","build":"1244-79d6e57"}}
+        try:
+            dataverse_version = requests.get(f'{self.dv_url}/api/info/version')#, headers=headers)
+            return dataverse_version.json()['data']['version']
+        except Exception as e:
+            print("Unable to get version of Dataverse install. Error: " + e)
     ######################
     ### SUB-TEST CALLS ###
     ######################
+
+    def get_testing_info(self):
+        info = {}
+        info['dv_url'] = self.dv_url
+        info['dv_version'] = self.get_dataverse_version()
+        info['browser_version'] = self.browser_type + " " + self.sesh.capabilities['browserVersion']
+        #TODO: Test the username at some point in the process, to confirm our config
+        info['test_user'] = self.username
+
+        return info
 
     def r01_mainpath_test_sso_auth(self):
         results = {}
@@ -152,15 +173,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         return results
 
-    def r01_two_factor_auth(self):
-        # TODO: Current thought is to load a page and then set an implicit wait for what we expect after two-factor completes.
-        #       There will be a very long wait on this to allow user input.
-        pass
-
     def get_api_token(self):
+        #We confirm we are the user we think we are. This is mostly for reporting purproses
+        self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=accountInfo')
+        self.assertEqual(self.sesh.find_element('xpath', '/html/body/div[1]/form/div/div/div[3]/div[2]/table/tbody/tr[1]/td').text, self.username) 
+        
         #Note: This code assumes you have already clicked "Create Token" with this account.
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=apiTokenTab')
-        self.api_token = self.sesh.find_element('xpath', '//*[@id="apiToken"]/pre/code').text
+        self.api_token = self.sesh.find_element('xpath', '//*[@id="apiToken"]/pre/code').text 
 
         return {}
 

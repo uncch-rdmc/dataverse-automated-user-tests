@@ -14,7 +14,7 @@ def main():
 
     ingest_test = t.IngestWorkflowReportTestCase(capture=True, test_files=True)
     ingest_test.setUp()
-    result = ingest_test.test_requirements()
+    screenshots, info = ingest_test.test_requirements()
     ingest_test.tearDown()
 
     #print(template.render(**text))
@@ -22,7 +22,7 @@ def main():
     with open('output.html', 'w') as f:
         #f.write(template.render(**text))
         # print(result)
-        f.write(template.render(text=text, screenshots=result)) #we want them in the dictionary for template iteration
+        f.write(template.render(text=text, screenshots=screenshots, info=info)) #we want them in the dictionary for template iteration
 
     print("rendered")
 
