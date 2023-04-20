@@ -60,25 +60,29 @@
 <td>Test User:</td>
 <td>{{info.test_user}}</td>
 </tr>
+<tr>
+<td>Test Date:</td>
+<td>{{info.test_date}}</td>
+</tr>
 </table>
 
 <hr>
 <h2>Results</h2>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r01_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r02_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r03_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r04_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r05_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r06_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r09_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r10_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r11_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r12_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r13_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r15_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r16_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r17_title}}</p>
-<p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r20_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r01_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r02_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r03_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r04_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r05_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r06_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r09_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r10_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r11_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r12_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r13_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r15_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r16_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r17_title}}</p>
+<p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{text.r20_title}}</p>
 
 {# TODO: try iterating on the prefix for the text fields instead. We should be able to do this for the pictures as well#}
 {# TODO: try adding page breaks at the end of each section for when we print to pdf. Start at https://stackoverflow.com/questions/42005819/ #}
@@ -87,10 +91,11 @@
   <br/>{# remove after page break? #}
   {# TODO: Round "PASS" text corners #}
   <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #008e00;">PASS</h4></div>
+  {# <i class="fa-regular fa-clock"></i> Duration: 1:30 #}
   <hr>
   {% for key, value in text.items() %}
     {% if key.startswith('r' + ('%02d' % req) + '_p') %}
-    <p><i class="fa-sharp fa-solid fa-circle-check" style="color: #008e00;"></i> {{value}}</p>
+    <p><i class="fa-solid fa-circle-check" style="color: #008e00;"></i> {{value}}</p>
     <div style="margin-left: 7px;">
       {# We have to do make our count an object to deal with scoping issues in jinja #}
       {% set count = namespace(value=0) %}

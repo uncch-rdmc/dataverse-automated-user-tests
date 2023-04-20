@@ -1,4 +1,5 @@
 import time, unittest, os, requests, re
+from datetime import datetime
 from io import BytesIO
 from urllib import parse
 from python.tests.mixins.dataverse_testing_mixin import *
@@ -120,8 +121,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         info['dv_url'] = self.dv_url
         info['dv_version'] = self.get_dataverse_version()
         info['browser_version'] = self.browser_type + " " + self.sesh.capabilities['browserVersion']
-        #TODO: Test the username at some point in the process, to confirm our config
         info['test_user'] = self.username
+        info['test_date'] = datetime.now().strftime("%A, %B %d, %Y")
 
         return info
 
