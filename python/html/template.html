@@ -90,11 +90,23 @@
   {# TODO: Round "PASS" text corners #}
 
   {% if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) %}
-    <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #c91c1c; border-radius: 4px;">FAIL</h4></div>
+    <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #c91c1c; color: #ffffff; border-radius: 4px;">FAIL</h4></div>
   {% else %}
-    <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #008e00; border-radius: 4px;">PASS</h4></div>
+    <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #008e00; color: #ffffff; border-radius: 4px;">PASS</h4></div>
   {% endif %}
-  {# <i class="fa-regular fa-clock"></i> Duration: 1:30 #}
+
+  {% if req in end_times %}
+  <table>
+    <tr>
+      <td><i class="fa-regular fa-calendar-days"></i> Date/Time:&nbsp;&nbsp;</td>
+      <td>{{ datetime.fromtimestamp(end_times[req]).strftime('%B %e, %Y %H:%M') }}</td>
+    </tr>
+    <tr>
+      <td><i class="fa-regular fa-clock"></i> Duration:</td>
+      <td>{{'%0.1f' % (end_times[req]-start_times[req])}} seconds</td>
+    </tr>
+  </table>
+  {% endif %}
   <hr>
   {% for key, value in text.items() %}
     {% if key.startswith('r' + ('%02d' % req) + '_p') %}

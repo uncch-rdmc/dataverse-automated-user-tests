@@ -1,4 +1,4 @@
-import jinja2, sys, traceback
+import jinja2, sys, traceback, datetime
 from python.html.text import *
 from ..tests import test_ingest_workflow_report as t
 #import html.text #Imports a text variable that stores our strings
@@ -11,9 +11,10 @@ def main():
 
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader("python/html/")) #TODO: Figure out how to do paths better?
     environment.globals['index_with_default'] = index_with_default
+    environment.globals['datetime'] = datetime.datetime
     template = environment.get_template("template.html")
 
-    ingest_test = t.IngestWorkflowReportTestCase(capture=True, test_files=True)
+    ingest_test = t.IngestWorkflowReportTestCase(do_screenshots=True, test_files=True)
     ingest_test.setUp()
     try:
         ingest_test.test_requirements()
@@ -29,13 +30,17 @@ def main():
         print(ingest_test.req)
         print(ingest_test.part)
         print(failure)
-        f.write(template.render(text=text, 
-                                screenshots=ingest_test.screenshots, 
-                                info=ingest_test.info, 
-                                last_req=int(ingest_test.req),
-                                last_part=int(ingest_test.part),
-                                test_order=ingest_test.test_order,
-                                failure=failure)) #we want them in the dictionary for template iteration
+        print(ingest_test.start_times)
+        print(ingest_test.end_times)
+        f.write(template.render(text = text, 
+                                screenshots = ingest_test.screenshots, 
+                                start_times = ingest_test.start_times,
+                                end_times = ingest_test.end_times,
+                                info = ingest_test.info, 
+                                last_req = int(ingest_test.req),
+                                last_part = int(ingest_test.part),
+                                test_order = ingest_test.test_order,
+                                failure = failure)) #we want them in the dictionary for template iteration
 
     print("rendered")
 

@@ -85,6 +85,9 @@ text = {
 
     'r11_title': 'Creating citation metadata',
     'r11_p01': 'Complete the metadata form in the Citation Metadata section of the page by entering the appropriate information into the text fields provided or by selecting options from the given drop-down list for each of the corresponding citation metadata fields.',
+    # 'r11_p02': 'After creation, on the newly created dataset page, click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
+    # 'r11_p03': 'In each section of the metadata form, add additional descriptive information about the dataset by entering the appropriate information into the text fields provided or by selecting options from the given drop-down list for each of the corresponding metadata fields.',
+    # 'r11_p04': 'Click on the Save Changes button.',
 
     'r12_title': 'Edit dataset-level metadata',
     'r12_p01': 'Click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
@@ -124,5 +127,6 @@ text = {
     'r20_p01': 'Confirm that the MD5 matches the pre-dataverse ingest MD5 for each file.',
     'r20_p02': 'If necessary, update the file name and define the file path in the corresponding metadata fields for each uploaded file.',
     'r20_p03': 'Add a file description in the Description text field for each uploaded file.',
+    'r20_p04': 'Click on the Save Dataset button.',
 }
 
