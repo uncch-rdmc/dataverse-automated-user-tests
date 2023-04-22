@@ -77,16 +77,16 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = self.get_testing_info()
 
         tests = [
-            self.r01alt_mainpath_builtin_auth,
+            #self.r01alt_mainpath_builtin_auth,
+            self.r01_mainpath_test_sso_auth,
             self.get_api_token,
-            #self.r01_mainpath_test_sso_auth,
-            # self.r02_mainpath_add_user_group_role,
-            # self.r03_mainpath_create_sub_dataverse,
-            # self.r04_mainpath_edit_dataverse,
-            # self.r05_mainpath_create_metadata_template,
-            # self.r06_mainpath_edit_metadata_template,
-            # self.r09r11r13r20_mainpath_create_dataset,
-            # self.r10r12r15r16r17_mainpath_edit_dataset,
+            self.r02_mainpath_add_user_group_role,
+            self.r03_mainpath_create_sub_dataverse,
+            self.r04_mainpath_edit_dataverse,
+            self.r05_mainpath_create_metadata_template,
+            self.r06_mainpath_edit_metadata_template,
+            self.r09r11r13r20_mainpath_create_dataset,
+            self.r10r12r15r16r17_mainpath_edit_dataset,
             self.r21_mainpath_search_dataset,
         ]
         for test in tests:
@@ -200,7 +200,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     def get_api_token(self):
         #We confirm we are the user we think we are. This is mostly for reporting purproses
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=accountInfo')
-        self.assertEqual(self.sesh.find_element('xpath', '/html/body/div[1]/form/div/div/div[3]/div[2]/table/tbody/tr[1]/td').text, self.username) 
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="userIdentifier"]/td').text, self.username) 
+        #//*[@id="userIdentifier"]/td
         
         #Note: This code assumes you have already clicked "Create Token" with this account.
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=apiTokenTab')
@@ -242,16 +243,18 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleAlias"]').send_keys(self.role_alias)
         self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleDescription"]').send_keys("This is an automated test role.")
         self.take_screenshot(shot:=1)
-
+        
+        #/html/body/div[1]/form/div[5]/div[2]/div/div/div[2]/div[2]/table/tbody/tr[1]/td/input
+        #//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[1]/td/input
         self.part = '06'
-        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:0"]').click()
-        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:1"]').click()
-        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:2"]').click()
-        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt406:3"]').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[1]/td/input').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[2]/td/input').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[3]/td/input').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[4]/td/input').click()
         self.take_screenshot(shot:=1)
 
         self.part = '07'
-        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt409"]').click()
+        self.sesh.find_element('xpath', '//*[@id="editRoleButtonPanel"]/button[1]').click()
         time.sleep(1)
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:roleMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
         self.take_screenshot(shot:=1)
@@ -277,7 +280,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
 
         self.part = '12'
-        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:j_idt385"]/span').click()
+        self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignRoleContent"]/div[2]/button[1]').click()
         time.sleep(1)
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignmentMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
         self.take_screenshot(shot:=1)
@@ -782,6 +785,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
         self.take_screenshot(shot:=shot+1)
+        time.sleep(1) #TODO: Probably remove this wait when we replace the below dynamic id xpath with one based off a stable id
 
         self.part = '06'
         if not self.templates_exist:
@@ -845,6 +849,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.part = '07'
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
+            time.sleep(1)
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_1_replace_md5)
 
             self.part = '08'
@@ -915,10 +920,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         else:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
         
-        if not self.templates_exist:
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
-        else:
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2544"]').click() #click publish confirm
+        # if not self.templates_exist:
+        #     self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
+        # else:
+        #     self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2544"]').click() #click publish confirm
+
+        time.sleep(1)
+
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:publishDataset"]/div[2]/div[2]/button[1]').click()
         
         self.sesh.implicitly_wait(30)
         self.sesh.find_element('class name', 'label-default') #Find element to wait for load. May trigger prematurely with files added.
@@ -929,6 +938,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
         
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
+        print("a4")
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
 
         if not self.templates_exist:
@@ -937,8 +947,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         else:
             # print("YES")
             self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_yestemplate) 
-    
+
+        #TODO: When we finish this, maybe skip cancelling and try removing the sleep
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
+        time.sleep(5) #We have to sleep after cancelling, even though test 21 just goes to another page, because it won't nav
 
         
     # This test of file upload requires manual interaction by the user, as automating selecting file via toe OS file picker is super painful
@@ -960,29 +972,49 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         pass
 
     def r21_mainpath_search_dataset(self):
-        # We need to do a simple search and an advanced search
-        # Can we just do ONE advanced search with all the metadata fields or what?
-        # I could construct a string for the search field to do the advanced search (instead of ui interaction). But I probably shouldn't
-        # ...
-        # So advanced search is an OR statement with the fields. So if we have to exercise ALL the search fields its going to be very painful.
-        # Searching multiple words is also painful because they are also ORed
-        # ... We can probably avoid the pain by using long custom single words (that no other dataset will have)
-        # It seems like there are no actual screenshots or steps for r10?
-        # I think we are using this as a catch-all for the editing that is not covered by other requirements
-        self.set_req('12')
+        self.set_req('21')
         self.set_start_time()
 
+        self.part = '01' # enter search terms (basic)
+        print(self.dv_url)
         self.sesh.get(self.dv_url)
-        
-        self.part = '01'
-        self.part = '02'
-        self.part = '03'
-        self.part = '04'
-        self.part = '05'
-        self.part = '06'
-        self.part = '07'
-        
+        time.sleep(5)
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath','//*[@id="searchResults"]/div[2]/div[1]/form/div/div/input').send_keys('edit'+self.ds_props['title']) #each word is an inclusive or search
+        self.take_screenshot(shot:=shot+1)
 
+        self.part = '02' # click search button
+
+        self.sesh.find_element('xpath', '//*[@id="searchResults"]/div[2]/div[1]/form/div/div/span').click()
+        time.sleep(1)
+        self.take_screenshot(shot:=1)
+
+        self.part = '03' # select relevant dataset
+        self.sesh.find_element('xpath', '//*[@id="resultsTable"]/tbody/tr[1]/td/div/div[1]/a').click()
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title"]').text, 'edit'+self.ds_props['title'])
+        self.take_screenshot(shot:=1)
+
+        self.part = '04' # click advanced search
+        self.sesh.get(self.dv_url)
+        time.sleep(1)
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="searchResults"]/div[2]/div[1]/form/div/a').click()
+        time.sleep(1)
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '05' # enter metadata based search content
+        self.sesh.find_element('xpath','//*[@id="advancedSearchForm:block:0:field:5:searchValue"]').send_keys('edit'+self.ds_props['keyword_term']) #each word is an inclusive or search
+        self.take_screenshot(shot:=1)
+
+        self.part = '06' # click find
+        self.sesh.find_element('xpath', '//*[@id="advancedSearchForm"]/div[5]/button').click()
+        time.sleep(1)
+        self.take_screenshot(shot:=1)
+
+        self.part = '07' # select dataset
+        self.sesh.find_element('xpath', '//*[@id="resultsTable"]/tbody/tr[1]/td/div/div[1]/a').click()
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title"]').text, 'edit'+self.ds_props['title'])
+        self.take_screenshot(shot:=1)
 
         self.set_end_time()
 

@@ -1,7 +1,6 @@
 import time
 
 class DatasetTestingMixin(object):
-    dataset_name = "test_dataset"
     dataset_id = None
     template_id = None
 
@@ -11,7 +10,7 @@ class DatasetTestingMixin(object):
 
     ds_props = {
         #'host_dataverse': '',
-        'title': dataset_name,
+        'title': 'test_dataset_lorem_ipsum_1924',
         'author_name': 'author',
         'author_affiliation': 'affiliation',
         #'author_id_type': 'ORCID',
@@ -22,7 +21,7 @@ class DatasetTestingMixin(object):
         'description': 'this is a test description',
         'date': '2022-11-11',
         'subject': 'Physics',
-        'keyword_term': 'keyword',
+        'keyword_term': 'test_keyword_dolor_sit_amet_1924',
         'keyword_cv_name': 'vocab_name',
         'keyword_cv_url': 'https://odum.unc.edu/',
         'related_pub_citation': 'this is a test citation',
