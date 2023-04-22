@@ -128,5 +128,15 @@ text = {
     'r20_p02': 'If necessary, update the file name and define the file path in the corresponding metadata fields for each uploaded file.',
     'r20_p03': 'Add a file description in the Description text field for each uploaded file.',
     'r20_p04': 'Click on the Save Dataset button.',
+
+    'r21_title': 'Search metadata for individual studies',
+    'r21_p01': 'Enter search terms in the search box on the dataverse landing page.',
+    'r21_p02': 'Click on the magnifying glass button next to the search box.',
+    'r21_p03': 'Select the relevant dataset from the search results that appear.',
+    'r21_p04': 'Click on the Advanced Search link next to the search box.',
+    'r21_p05': 'In the advanced search form, enter search terms into the corresponding metadata fields.',
+    'r21_p06': 'Click on the Find button.',
+    'r21_p07': 'Select the relevant dataset from the search results that appear.',
+    
 }
 

@@ -80,13 +80,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.r01alt_mainpath_builtin_auth,
             self.get_api_token,
             #self.r01_mainpath_test_sso_auth,
-            self.r02_mainpath_add_user_group_role,
-            self.r03_mainpath_create_sub_dataverse,
-            self.r04_mainpath_edit_dataverse,
-            self.r05_mainpath_create_metadata_template,
-            self.r06_mainpath_edit_metadata_template,
-            self.r09r11r13r20_mainpath_create_dataset,
-            self.r10r12r15r16r17_mainpath_edit_dataset
+            # self.r02_mainpath_add_user_group_role,
+            # self.r03_mainpath_create_sub_dataverse,
+            # self.r04_mainpath_edit_dataverse,
+            # self.r05_mainpath_create_metadata_template,
+            # self.r06_mainpath_edit_metadata_template,
+            # self.r09r11r13r20_mainpath_create_dataset,
+            # self.r10r12r15r16r17_mainpath_edit_dataset,
+            self.r21_mainpath_search_dataset,
         ]
         for test in tests:
             test()
@@ -150,7 +151,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         return info
 
     def r01_mainpath_test_sso_auth(self):
-        results = {}
         self.set_req('01')
         self.set_start_time()
         shot = 0
@@ -180,11 +180,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.implicitly_wait(10)
 
         self.set_end_time()
-        return results
-    
+            
     #TODO: This test doesn't actually fufill a req, should I rename it and stop doing req stuff?
     def r01alt_mainpath_builtin_auth(self):
-        results = {}
         self.set_req('01')
 
         self.part = '01'
@@ -198,8 +196,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
 
-        return results
-
+        
     def get_api_token(self):
         #We confirm we are the user we think we are. This is mostly for reporting purproses
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=accountInfo')
@@ -213,7 +210,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
     #TODO: Maybe make this test act upon our created sub-dataverse instead. Clean up is slightly easier, but then the test relies on other tests
     def r02_mainpath_add_user_group_role(self):
-        results = {}
         self.set_req('02')
         self.set_start_time()
         shot = 0
@@ -286,10 +282,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignmentMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
         self.take_screenshot(shot:=1)
         self.set_end_time()
-        return results
-    
+            
     def r03_mainpath_create_sub_dataverse(self):
-        results = {}
         self.set_req('03')
         self.set_start_time()
         shot = 0
@@ -346,10 +340,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.dataverse_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="dataverseForm:themeWidgetsOpts"]').get_attribute("href")) 
 
         self.set_end_time()
-        return results
-
+        
     def r04_mainpath_edit_dataverse(self):
-        results = {}
         self.set_req('04')
         self.set_start_time()
 
@@ -444,10 +436,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1) #wait before switching pages in r05
 
         self.set_end_time()
-        return results
-    
+            
     def r05_mainpath_create_metadata_template(self):
-        results = {}
         self.set_req('05')
         self.set_start_time()
 
@@ -533,10 +523,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.confirm_license(add_string='create', xpath_dict=self.ds_license_template_xpaths)
 
         self.set_end_time()
-        return results
-    
+            
     def r06_mainpath_edit_metadata_template(self):
-        results = {}
         self.set_req('06')
         self.set_start_time()
 
@@ -593,10 +581,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.confirm_license(add_string='edit', xpath_dict=self.ds_license_template_xpaths)
 
         self.set_end_time()
-        return results
-    
+            
     def r09r11r13r20_mainpath_create_dataset(self): #
-        results = {}
         self.set_req('09')
         self.set_start_time()
 
@@ -708,10 +694,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         
         time.sleep(self.default_wait)
 
-        return results
-    
+            
     def r10r12r15r16r17_mainpath_edit_dataset(self):
-        results = {}
         # It seems like there are no actual screenshots or steps for r10?
         # I think we are using this as a catch-all for the editing that is not covered by other requirements
         self.set_req('12')
@@ -956,15 +940,13 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
 
-        return results
-
+        
     # This test of file upload requires manual interaction by the user, as automating selecting file via toe OS file picker is super painful
     # We may try to automate the file picker someday.
     # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
     # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
 
     # def r13_mainpath_upload_dataset_files(self):
-    #     results = {}
     #     self.set_req('13')
 
     #     self.part = '01'
@@ -985,7 +967,24 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         # So advanced search is an OR statement with the fields. So if we have to exercise ALL the search fields its going to be very painful.
         # Searching multiple words is also painful because they are also ORed
         # ... We can probably avoid the pain by using long custom single words (that no other dataset will have)
-        pass
+        # It seems like there are no actual screenshots or steps for r10?
+        # I think we are using this as a catch-all for the editing that is not covered by other requirements
+        self.set_req('12')
+        self.set_start_time()
+
+        self.sesh.get(self.dv_url)
+        
+        self.part = '01'
+        self.part = '02'
+        self.part = '03'
+        self.part = '04'
+        self.part = '05'
+        self.part = '06'
+        self.part = '07'
+        
+
+
+        self.set_end_time()
 
     def r24_mainpath_browse_datasets(self):
         # Need to test the previous/next buttons
