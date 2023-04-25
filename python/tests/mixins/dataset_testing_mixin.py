@@ -828,4 +828,3 @@ class DatasetTestingMixin(object):
     #     # - //*[@id="manageTemplatesForm:allTemplates_data"]/tr[1]/td[4]/div/div/ul/li[1]/a
     #     # - <a href="/template.xhtml?id=10&amp;ownerId=1&amp;editMode=METADATA">Metadata</a>
     #     # If it matches the provided id, we click the delete button in that tr
-

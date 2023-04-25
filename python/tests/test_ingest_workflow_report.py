@@ -621,7 +621,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
 
-        self.set_end_time()
+        #self.set_end_time() #We continue this test later so we don't do the end time here
 
         if self.test_files:
             self.set_req('13')
@@ -671,9 +671,32 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
 
 #TODO: Add additional metadata here (R11)
+#      - This means calling set_dataset_metadata_edit before first publish (maybe use "postcreate" as add_string)
 #TODO: Add screenshots to code below after adding other requirements
-#TODO: We should be doing our tests BEFORE publishing
+#TODO: We should maybe be doing our tests BEFORE publishing. Check reqs? Definitely for r14, maybe just move these up?
 #TODO: I'm not sure what to do for R19 (sign document) but it should be here
+        self.set_req('11')
+
+        self.part = '02' #click edit dataset
+        self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click edit dataset
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click metadata
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '03' #edit metadata postcreate
+        self.set_dataset_metadata_edit(add_string='postcreate', xpath_dict=self.ds_edit_xpaths_notemplate)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(8):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+
+        self.part = '04' #save
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to save dataset
+        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a') #Wait for load
+        self.take_screenshot(shot:=1)
+
+        self.set_end_time()
 
         # self.set_req('14')
         # self.set_start_time()
@@ -693,12 +716,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
 
-        self.sesh.implicitly_wait(3)
+        self.sesh.implicitly_wait(3) #Why are we doing this?
         try: 
-            self.confirm_dataset_metadata(add_string='create', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
+            self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
         except Exception:
             self.templates_exist = True
-            self.confirm_dataset_metadata(add_string='create', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
+            self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
         self.sesh.implicitly_wait(10)
         
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data

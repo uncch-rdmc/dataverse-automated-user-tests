@@ -85,9 +85,9 @@ text = {
 
     'r11_title': 'Creating citation metadata',
     'r11_p01': 'Complete the metadata form in the Citation Metadata section of the page by entering the appropriate information into the text fields provided or by selecting options from the given drop-down list for each of the corresponding citation metadata fields.',
-    # 'r11_p02': 'After creation, on the newly created dataset page, click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
-    # 'r11_p03': 'In each section of the metadata form, add additional descriptive information about the dataset by entering the appropriate information into the text fields provided or by selecting options from the given drop-down list for each of the corresponding metadata fields.',
-    # 'r11_p04': 'Click on the Save Changes button.',
+    'r11_p02': 'After creation, on the newly created dataset page, click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
+    'r11_p03': 'In each section of the metadata form, add additional descriptive information about the dataset by entering the appropriate information into the text fields provided or by selecting options from the given drop-down list for each of the corresponding metadata fields.',
+    'r11_p04': 'Click on the Save Changes button.',
 
     'r12_title': 'Edit dataset-level metadata',
     'r12_p01': 'Click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
@@ -98,6 +98,11 @@ text = {
     'r13_p01': 'Upload dataset files in the Upload with HTTP via your browser section of the page by clicking on the Select Files to Add button.',
     'r13_p02': 'In the file explorer box that appears, navigate to and select each file to be included in the dataset.',
     #'r13_p03': 'Alternatively, drag and drop each dataset file into the Drag and drop files here box.  A list of uploaded files will appear with an MD5 and editable file-level metadata fields for each file.',
+
+    'r14_title': 'Review data set/study metadata',
+    'r14_p01': 'Inspect the list of files and corresponding file-level metadata to ensure that the correct files were ingested.',
+    'r14_p02': 'Inspect the metadata to ensure that the metadata is complete, accurate, and free of typos or grammatical errors.',
+    'r14_p03': 'Confirm that that the Dataset Terms are appropriate for the dataset.', 
 
     'r15_title': 'Ingest new version of an existing file',
     'r15_p01': 'Click on the file name to navigate to the file landing page.',
