@@ -77,8 +77,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = self.get_testing_info()
 
         tests = [
-            #self.r01alt_mainpath_builtin_auth,
-            self.r01_mainpath_test_sso_auth,
+            self.r01alt_mainpath_builtin_auth,
+            #self.r01_mainpath_test_sso_auth,
             self.get_api_token,
             self.r02_mainpath_add_user_group_role,
             self.r03_mainpath_create_sub_dataverse,
@@ -107,7 +107,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 print("Unable to destroy dataset on tearDown. Error: " + e)
         if dv_id is not None:
             try:
-                #resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{self.dataverse_name}', headers=headers)
+                #resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{self.dataverse_identifier}', headers=headers)
                 resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{dv_id}', headers=headers)
                 print(resp_dv_delete.__dict__)
             except Exception as e:
@@ -323,11 +323,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         ### Test Save ###
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
-        self.assertEqual(self.dv_url+'/dataverse/'+self.dataverse_name+'/', self.sesh.current_url) #confirm page
+        self.assertEqual(self.dv_url+'/dataverse/'+self.dataverse_identifier+'/', self.sesh.current_url) #confirm page
         self.take_screenshot(shot:=1)
 
         self.confirm_dataverse_metadata(add_string="create")
-        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
         
         ### Dataverse Page - Publish ###
         self.part = '05'
@@ -349,7 +349,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_start_time()
 
         self.part = '01'
-        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
         time.sleep(self.default_wait)
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
@@ -375,14 +375,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
         self.take_screenshot(shot:=1)
         
-        #print(self.dv_url + '/dataverse/' + self.dataverse_name + '/')
-        # self.sesh.get(self.dv_url + '/dataverse/' + self.dataverse_name + '/')
+        #print(self.dv_url + '/dataverse/' + self.dataverse_identifier + '/')
+        # self.sesh.get(self.dv_url + '/dataverse/' + self.dataverse_identifier + '/')
         # time.sleep(self.default_wait)
         time.sleep(1)
         self.confirm_dataverse_metadata()
 
         self.part = '04' #Select metadata facets
-        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
         #time.sleep(1)
@@ -445,7 +445,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_start_time()
 
         self.part = '01'
-        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
         time.sleep(self.default_wait)
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
@@ -590,7 +590,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_start_time()
 
         self.part = '01'
-        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_name)
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/button').click() #click add data
         self.take_screenshot(shot:=1)
 
@@ -598,9 +598,17 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="addDataForm"]/div/ul/li[2]/a').click() #click new dataset
         self.take_screenshot(shot:=1)
 
-        self.set_end_time()
+        self.part = '03'
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:selectHostDataverse_input"]').clear()
+        self.sesh.find_element('xpath','//*[@id="datasetForm:selectHostDataverse_input"]').send_keys(self.dv_props['name'])
+        time.sleep(2)
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
+        self.take_screenshot(shot:=shot+1)
+        time.sleep(1)
+        #self.sesh.find_element('xpath', '//*[@id="datasetForm:selectHostDataverse_panel"]/table/tbody/tr[1]').send_keys(Keys.ENTER)
 
-        #TODO: set host dataverse (self.part 3) first
+        self.set_end_time()
 
         self.set_req('11')
         self.set_start_time()
@@ -938,7 +946,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
         
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
-        print("a4")
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
 
         if not self.templates_exist:
@@ -976,7 +983,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_start_time()
 
         self.part = '01' # enter search terms (basic)
-        print(self.dv_url)
         self.sesh.get(self.dv_url)
         time.sleep(5)
         self.take_screenshot(shot:=1)

@@ -27,11 +27,9 @@ def main():
     with open('output.html', 'w') as f:
         #f.write(template.render(**text))
         # print(result)
-        print(ingest_test.req)
-        print(ingest_test.part)
-        print(failure)
-        print(ingest_test.start_times)
-        print(ingest_test.end_times)
+        print("Last Req: " + ingest_test.req)
+        print("Last Part: " + ingest_test.part)
+        print("Was Failure: " + str(failure))
         f.write(template.render(text = text, 
                                 screenshots = ingest_test.screenshots, 
                                 start_times = ingest_test.start_times,

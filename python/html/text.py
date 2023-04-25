@@ -70,7 +70,7 @@ text = {
     'r09_title': 'Creating a dataset',
     'r09_p01': 'Click on the Add Data button located at the upper-right hand side of the dataverse landing page.',
     'r09_p02': 'In the drop-down list that appears, select the New Dataset option.',
-    # 'r09_p03': 'In the dataset metadata page, select the Host Dataverse from the drop-down list provided.',
+    'r09_p03': 'In the dataset metadata page, select the Host Dataverse from the drop-down list provided.',
 
     'r10_title': 'Editing a dataset',
     'r10_p01': 'Click the checkbox next to the file(s) that require(s) editing.',
