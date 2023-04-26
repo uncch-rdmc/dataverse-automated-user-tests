@@ -135,7 +135,18 @@ text = {
     'r17_title': 'Add version notes',
     'r17_p01': 'Add version change notes to the Notes metadata field.',
 
+    'r18_title': 'Review materials for publication',
+    'r18_p01': 'Inspect the list of files and corresponding file-level metadata to ensure that the correct files were ingested.',
+    'r18_p02': 'Inspect the citation metadata to ensure that the metadata is complete, accurate, and free of typos or grammatical errors.',
+    'r18_p03': 'Confirm that that the Dataset Terms are appropriate for the dataset.',
+
     'r20_title': 'Publish the dataset/study verify that they have compared the pre and post publishing checksum of the file',
+
+#TODO: DO
+    # 'r20_p0': 'Once the updated dataset record has been reviewed, click on the Publish Dataset button to the right-hand side of the dataset citation.'
+    # 'r20_p0': 'In the Publish Dataset dialogue box that appears, click on the radio button next to the appropriate release type.'
+    # 'r20_p0': 'Click on the Continue button.'
+
     'r20_p01': 'Confirm that the MD5 matches the pre-dataverse ingest MD5 for each file.',
     'r20_p02': 'If necessary, update the file name and define the file path in the corresponding metadata fields for each uploaded file.',
     'r20_p03': 'Add a file description in the Description text field for each uploaded file.',

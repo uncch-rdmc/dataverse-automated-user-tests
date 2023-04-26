@@ -86,7 +86,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.r05_mainpath_create_metadata_template,
             self.r06_mainpath_edit_metadata_template,
             self.r09r11r13r20_mainpath_create_dataset,
-            self.r10r12r15r16r17_mainpath_edit_dataset,
+            self.r10r12r15r16r17r18_mainpath_edit_dataset,
             self.r21_mainpath_search_dataset,
         ]
         for test in tests:
@@ -738,10 +738,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-#... so we do pretty much the same test again after update (r18). Should I call this somewhere else? Or just copy/paste
-#... probably just copy paste with a note
-
-        self.set_req('14')
+        self.set_req('14') #NOTE: Very similar to req 18. If you edit this also edit that
         self.set_start_time()
 
         self.part = '01' 
@@ -754,6 +751,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
 
         self.part = '02'
+        self.sesh.execute_script("window.scrollTo(0, 0)") 
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
         self.sesh.implicitly_wait(3) #We fail fast because we expect this to happen when a dataset template has been made already (normal test path)
@@ -825,7 +823,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         # time.sleep(self.default_wait)
 
             
-    def r10r12r15r16r17_mainpath_edit_dataset(self):
+    def r10r12r15r16r17r18_mainpath_edit_dataset(self):
         # It seems like there are no actual screenshots or steps for r10?
         # I think we are using this as a catch-all for the editing that is not covered by other requirements
         self.set_req('12')
@@ -1022,7 +1020,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '06'
             time.sleep(1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_2_renamed.txt')
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_2_renamed.png')
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').send_keys('/testfolder2/')
             self.take_screenshot(shot:=1)
@@ -1039,9 +1037,58 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.set_end_time()
 
+        self.set_req('18') #NOTE: Very similar to req 14. If you edit this also edit that
+        self.set_start_time()
+
+        self.part = '01' 
+
+        self.sesh.execute_script(f"window.scrollTo(0, {3 * self.scroll_height})") 
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[1]/a').text, 'test_file_1_replace_renamed.txt')
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileHierarchy"]').text, 'testreplacefolder/')
+        self.assertEqual('MD5: ' + self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_1_replace_md5)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileDescNonEmpty"]').text, 'test_file_replace_description')
+
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[1]/a').text, 'test_file_2_renamed.png')
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileHierarchy"]').text, 'testfolder2/')
+        self.assertEqual('MD5: ' + self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_2_md5)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileDescNonEmpty"]').text, 'test_file_description2')
+        self.take_screenshot(shot:=1)
+
+        self.part = '02'
+        self.sesh.execute_script("window.scrollTo(0, 0)") 
+        self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
+        # if not self.templates_exist: 
+        #     self.confirm_dataset_metadata(add_string='edit', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
+        # else:
+        #NOTE: This seems to line up with notemplate even though there is one at this point? Maybe its different off a draft dataset instead of off a non-draft?
+        #      If this blows up testing without a template, investigate more
+        self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate) #xpath_dict=self.ds_edit_xpaths_yestemplate)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(8):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
+
+        self.part = '03' #terms (license)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
+        time.sleep(.5)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:termsTab"]/div[1]/a').click()
+        time.sleep(1)
+        self.confirm_license(add_string='edit', xpath_dict=self.ds_license_edit_xpaths)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click()
+
+        self.set_end_time()
+
+        time.sleep(1)
+
 #TODO: Add screenshots to code below after adding other requirements
-        # self.set_req('18')
-        # self.set_start_time()
         if self.test_files:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
         else:
