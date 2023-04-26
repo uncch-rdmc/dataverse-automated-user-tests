@@ -71,7 +71,14 @@ text = {
     'r09_p01': 'Click on the Add Data button located at the upper-right hand side of the dataverse landing page.',
     'r09_p02': 'In the drop-down list that appears, select the New Dataset option.',
     'r09_p03': 'In the dataset metadata page, select the Host Dataverse from the drop-down list provided.',
+    'r09_p04': 'Click on the Terms tab on the dataset landing page.',
+    'r09_p05': 'Click on the Edit Terms Requirements button.',
+    'r09_p06': 'In the Dataset Terms section, select the appropriate terms by selecting from the License/Data Use Agreement drop-down list provided.',
+    'r09_p07': 'Enter and/or update custom dataset terms, information about restricted files and terms of access in the fields provided.',
+    'r09_p08': 'Click on the Save Changes button.',
+    'r09_p09': 'Once the dataset record has been reviewed, click on the Publish Dataset button to the right-hand side of the dataset citation to finalize and create version 1 of the dataset.',
 
+#TODO: I guessed on some of these reqs and I think they need to be moved. Anything that isn't data (e.g. terms) is probably req 12?
     'r10_title': 'Editing a dataset',
     'r10_p01': 'Click the checkbox next to the file(s) that require(s) editing.',
     'r10_p02': 'Click on the Edit Files button above the file list and select the Metadata option.',

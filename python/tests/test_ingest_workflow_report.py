@@ -516,8 +516,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(self.default_wait) #For some reason we are getting a reference error below without waiting. Maybe its getting the div for the previous page?
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
         self.take_screenshot(shot:=1)
-        time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
-        
+        time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?  
+
+        #NOTE: we don't screenshot here because its not an actual requirement to check at this point. We could maybe disable this
+
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
         self.confirm_dataset_metadata(add_string='create', xpath_dict=self.ds_template_xpaths)
         self.confirm_dataset_metadata_template_instructions(add_string='create')
@@ -573,9 +575,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.part = '06'  
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
-        time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?
+        time.sleep(self.default_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work (not that I'm actually doing that here...)?
         self.take_screenshot(shot:=1)
         
+        #NOTE: we don't screenshot here because its not an actual requirement to check at this point. We could maybe disable this
+
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
         self.confirm_dataset_metadata(add_string='edit', xpath_dict=self.ds_template_xpaths)
         self.confirm_dataset_metadata_template_instructions(add_string='edit')
@@ -585,7 +589,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
             
-    def r09r11r13r20_mainpath_create_dataset(self): #
+    def r09r11r13r20_mainpath_create_dataset(self):
         self.set_req('09')
         self.set_start_time()
 
@@ -608,7 +612,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1)
         #self.sesh.find_element('xpath', '//*[@id="datasetForm:selectHostDataverse_panel"]/table/tbody/tr[1]').send_keys(Keys.ENTER)
 
-        self.set_end_time()
+        #self.set_end_time() #We continue this test later
 
         self.set_req('11')
         self.set_start_time()
@@ -670,8 +674,44 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         ### Get dataset id from permissions page url for later uses ###
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
 
-#TODO: Add additional metadata here (R11)
-#      - This means calling set_dataset_metadata_edit before first publish (maybe use "postcreate" as add_string)
+        self.set_req('09')
+
+        # Dataset-terms (note: create and edit use the same code)
+        self.part = '04'
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
+        self.take_screenshot(shot:=shot+1)
+        time.sleep(1) #TODO: Probably remove this wait when we replace the below dynamic id xpath with one based off a stable id
+
+        self.part = '05'
+        if not self.templates_exist:
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1722"]').click()
+        else:
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1719"]').click()
+
+        self.part = '06'
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:licenses"]').click() #click license dropdown
+        time.sleep(.2)
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
+        time.sleep(.2)
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '07'
+        self.set_license(add_string='edit', xpath_dict=self.ds_license_edit_xpaths)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+
+        self.part = '08'
+        self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottomTerms"]').click()
+        self.take_screenshot(shot:=1)
+        time.sleep(1)
+        self.take_screenshot(shot:=shot+1)
+
 #TODO: Add screenshots to code below after adding other requirements
 #TODO: We should maybe be doing our tests BEFORE publishing. Check reqs? Definitely for r14, maybe just move these up?
 #TODO: I'm not sure what to do for R19 (sign document) but it should be here
@@ -698,35 +738,91 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        # self.set_req('14')
-        # self.set_start_time()
+#... so we do pretty much the same test again after update (r18). Should I call this somewhere else? Or just copy/paste
+#... probably just copy paste with a note
 
-        if self.test_files:
-            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
-        else:
-            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
+        self.set_req('14')
+        self.set_start_time()
 
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:publishDataset_content"]/div[4]/button[1]').click() #click publish confirm
+        self.part = '01' 
 
-        self.sesh.implicitly_wait(30)
-        self.sesh.find_element('class name', 'label-default') #Find element to wait for load. May trigger prematurely with files added.
-        self.sesh.implicitly_wait(10)
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.0") #Test dataset published
-        
+        self.sesh.execute_script(f"window.scrollTo(0, {3 * self.scroll_height})") 
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[1]/a').text, 'test_file_1_renamed.txt')
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileHierarchy"]').text, 'testfolder/')
+        self.assertEqual('MD5: ' + self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_1_md5)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileDescNonEmpty"]').text, 'test_file_description')
+        self.take_screenshot(shot:=1)
+
+        self.part = '02'
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
-
-        self.sesh.implicitly_wait(3) #Why are we doing this?
+        self.sesh.implicitly_wait(3) #We fail fast because we expect this to happen when a dataset template has been made already (normal test path)
         try: 
             self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
         except Exception:
             self.templates_exist = True
             self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
         self.sesh.implicitly_wait(10)
-        
+        if self.do_screenshots:
+            shot = 0
+            for i in range(8):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
+
+        self.part = '03' #terms (license)
+    
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
+        time.sleep(.5)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:termsTab"]/div[1]/a').click()
+        time.sleep(1)
+
+        self.confirm_license(add_string='edit', xpath_dict=self.ds_license_edit_xpaths)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click()
+
+        self.set_end_time()
+
+        self.set_req('09')
+
+        self.part = '09'
+
+        self.take_screenshot(shot:=1)
+        if self.test_files:
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
+        else:
+            self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:publishDataset_content"]/div[4]/button[1]').click() #click publish confirm
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.implicitly_wait(30)
+        self.sesh.find_element('class name', 'label-default') #Find element to wait for load. May trigger prematurely with files added.
+        self.sesh.implicitly_wait(10)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.0") #Test dataset published
+        self.take_screenshot(shot:=shot+1)
+
+        self.set_end_time()
+
+#TODO: Testing the published dataset is part of a later req (r22 or r23?)
+
+        # self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
+        # self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
+
+        # self.sesh.implicitly_wait(3) #We fail fast because we expect this to happen when a dataset template has been made already (normal test path)
+        # try: 
+        #     self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
+        # except Exception:
+        #     self.templates_exist = True
+        #     self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
+        # self.sesh.implicitly_wait(10)
         
-        time.sleep(self.default_wait)
+        # self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
+        
+        # time.sleep(self.default_wait)
 
             
     def r10r12r15r16r17_mainpath_edit_dataset(self):
@@ -811,7 +907,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success")
             self.take_screenshot(shot:=1)
     
-        # Dataset-terms
+        # Dataset-terms (note: create and edit use the same code)
         self.part = '05'
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
@@ -982,24 +1078,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
         time.sleep(5) #We have to sleep after cancelling, even though test 21 just goes to another page, because it won't nav
 
-        
-    # This test of file upload requires manual interaction by the user, as automating selecting file via toe OS file picker is super painful
+    # The test of file upload requires manual interaction by the user, as automating selecting file via toe OS file picker is super painful
     # We may try to automate the file picker someday.
     # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
     # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
-
-    # def r13_mainpath_upload_dataset_files(self):
-    #     self.set_req('13')
-
-    #     self.part = '01'
-
-    #     self.part = '02'
-    #     # Select files
-
-    def r14_mainpath_review_data_set(self):
-        # We need to take the existing "confirm_dataset_metadata" and make it work for the citation metadata tab (instead of the edit page)
-        # ... Well because tab versions of the fields combine other ones, I need to rewrite the asserts. So I probably need a new method
-        pass
 
     def r21_mainpath_search_dataset(self):
         self.set_req('21')
