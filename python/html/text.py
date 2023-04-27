@@ -158,8 +158,8 @@ text = {
     'r22_title': 'Dataverse must support Dataset and study discovery where archivists and compliance officers are able to view metadata and data files',
     'r22_p01': 'Navigate to the relevant dataset record landing page',
     'r22_p02': 'Review the list of dataset files. To view additional file information, click on the file name to navigate to the file landing page.',
-    'r22_p03': 'Review dataset citation and descriptive metadata.',
-    'r22_p04': 'Review dataset terms.',
+    'r22_p03': 'Review dataset citation and descriptive metadata by clicking on the Metadata tab.',
+    'r22_p04': 'Review dataset terms by clicking on the Terms tab.',
 
     'r23_title': 'Dataverse must support Dataset and study discovery where archivists and compliance officers are able to view version history',
     'r23_p01': 'Navigate to the relevant dataset record landing page and click on the Versions tab',
@@ -168,7 +168,7 @@ text = {
 
     'r24_title': 'Dataverse must support Dataset and study discovery where archivists and compliance officers are able to browse Dataverse',
     'r24_p01': 'Dataset records appear on the dataverse main page.  To browse beyond the 10 dataset records on the main landing page, click on a page number or Next > button located below the dataset list.',
-    'r24_p02': 'If needed, add filters to the datasets listed by clicking on one or more metadata facets listed on the left-hand side of the dataverse landing page.',
+    'r24_p02': 'If needed, add filters to the datasets listed.',
     'r24_p03': 'Select the relevant dataset.',
 
     #TODO: I think I want to test downloading the full zip as well. Maybe instead of download multiple?

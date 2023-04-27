@@ -50,6 +50,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
         if self.browser_type == "Chrome":
+            options.add_experimental_option("prefs", {
+                "download.default_directory":"/Users/madunlap/selenium_downloads", 
+                "download.prompt_for_download": False
+            })
+            
             self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         if self.do_screenshots:
             self.sesh.set_window_size(1200,827) #675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
@@ -87,7 +92,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.r06_mainpath_edit_metadata_template,
             self.r09r11r13r20_mainpath_create_dataset,
             self.r10r12r15r16r17r18_mainpath_edit_dataset,
-            self.r21_mainpath_search_dataset,
+            self.r21r22r23r24_dataset_file_discovery,
         ]
         for test in tests:
             test()
@@ -174,6 +179,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.part = '04'
         self.sesh.implicitly_wait(3600)
+        print("User input required: complete oauth login.")
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait login to complete
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
         self.take_screenshot(shot:=1)
@@ -640,6 +646,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             #       Instead we do a find element that will show up after upload and wait for the test-user to do the upload
             #       We may be able to do this via robot later https://robotframework.org/robotframework/latest/libraries/Screenshot.html#Take%20Screenshot
             self.sesh.implicitly_wait(3600)
+            print("User input required: upload test_file_1.txt")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("upload completed")
@@ -962,6 +969,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.take_screenshot(shot:=1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
             self.sesh.implicitly_wait(3600)
+            print("User input required: upload test_file_1_replace.txt")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("replace completed")
@@ -1006,6 +1014,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.take_screenshot(shot:=1) 
             self.sesh.find_element('xpath','//*[@id="datasetForm:fileUpload"]/div[1]/span').click() #save
             self.sesh.implicitly_wait(3600)
+            print("User input required: upload test_file_2.png")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("upload completed")
@@ -1130,7 +1139,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
     # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
 
-    def r21_mainpath_search_dataset(self):
+    def r21r22r23r24_dataset_file_discovery(self):
         self.set_req('21')
         self.set_start_time()
 
@@ -1176,10 +1185,110 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-    def r24_mainpath_browse_datasets(self):
-        # Need to test the previous/next buttons
-        # Need to select facets and click a dataset? (Maybe we can avoid clicking?)
-        pass
+        self.set_req('22')
+        self.set_start_time()
+
+        self.part = '01' #nav to landing (already there)
+        self.take_screenshot(shot:=1)
+
+        self.part = '02' #nav to file tab, click a file
+        self.sesh.execute_script("window.scrollTo(0, 1200)") 
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[1]/a').click() #click edit dataset
+        time.sleep(2)
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '03' #nav to metadata tab
+        self.sesh.find_element('xpath', '//*[@id="breadcrumbLnk2"]').click() #click edit dataset
+        time.sleep(2)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[2]/a').click()
+        time.sleep(.2)
+        self.take_screenshot(shot:=1)
+
+        self.part = '04' #nav to terms tab
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
+        time.sleep(.2)
+        self.take_screenshot(shot:=1)
+        self.set_end_time()
+
+        #NOTE: This code should maybe just be seperate? we upload 6 more files both to make pagination work and to have enough versions
+
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[1]/a').click()
+        time.sleep(.2)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click()
+        time.sleep(1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
+        self.sesh.implicitly_wait(3600)
+        print("User input required: upload 6 pagination files (select multiple in the system dialog).")
+        self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
+        self.sesh.implicitly_wait(10)
+        self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #create dataset
+
+        #END
+
+        self.set_req('23')
+        self.set_start_time()
+
+        self.part = '01' #nav to dataset and then version tab
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[4]/a').click()
+        time.sleep(.2)
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '02' #click version details for a version
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[2]/td[3]/a').click()
+        time.sleep(2)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(4):
+                self.sesh.execute_script(f"document.getElementById('datasetForm:detailsBlocks_content').scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:detailsBlocks"]/div[1]/a').click()
+
+        self.part = '03' #compare two versions
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[3]/td[1]/div/div/span').click()
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[1]/td[1]/div/div/span').click()
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTab"]/div[1]/button[1]').click()
+        time.sleep(2)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(5):
+                self.sesh.execute_script(f"document.getElementById('datasetForm:detailsBlocks_content').scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:detailsBlocks"]/div[1]/a').click()
+
+        self.set_end_time()
+
+        self.set_req('24')
+        self.set_start_time()
+
+        self.part = '01' #from main page, exercise pagination.
+        self.sesh.get(self.dv_url)
+        self.sesh.find_element('xpath', '//*[@id="facetType"]/div[3]/a[1]/div/div[2]/span').click()
+        time.sleep(1)
+        self.take_screenshot(shot:=1)
+        self.sesh.execute_script("window.scrollTo(0, 1200)") 
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="dv-main"]/div[2]/ul/li[4]/a').click()
+        time.sleep(2)
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.execute_script("window.scrollTo(0, 1200)") 
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '02' #use metadata facet to filter
+        self.sesh.get(self.dv_url)
+        time.sleep(1)
+        self.take_screenshot(shot:=1)
+        self.sesh.get(f'{self.dv_url}/dataverse/root?q=&fq1=keywordValue_ss%3A%22edit{self.ds_props["keyword_term"]}%22&fq0=dvObjectType%3A%28dataverses+OR+datasets+OR+files%29&types=dataverses%3Adatasets%3Afiles&sort=dateSort&order=') 
+        time.sleep(1)
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '03' #select dataset
+        self.sesh.find_element('xpath', '//*[@id="resultsTable"]/tbody/tr[2]/td/div/div[1]/a/span').click()
+        time.sleep(1)
+        self.take_screenshot(shot:=1)
+
+        self.set_end_time()
 
     def take_screenshot(self, shot):
         if self.do_screenshots: 
