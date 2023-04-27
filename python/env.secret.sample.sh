@@ -7,3 +7,6 @@ export DATAVERSE_TEST_USER_PASSWORD_BUILTIN=
 
 # For sso login testing
 export DATAVERSE_SSO_OPTION_VALUE=
+
+#The tests will make a subfolder named "seleniumdownloads" during testing and then delete it at the end
+export DOWNLOAD_PARENT_DIR=

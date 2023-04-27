@@ -1,4 +1,6 @@
-import time, unittest, os, requests, re
+import time, unittest, os, requests, re, hashlib
+from shutil import rmtree
+from zipfile import ZipFile
 from datetime import datetime
 from io import BytesIO
 from urllib import parse
@@ -27,6 +29,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.perm_test_username = os.getenv('DATAVERSE_USERNAME_FOR_PERM_TEST')
         self.sso_option_value = os.getenv('DATAVERSE_SSO_OPTION_VALUE')
+#TODO: Make this actually the full directory with seleniumdownloads to not have to fstring repeatedly
+        self.download_parent_dir = os.getenv('DOWNLOAD_PARENT_DIR')
         self.default_wait = 2
         self.scroll_height = 600 #For scrolling with screenshots
         #self.failed = False #TODO: Delete?
@@ -41,6 +45,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = {}
         self.test_order = []
 
+#TODO: Make these just MD5s and fix code
         self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
         self.test_file_1_replace_md5 = 'MD5: 07436de69e3283065a2453322ee22ba3'
         self.test_file_2_md5 = 'MD5: c7803e4497be4984e41102e1b2ef64cc'
@@ -49,9 +54,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         options = Options()
         #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
+
         if self.browser_type == "Chrome":
             options.add_experimental_option("prefs", {
-                "download.default_directory":"/Users/madunlap/selenium_downloads", 
+                "download.default_directory":f"{self.download_parent_dir}/seleniumdownloads", 
                 "download.prompt_for_download": False
             })
             
@@ -71,7 +77,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
     def tearDown(self):
         self.delete_dv_resources(self.dataset_id, self.dataverse_id, self.role_alias)
-
+        try:
+            rmtree(f'{self.download_parent_dir}/seleniumdownloads/')
+        except Exception as e:
+            #TODO: Only error if folder exists
+            print("Unable to delete download folder. Likely the test never got this far. Error: " + str(e))
 
     #TODO: Maybe add some options to these functions to slim down some of the tests. For example, dataset template instructions which take forever. 
     def test_requirements(self):
@@ -92,7 +102,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.r06_mainpath_edit_metadata_template,
             self.r09r11r13r20_mainpath_create_dataset,
             self.r10r12r15r16r17r18_mainpath_edit_dataset,
-            self.r21r22r23r24_dataset_file_discovery,
+            self.r21r22r23r24r25_dataset_file_discovery,
         ]
         for test in tests:
             test()
@@ -109,20 +119,20 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 resp_ds_destroy = requests.delete(f'{self.dv_url}/api/datasets/{ds_id}/destroy', headers=headers)
                 print(resp_ds_destroy.__dict__)
             except Exception as e:
-                print("Unable to destroy dataset on tearDown. Error: " + e)
+                print("Unable to destroy dataset on tearDown. Error: " + str(e))
         if dv_id is not None:
             try:
                 #resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{self.dataverse_identifier}', headers=headers)
                 resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{dv_id}', headers=headers)
                 print(resp_dv_delete.__dict__)
             except Exception as e:
-                print("Unable to delete dataverse on tearDown. Error: " + e)
+                print("Unable to delete dataverse on tearDown. Error: " + str(e))
         if role_alias is not None:
             try:
                 resp_role_delete = requests.delete(f'{self.dv_url}/api/roles/:alias?alias={role_alias}', headers=headers)
                 print(resp_role_delete.__dict__)
             except Exception as e:
-                print("Unable to delete role on tearDown. Error: " + e)
+                print("Unable to delete role on tearDown. Error: " + str(e))
 
     def get_dataverse_version(self):
         # $ curl http://localhost:8080/api/info/version
@@ -183,6 +193,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait login to complete
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
         self.take_screenshot(shot:=1)
+        print("Authorization Completed")
         self.sesh.implicitly_wait(10)
 
         self.set_end_time()
@@ -649,7 +660,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             print("User input required: upload test_file_1.txt")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
-            print("upload completed")
+            print("Upload Completed")
             self.take_screenshot(shot:=1)
             self.set_end_time()
 
@@ -972,7 +983,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             print("User input required: upload test_file_1_replace.txt")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
-            print("replace completed")
+            print("Replace Completed")
 
             self.part = '04'
             # self.part = '05'
@@ -1017,7 +1028,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             print("User input required: upload test_file_2.png")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
-            print("upload completed")
+            print("Upload Completed")
 
             self.part = '03'
             # self.part = '04'
@@ -1139,7 +1150,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
     # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
 
-    def r21r22r23r24_dataset_file_discovery(self):
+    def r21r22r23r24r25_dataset_file_discovery(self):
         self.set_req('21')
         self.set_start_time()
 
@@ -1199,8 +1210,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=shot+1)
 
         self.part = '03' #nav to metadata tab
-        self.sesh.find_element('xpath', '//*[@id="breadcrumbLnk2"]').click() #click edit dataset
+        self.sesh.find_element('xpath', '//*[@id="breadcrumbLnk2"]').click() #click back to dataset
         time.sleep(2)
+        self.sesh.execute_script("window.scrollTo(0, 1200)") 
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[2]/a').click()
         time.sleep(.2)
         self.take_screenshot(shot:=1)
@@ -1211,69 +1223,74 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
         self.set_end_time()
 
-        #NOTE: This code should maybe just be seperate? we upload 6 more files both to make pagination work and to have enough versions
+        #This code is not part of a req per say. But we need another version of the dataset for version testing, and more files to garuntee enough objects for browse pagination
 
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[1]/a').click()
-        time.sleep(.2)
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click()
-        time.sleep(1)
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
-        self.sesh.implicitly_wait(3600)
-        print("User input required: upload 6 pagination files (select multiple in the system dialog).")
-        self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
-        self.sesh.implicitly_wait(10)
-        self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #create dataset
-
-        #END
+        if self.test_files:
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[1]/a').click()
+            time.sleep(1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click()
+            time.sleep(1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
+            self.sesh.implicitly_wait(3600)
+            print("User input required: upload 6 pagination files (select multiple in the system dialog).")
+            self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
+            self.sesh.implicitly_wait(10)
+            print("Upload Completed")
+            self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #save files
 
         self.set_req('23')
         self.set_start_time()
 
         self.part = '01' #nav to dataset and then version tab
+        time.sleep(1)
         self.take_screenshot(shot:=1)
+        self.sesh.execute_script("window.scrollTo(0, 1200)") 
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[4]/a').click()
         time.sleep(.2)
         self.take_screenshot(shot:=shot+1)
 
         self.part = '02' #click version details for a version
+        self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[2]/td[3]/a').click()
         time.sleep(2)
         if self.do_screenshots:
-            shot = 0
             for i in range(4):
                 self.sesh.execute_script(f"document.getElementById('datasetForm:detailsBlocks_content').scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:detailsBlocks"]/div[1]/a').click()
 
-        self.part = '03' #compare two versions
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[3]/td[1]/div/div/span').click()
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[1]/td[1]/div/div/span').click()
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTab"]/div[1]/button[1]').click()
-        time.sleep(2)
-        if self.do_screenshots:
-            shot = 0
-            for i in range(5):
-                self.sesh.execute_script(f"document.getElementById('datasetForm:detailsBlocks_content').scrollTo(0, {i * self.scroll_height})") 
-                self.take_screenshot(shot:=shot+1)
-        self.sesh.find_element('xpath', '//*[@id="datasetForm:detailsBlocks"]/div[1]/a').click()
+        if self.test_files: #Requires files currently because uploading of the files creates the draft version which creates 3 version and enabled the checkbox compare dialog
+            time.sleep(1)
+            self.take_screenshot(shot:=1)
+            self.part = '03' #compare two versions
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[3]/td[1]/div/div/span').click()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[1]/td[1]/div/div/span').click()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTab"]/div[1]/button[1]').click()
+            time.sleep(2)
+            if self.do_screenshots:
+                for i in range(5):
+                    self.sesh.execute_script(f"document.getElementById('datasetForm:detailsBlocks_content').scrollTo(0, {i * self.scroll_height})") 
+                    self.take_screenshot(shot:=shot+1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:detailsBlocks"]/div[1]/a').click()
 
         self.set_end_time()
 
         self.set_req('24')
         self.set_start_time()
 
-        self.part = '01' #from main page, exercise pagination.
-        self.sesh.get(self.dv_url)
-        self.sesh.find_element('xpath', '//*[@id="facetType"]/div[3]/a[1]/div/div[2]/span').click()
-        time.sleep(1)
-        self.take_screenshot(shot:=1)
-        self.sesh.execute_script("window.scrollTo(0, 1200)") 
-        self.take_screenshot(shot:=shot+1)
-        self.sesh.find_element('xpath', '//*[@id="dv-main"]/div[2]/ul/li[4]/a').click()
-        time.sleep(2)
-        self.take_screenshot(shot:=shot+1)
-        self.sesh.execute_script("window.scrollTo(0, 1200)") 
-        self.take_screenshot(shot:=shot+1)
+        if self.test_files: #Requires files currently because we upload 6 additional files to have enough files to ensure pagination exists
+            self.part = '01' #from main page, exercise pagination.
+            self.sesh.get(self.dv_url)
+            self.sesh.find_element('xpath', '//*[@id="facetType"]/div[3]/a[1]/div/div[2]/span').click()
+            time.sleep(1)
+            self.take_screenshot(shot:=1)
+            self.sesh.execute_script("window.scrollTo(0, 1200)") 
+            self.take_screenshot(shot:=shot+1)
+            self.sesh.find_element('xpath', '//*[@id="dv-main"]/div[2]/ul/li[4]/a').click()
+            time.sleep(2)
+            self.take_screenshot(shot:=shot+1)
+            self.sesh.execute_script("window.scrollTo(0, 1200)") 
+            self.take_screenshot(shot:=shot+1)
 
         self.part = '02' #use metadata facet to filter
         self.sesh.get(self.dv_url)
@@ -1289,6 +1306,42 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
 
         self.set_end_time()
+
+        self.set_req('25')
+        self.set_start_time()
+        if self.test_files:
+            self.part = '01' #navigate to dataset
+            self.take_screenshot(shot:=1)
+
+            self.part = '02' #download individual file via access file icon next to file info
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/a[2]/span[1]').click()
+            self.take_screenshot(shot:=1)
+            time.sleep(.5)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/ul/li[4]/a').click()
+            self.take_screenshot(shot:=shot+1)
+            time.sleep(2)
+            downloaded_hash_single = hashlib.md5(open(f'{self.download_parent_dir}/seleniumdownloads/test_file_2_renamed.png', 'rb').read()).hexdigest()
+            self.assertEqual(self.test_file_2_md5, f'MD5: {downloaded_hash_single}')
+
+            self.part = '03' #select multiple files for download
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[1]/td[1]/div/div').click()
+            time.sleep(1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[3]/td[1]/div/div').click()
+            time.sleep(1)
+            self.take_screenshot(shot:=1)
+
+            self.part = '04' #download files via download button above list
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:downloadButtonBlockNormal"]/a').click()
+            time.sleep(4)
+            with ZipFile(f'{self.download_parent_dir}/seleniumdownloads/dataverse_files.zip', 'r') as zip_ref:
+                zip_ref.extractall(f'{self.download_parent_dir}/seleniumdownloads/zipfolder/')
+
+            downloaded_hash_folder_file_1_replaced = hashlib.md5(open(f'{self.download_parent_dir}/seleniumdownloads/zipfolder/testreplacefolder/test_file_1_replace_renamed.txt', 'rb').read()).hexdigest()
+            self.assertEqual(self.test_file_1_replace_md5, f'MD5: {downloaded_hash_folder_file_1_replaced}')
+
+        self.set_end_time()
+
+### Non-test functions ###
 
     def take_screenshot(self, shot):
         if self.do_screenshots: 

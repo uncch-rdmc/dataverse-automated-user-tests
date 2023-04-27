@@ -178,7 +178,5 @@ text = {
     'r25_p03': 'To download multiple files, click on the checkbox next to each dataset file that requires downloading.',
     'r25_p04': 'Click on the Download button above the file list, then select the file format required from the available options in the drop-down list.',
     
-    
-    
 }
 
