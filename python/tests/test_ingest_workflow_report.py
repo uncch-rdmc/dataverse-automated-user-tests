@@ -812,6 +812,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
         else:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
+        #time.sleep(1) #This failed randomly once so now I wait
         self.take_screenshot(shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:publishDataset_content"]/div[4]/button[1]').click() #click publish confirm
         self.take_screenshot(shot:=shot+1)
@@ -1203,7 +1204,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
 
         self.part = '02' #nav to file tab, click a file
-        self.sesh.execute_script("window.scrollTo(0, 1200)") 
+        self.sesh.execute_script("window.scrollTo(0, 600)") 
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[1]/a').click() #click edit dataset
         time.sleep(2)
@@ -1212,7 +1213,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.part = '03' #nav to metadata tab
         self.sesh.find_element('xpath', '//*[@id="breadcrumbLnk2"]').click() #click back to dataset
         time.sleep(2)
-        self.sesh.execute_script("window.scrollTo(0, 1200)") 
+        self.sesh.execute_script("window.scrollTo(0, 600)") 
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[2]/a').click()
         time.sleep(.2)
         self.take_screenshot(shot:=1)
@@ -1244,7 +1245,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.part = '01' #nav to dataset and then version tab
         time.sleep(1)
         self.take_screenshot(shot:=1)
-        self.sesh.execute_script("window.scrollTo(0, 1200)") 
+        self.sesh.execute_script("window.scrollTo(0, 600)") 
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[4]/a').click()
         time.sleep(.2)
         self.take_screenshot(shot:=shot+1)
@@ -1261,13 +1262,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         if self.test_files: #Requires files currently because uploading of the files creates the draft version which creates 3 version and enabled the checkbox compare dialog
             time.sleep(1)
-            self.take_screenshot(shot:=1)
+            self.take_screenshot(shot:=shot+1)
             self.part = '03' #compare two versions
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[3]/td[1]/div/div/span').click()
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTable_data"]/tr[1]/td[1]/div/div/span').click()
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:versionsTab"]/div[1]/button[1]').click()
             time.sleep(2)
             if self.do_screenshots:
+                shot = 0
                 for i in range(5):
                     self.sesh.execute_script(f"document.getElementById('datasetForm:detailsBlocks_content').scrollTo(0, {i * self.scroll_height})") 
                     self.take_screenshot(shot:=shot+1)
@@ -1284,10 +1286,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh.find_element('xpath', '//*[@id="facetType"]/div[3]/a[1]/div/div[2]/span').click()
             time.sleep(1)
             self.take_screenshot(shot:=1)
+            self.sesh.execute_script("window.scrollTo(0, 600)") 
+            self.take_screenshot(shot:=shot+1)
             self.sesh.execute_script("window.scrollTo(0, 1200)") 
             self.take_screenshot(shot:=shot+1)
             self.sesh.find_element('xpath', '//*[@id="dv-main"]/div[2]/ul/li[4]/a').click()
             time.sleep(2)
+            self.take_screenshot(shot:=shot+1)
+            self.sesh.execute_script("window.scrollTo(0, 600)") 
             self.take_screenshot(shot:=shot+1)
             self.sesh.execute_script("window.scrollTo(0, 1200)") 
             self.take_screenshot(shot:=shot+1)
@@ -1314,11 +1320,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.take_screenshot(shot:=1)
 
             self.part = '02' #download individual file via access file icon next to file info
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/a[2]/span[1]').click()
+            self.sesh.execute_script("window.scrollTo(0, 900)") 
             self.take_screenshot(shot:=1)
-            time.sleep(.5)
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/ul/li[4]/a').click()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/a[2]/span[1]').click()
+            time.sleep(2)
             self.take_screenshot(shot:=shot+1)
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/ul/li[4]/a').click()
             time.sleep(2)
             downloaded_hash_single = hashlib.md5(open(f'{self.download_parent_dir}/seleniumdownloads/test_file_2_renamed.png', 'rb').read()).hexdigest()
             self.assertEqual(self.test_file_2_md5, f'MD5: {downloaded_hash_single}')
@@ -1328,6 +1335,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             time.sleep(1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[3]/td[1]/div/div').click()
             time.sleep(1)
+            self.sesh.execute_script("window.scrollTo(0, 900)") 
             self.take_screenshot(shot:=1)
 
             self.part = '04' #download files via download button above list
