@@ -4,6 +4,7 @@ from ..tests import test_ingest_workflow_report as t
 #import html.text #Imports a text variable that stores our strings
 
 def main():
+    version = "0.9" #Update this number when doing a new release
     if sys.version_info < (3, 7):
         print("Code requires Python 3.7 or later for ordered dictionaries")
         print("Exiting...")
@@ -38,6 +39,7 @@ def main():
                                 last_req = int(ingest_test.req),
                                 last_part = int(ingest_test.part),
                                 test_order = ingest_test.test_order,
+                                test_version = version,
                                 failure = failure)) #we want them in the dictionary for template iteration
 
     print("rendered")
