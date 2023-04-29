@@ -95,7 +95,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         for test in tests:
             test()
                 
-        
         print("Tests Complete")
 
     #Written to allow calling these deletes directly for cleanup outside of the normal test run
@@ -537,13 +536,31 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_start_time()
 
         self.part = '01'
-        self.part = '02'
-        self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
-        time.sleep(2 + self.extra_wait) #added for screenshot
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
+        time.sleep(2 + self.extra_wait)
         self.take_screenshot(shot:=1)
-        self.part = '04'
+        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="dataverseForm:manageTemplates"]').click() #click manage templates
+        time.sleep(2 + self.extra_wait)
+
+        self.part = '02'
+        if(self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').is_selected()):
+            self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').click() #we disable display of root templates to make the template list always contain our one template
+            time.sleep(1 + self.extra_wait)
+        self.take_screenshot(shot:=1)
+
+        self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:allTemplates_data"]/tr/td[4]/div/div/button').click()
+        time.sleep(.5 + self.extra_wait)
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:allTemplates_data"]/tr/td[4]/div/div/ul/li[1]/a').click()
+        time.sleep(2 + self.extra_wait) #added for screenshot
+        self.take_screenshot(shot:=shot+1)
+
+        self.part = '04' #part 5 screenshots capture part 4
         self.part = '05'
         self.set_dataset_metadata_template_instructions(add_string='edit')
+
         if self.do_screenshots:
             shot = 0
             for i in range(9):
@@ -562,30 +579,55 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             for i in range(9):
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
-        self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save + Add Terms"
+        self.part = '06'  
+        self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.take_screenshot(shot:=1)
+
+        self.part = '07'
+        self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
+        time.sleep(2 + self.extra_wait)
+        self.take_screenshot(shot:=1)
+        self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click() #click dataverse edit button
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="dataverseForm:manageTemplates"]').click() #click manage templates
+        time.sleep(2 + self.extra_wait)
+
+        self.part = '08'
+        if(self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').is_selected()):
+            self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').click() #we disable display of root templates to make the template list always contain our one template
+            time.sleep(1 + self.extra_wait)
+        self.take_screenshot(shot:=1)
+
+        self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:allTemplates_data"]/tr/td[4]/div/div/button').click()
+        time.sleep(.5 + self.extra_wait)
+        self.take_screenshot(shot:=shot+1)
+        self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:allTemplates_data"]/tr/td[4]/div/div/ul/li[2]/a').click()
+        time.sleep(2 + self.extra_wait) #added for screenshot
         self.take_screenshot(shot:=shot+1)
 
-#TODO: Are we suppose to be doing screenshots editing the license template
-        self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
+        self.part = '09'
 
         self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
         time.sleep(.2 + self.extra_wait)
         self.sesh.find_element('xpath','//*[@id="templateForm:licenses_0"]').click() #click "cc-by 1.0" inside dropdown
         time.sleep(.2 + self.extra_wait)
         self.set_license(add_string='edit', xpath_dict=self.ds_license_template_xpaths)
+        if self.do_screenshots:
+            shot = 0
+            for i in range(3):
+                self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
+                self.take_screenshot(shot:=shot+1)
 
-        self.part = '06'  
+        self.part = '10'  
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
-        time.sleep(2) #not sure why I have to do this but ok? Shouldn't confirming the alert work (not that I'm actually doing that here... + self.extra_wait)?
+        time.sleep(2 + self.extra_wait)
         self.take_screenshot(shot:=1)
-        
-        #NOTE: we don't screenshot here because its not an actual requirement to check at this point. We could maybe disable this
 
+        #NOTE: we don't screenshot here because its not a requirement to confirm the data.
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
         self.confirm_dataset_metadata(add_string='edit', xpath_dict=self.ds_template_xpaths)
         self.confirm_dataset_metadata_template_instructions(add_string='edit')
-
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.confirm_license(add_string='edit', xpath_dict=self.ds_license_template_xpaths)
 

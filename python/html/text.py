@@ -66,6 +66,11 @@ text = {
     'r06_p04': 'To add or update instructions on how to complete a metadata field, click on the (None - click to add) link above the text field for the metadata element.',
     'r06_p05': 'Enter the metadata field instructions in the Custom instructions field that appears, then click on the check button.',
     'r06_p06': 'Click on the Save Changes button.',
+    'r06_p07': 'On the dataverse landing page, click on the Edit button and select the Dataset Templates option from the drop-down list.',
+    'r06_p08': 'Click on the Edit Template button and select the Terms option in the drop-down list that appears.',
+    'r06_p09': 'In the Terms form, enter updated information that is standard across all datasets in the dataset into the applicable terms fields.',
+    'r06_p10': 'Click on the Save Changes button.', 
+
 
     'r09_title': 'Dataverse must support study and dataset creation where the archivist must be able to create a new dataset/study',
     'r09_p01': 'Click on the Add Data button located at the upper-right hand side of the dataverse landing page.',
