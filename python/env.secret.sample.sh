@@ -10,3 +10,6 @@ export DATAVERSE_SSO_OPTION_VALUE=
 
 #The tests will make a subfolder named "seleniumdownloads" during testing and then delete it at the end
 export DOWNLOAD_PARENT_DIR=
+
+#Increment this to add a fixed additional wait to all sleep statements. Useful for when a server is being slow etc.
+export EXTRA_WAIT=0
