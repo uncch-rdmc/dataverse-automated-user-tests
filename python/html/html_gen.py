@@ -15,7 +15,7 @@ def main():
     environment.globals['datetime'] = datetime.datetime
     template = environment.get_template("template.html")
 
-    ingest_test = t.IngestWorkflowReportTestCase(do_screenshots=True, test_files=True)
+    ingest_test = t.IngestWorkflowReportTestCase(do_screenshots=True, do_file_tests=True)
     ingest_test.setUp()
     try:
         ingest_test.test_requirements()
@@ -30,7 +30,10 @@ def main():
         # print(result)
         print("Last Req: " + ingest_test.req)
         print("Last Part: " + ingest_test.part)
-        print("Was Failure: " + str(failure))
+        if failure:
+            print("Tests Failed")
+        else:
+            print("Tests Success!")
         f.write(template.render(text = text, 
                                 screenshots = ingest_test.screenshots, 
                                 start_times = ingest_test.start_times,
@@ -44,7 +47,6 @@ def main():
 
     print("rendered")
 
-
 # This custom function we add to jinja. It checks if an element is in a list, and if not returns a high number
 # This is because our failed tests won't be added to the list, so functionally we consider them late enough that they failed
 def index_with_default(alist, entry):
@@ -53,7 +55,6 @@ def index_with_default(alist, entry):
     except Exception:
         return 99999
     
-
 if __name__ == "__main__":
     #print(__package__)
     main()

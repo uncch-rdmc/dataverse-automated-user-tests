@@ -14,13 +14,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from webdriver_manager.chrome import ChromeDriverManager
 
-#NOTE: Our use of step in the code is for screenshot taking. Sometimes the code to confirm a step happens after another step has been done.
-
-#Note: I was seeing duplicate templates early into porting the code. I think its resolved but be aware
 class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, DatasetTestingMixin):
     def __init__(self, *args, **kwargs):
         self.do_screenshots = kwargs.pop('do_screenshots', False)
-        self.test_files = kwargs.pop('test_files', True) #NOTE: Disabling files will currently change the requirements for some test parts
+        self.do_file_tests = kwargs.pop('do_file_tests', True) 
         super(IngestWorkflowReportTestCase, self).__init__( *args, **kwargs)
 
     def setUp(self):
@@ -29,11 +26,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.perm_test_username = os.getenv('DATAVERSE_USERNAME_FOR_PERM_TEST')
         self.sso_option_value = os.getenv('DATAVERSE_SSO_OPTION_VALUE')
-#TODO: Make this actually the full directory with seleniumdownloads to not have to fstring repeatedly
-        self.download_parent_dir = os.getenv('DOWNLOAD_PARENT_DIR')
+        self.download_full_path = os.getenv('DOWNLOAD_PARENT_DIR')+"/seleniumdownloads"
         self.extra_wait = int(os.getenv('EXTRA_WAIT'))
-        self.scroll_height = 600 #For scrolling with screenshots
-        #self.failed = False #TODO: Delete?
+        self.scroll_height = 600
         self.api_token = None
         self.templates_exist = False
         self.browser_type = "Chrome"
@@ -45,35 +40,36 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = {}
         self.test_order = []
 
-#TODO: Make these just MD5s and fix code
-        self.test_file_1_md5 = 'MD5: a5890ace30a3e84d9118196c161aeec2'
-        self.test_file_1_replace_md5 = 'MD5: 07436de69e3283065a2453322ee22ba3'
-        self.test_file_2_md5 = 'MD5: c7803e4497be4984e41102e1b2ef64cc'
+        self.test_file_1_md5 = 'a5890ace30a3e84d9118196c161aeec2'
+        self.test_file_1_replace_md5 = '07436de69e3283065a2453322ee22ba3'
+        self.test_file_2_md5 = 'c7803e4497be4984e41102e1b2ef64cc'
+        self.md5_prefix = 'MD5: ' #what dataverse appends to the beginning of md5s
 
         self.role_alias = "test_role_auto"
+        self.role_alias_created = False
 
         options = Options()
-        #options.add_experimental_option("detach", True) #To keep browser window open. Trying this to get closer to writing test code without rerunning the full test
-
         if self.browser_type == "Chrome":
             options.add_experimental_option("prefs", {
-                "download.default_directory":f"{self.download_parent_dir}/seleniumdownloads", 
+                "download.default_directory":self.download_full_path, 
                 "download.prompt_for_download": False
             })
             
             self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        else:
+            print("Browsers other than Chrome have not been tested, and certain tests will fail (file downloading).")
         if self.do_screenshots:
             self.sesh.set_window_size(1200,827) #675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
 
         self.sesh.implicitly_wait(10)
 
     def tearDown(self):
-        self.delete_dv_resources(self.dataset_id, self.dataverse_id, self.role_alias)
-        try:
-            rmtree(f'{self.download_parent_dir}/seleniumdownloads/')
-        except Exception as e:
-            #TODO: Only error if folder exists
-            print("Unable to delete download folder. Likely the test never got this far. Error: " + str(e))
+        self.delete_dv_resources(self.dataset_id, self.dataverse_id, (self.role_alias if self.role_alias_created else None))
+        if os.path.isdir(self.download_full_path):
+            try:
+                rmtree(self.download_full_path)
+            except Exception as e:
+                print("Unable to delete download folder even though it exists. Error: " + str(e))
 
     def test_requirements(self):
 
@@ -97,35 +93,41 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 
         print("Tests Complete")
 
-    #Written to allow calling these deletes directly for cleanup outside of the normal test run
-    def delete_dv_resources(self, ds_id=None, dv_id=None, role_alias=None):
-        print("API TOKEN: " + self.api_token)
+    def delete_dv_resources(self, ds_id=None, dv_id=None, r_alias=None):
         headers = {'X-Dataverse-key': self.api_token}
         if ds_id is not None:
             try:
                 resp_ds_destroy = requests.delete(f'{self.dv_url}/api/datasets/{ds_id}/destroy', headers=headers)
-                print(resp_ds_destroy.__dict__)
+                if "data" in resp_ds_destroy.json() and "message" in resp_ds_destroy.json()["data"]:
+                    print(f'Role delete called. Result: {resp_ds_destroy.status_code} - {resp_ds_destroy.json()["data"]["message"]}')
+                else:
+                    print(f'Role delete called. Result: {resp_ds_destroy.status_code} - {resp_ds_destroy.text}')
             except Exception as e:
                 print("Unable to destroy dataset on tearDown. Error: " + str(e))
         if dv_id is not None:
             try:
-                #resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{self.dataverse_identifier}', headers=headers)
                 resp_dv_delete = requests.delete(f'{self.dv_url}/api/dataverses/{dv_id}', headers=headers)
-                print(resp_dv_delete.__dict__)
+                if "data" in resp_dv_delete.json() and "message" in resp_dv_delete.json()["data"]:
+                    print(f'Role delete called. Result: {resp_dv_delete.status_code} - {resp_dv_delete.json()["data"]["message"]}')
+                else:
+                    print(f'Role delete called. Result: {resp_dv_delete.status_code} - {resp_dv_delete.text}')
             except Exception as e:
                 print("Unable to delete dataverse on tearDown. Error: " + str(e))
-        if role_alias is not None:
+        if r_alias is not None:
             try:
-                resp_role_delete = requests.delete(f'{self.dv_url}/api/roles/:alias?alias={role_alias}', headers=headers)
-                print(resp_role_delete.__dict__)
+                resp_role_delete = requests.delete(f'{self.dv_url}/api/roles/:alias?alias={r_alias}', headers=headers)
+                if "data" in resp_role_delete.json() and "message" in resp_role_delete.json()["data"]:
+                    print(f'Role delete called. Result: {resp_role_delete.status_code} - {resp_role_delete.json()["data"]["message"]}')
+                else:
+                    print(f'Role delete called. Result: {resp_role_delete.status_code} - {resp_role_delete.text}')
             except Exception as e:
                 print("Unable to delete role on tearDown. Error: " + str(e))
+        if (ds_id is None) and (dv_id is None) and (r_alias is None):
+            print("No resources to delete")
 
     def get_dataverse_version(self):
-        # $ curl http://localhost:8080/api/info/version
-        # {"status":"OK","data":{"version":"5.13","build":"1244-79d6e57"}}
         try:
-            dataverse_version = requests.get(f'{self.dv_url}/api/info/version')#, headers=headers)
+            dataverse_version = requests.get(f'{self.dv_url}/api/info/version')
             return dataverse_version.json()['data']['version']
         except Exception as e:
             print("Unable to get version of Dataverse install. Error: " + e)
@@ -163,10 +165,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
 
         self.part = '02'
-        #self.sesh.find_element('xpath', '//*[@id="idpSelectSelector"]/option[2]').click()
-        #print(self.sso_option_value)
         self.sesh.find_element('xpath', f"//option[@value='{self.sso_option_value}']").click() 
-        #time.sleep(.1 + self.extra_wait)
         self.take_screenshot(shot:=1)
         
         self.part = '03'
@@ -190,13 +189,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_req('01')
 
         self.part = '01'
-
-        #print(self.dv_url)
         self.sesh.get(f'{self.dv_url}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml')
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:0:credValue"]').send_keys(self.username)
         self.sesh.find_element('xpath', '//*[@id="loginForm:credentialsContainer:1:sCredValue"]').send_keys(self.password)
         self.sesh.find_element('xpath', '//*[@id="loginForm:login"]').click()
-        
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait for load
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
 
@@ -205,13 +201,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         #We confirm we are the user we think we are. This is mostly for reporting purproses
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=accountInfo')
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="userIdentifier"]/td').text, self.username) 
-        #//*[@id="userIdentifier"]/td
         
         #Note: This code assumes you have already clicked "Create Token" with this account.
         self.sesh.get(f'{self.dv_url}/dataverseuser.xhtml?selectTab=apiTokenTab')
         self.api_token = self.sesh.find_element('xpath', '//*[@id="apiToken"]/pre/code').text 
-
-        return {}
 
     def r02_mainpath_add_user_group_role(self):
         self.set_req('02')
@@ -246,9 +239,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleAlias"]').send_keys(self.role_alias)
         self.sesh.find_element('xpath','//*[@id="rolesPermissionsForm:roleDescription"]').send_keys("This is an automated test role.")
         self.take_screenshot(shot:=1)
-        
-        #/html/body/div[1]/form/div[5]/div[2]/div/div/div[2]/div[2]/table/tbody/tr[1]/td/input
-        #//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[1]/td/input
+
         self.part = '06'
         self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[1]/td/input').click()
         self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:editRolePermissionPanel_content"]/table/tbody/tr[2]/td/input').click()
@@ -259,7 +250,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.part = '07'
         self.sesh.find_element('xpath', '//*[@id="editRoleButtonPanel"]/button[1]').click()
         time.sleep(1 + self.extra_wait)
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:roleMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:roleMessages"]/div/div').get_attribute("class"), "alert alert-success") 
+        self.role_alias_created = True
         self.take_screenshot(shot:=1)
 
         self.part = '08'
@@ -285,7 +277,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.part = '12'
         self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignRoleContent"]/div[2]/button[1]').click()
         time.sleep(1 + self.extra_wait)
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignmentMessages"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="rolesPermissionsForm:assignmentMessages"]/div/div').get_attribute("class"), "alert alert-success") 
         self.take_screenshot(shot:=1)
         self.set_end_time()
             
@@ -316,7 +308,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1 + self.extra_wait) # wait after click for ui to be usable
         self.set_dataverse_metadata(add_string="create") #Metadata that is same for create/edit
         if self.do_screenshots:
-            #shot = 1
             for i in range(3):
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
@@ -325,7 +316,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #create dataverse
 
         ### Test Save ###
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") 
         self.assertEqual(self.dv_url+'/dataverse/'+self.dataverse_identifier+'/', self.sesh.current_url) #confirm page
         self.take_screenshot(shot:=1)
 
@@ -339,7 +330,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:j_idt431"]').click() #confirm publish
         self.take_screenshot(shot:=shot+1)
         self.sesh.implicitly_wait(30)
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") 
         self.sesh.implicitly_wait(10)
         self.take_screenshot(shot:=shot+1)
 
@@ -364,23 +355,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
         self.set_dataverse_metadata()
         self.take_screenshot(shot:=shot+1)
-        ## For some reason this scroll is breaking our find_element (back when self.part 4 was after this) call. I switched to taking a single screenshot as all the metadata fits on there.
-        # if self.do_screenshots:
-        #     #shot = 1
-        #     for i in range(3):
-        #         self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
-        #         self.take_screenshot(shot:=shot+1)
         self.sesh.find_element('xpath','//*[@id="dataverseForm:save"]').click() #save dataverse
 
         # We do self.part 10 before the other parts because we don't want any of the facet/search changes to stick
         self.part = '10'
-        time.sleep(2 + self.extra_wait) # I think our code is picking up on the previous page div, so we wait before getting the div
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") #confirm success alert
+        time.sleep(2 + self.extra_wait)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div').get_attribute("class"), "alert alert-success") 
         self.take_screenshot(shot:=1)
         
-        #print(self.dv_url + '/dataverse/' + self.dataverse_identifier + '/')
-        # self.sesh.get(self.dv_url + '/dataverse/' + self.dataverse_identifier + '/')
-        # time.sleep(2 + self.extra_wait)
         time.sleep(1 + self.extra_wait)
         self.confirm_dataverse_metadata()
 
@@ -388,11 +370,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.get(self.dv_url+'/dataverse/'+self.dataverse_identifier)
         self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div/div/div[2]/div[2]/button').click()
         self.sesh.find_element('xpath', '//*[@id="dataverseForm:editInfo"]').click()
-        #time.sleep(1 + self.extra_wait)
-        #We force a click here to handle another element intercepting
-        #self.sesh.execute_script('document.evaluate(\'//*[@id="dataverseForm:description"]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
-
-        self.sesh.execute_script(f"window.scrollTo(0, {2*self.scroll_height})") #scroll down some so we can see our changes better
+        
+        self.sesh.execute_script(f"window.scrollTo(0, {2*self.scroll_height})")
         self.sesh.find_element('xpath','//*[@id="dataverseForm:metadataRoot"]').click()
         self.take_screenshot(shot:=1)
         time.sleep(1 + self.extra_wait)
@@ -439,7 +418,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath','//*[@id="dataverseForm:cancel"]/span').click()
 
-        time.sleep(1 + self.extra_wait) #wait before switching pages in r05
+        time.sleep(1 + self.extra_wait)
 
         self.set_end_time()
             
@@ -480,31 +459,28 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.execute_script('document.evaluate(\'//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]/div[3]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
         time.sleep(1 + self.extra_wait)
         self.part = '04'
-        #self.sesh.find_element('xpath', '//*[@id="templateForm:editMetadataFragement"]').click() #click background to clear any open dropdowns
         self.set_dataset_metadata_edit(add_string='create', xpath_dict=self.ds_template_xpaths)
         if self.do_screenshots:
             shot = 0
             for i in range(9):
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
-        
-        #TODO: I think here it where I was setting license but didn't finish?
 
         self.part = '07'
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt892"]').click() #click "Save + Add Terms"
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
         self.take_screenshot(shot:=1)
 
-        self.template_id = parse.parse_qs(parse.urlparse(self.sesh.current_url).query)['id'][0]#<<- param_get(self.sesh.current_url, "id")
+        self.template_id = parse.parse_qs(parse.urlparse(self.sesh.current_url).query)['id'][0]
     
         self.part = '08'
-        #TODO: show selected terms in a screenshot later?
-        self.part = '09'
-
         self.sesh.find_element('xpath','//*[@id="templateForm:licenses_label"]').click() #click license dropdown
         time.sleep(.2 + self.extra_wait)
         self.sesh.find_element('xpath','//*[@id="templateForm:licenses_1"]').click() #click "cc-by 4.0" inside dropdown
         time.sleep(.2 + self.extra_wait)
+        self.take_screenshot(shot:=1)
+
+        self.part = '09'
         self.set_license(add_string='create', xpath_dict=self.ds_license_template_xpaths)
         if self.do_screenshots:
             shot = 0
@@ -514,18 +490,15 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.part = '10'
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Dataset Template" (which actually just saves the license)
-        
-        time.sleep(2 + self.extra_wait) #For some reason we are getting a reference error below without waiting. Maybe its getting the div for the previous page?
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+        time.sleep(2 + self.extra_wait)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
         self.take_screenshot(shot:=1)
-        time.sleep(2 + self.extra_wait) #not sure why I have to do this but ok? Shouldn't confirming the alert work?  
+        time.sleep(2 + self.extra_wait) #We have to wait extra after the alert before doing other things or the test blows up 
 
         #NOTE: we don't screenshot here because its not an actual requirement to check at this point. We could maybe disable this
-
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=METADATA')
         self.confirm_dataset_metadata(add_string='create', xpath_dict=self.ds_template_xpaths)
         self.confirm_dataset_metadata_template_instructions(add_string='create')
-
         self.sesh.get(self.dv_url+'/template.xhtml?id='+self.template_id+'&ownerId='+self.dataverse_id+'&editMode=LICENSE')
         self.confirm_license(add_string='create', xpath_dict=self.ds_license_template_xpaths)
 
@@ -545,8 +518,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(2 + self.extra_wait)
 
         self.part = '02'
+        #we disable display of root templates to make the template list always contain our one template
         if(self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').is_selected()):
-            self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').click() #we disable display of root templates to make the template list always contain our one template
+            self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').click() 
             time.sleep(1 + self.extra_wait)
         self.take_screenshot(shot:=1)
 
@@ -581,7 +555,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.take_screenshot(shot:=shot+1)
         self.part = '06'  
         self.sesh.find_element('xpath', '//*[@id="templateForm:j_idt893"]').click() #click "Save Changes"
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
         self.take_screenshot(shot:=1)
 
         self.part = '07'
@@ -594,8 +568,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(2 + self.extra_wait)
 
         self.part = '08'
+        #we disable display of root templates to make the template list always contain our one template
         if(self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').is_selected()):
-            self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').click() #we disable display of root templates to make the template list always contain our one template
+            self.sesh.find_element('xpath', '//*[@id="manageTemplatesForm:templateRoot"]').click() 
             time.sleep(1 + self.extra_wait)
         self.take_screenshot(shot:=1)
 
@@ -654,35 +629,29 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:selectHostDataverse_input"]').send_keys(Keys.ENTER)
         self.take_screenshot(shot:=shot+1)
         time.sleep(1 + self.extra_wait)
-        #self.sesh.find_element('xpath', '//*[@id="datasetForm:selectHostDataverse_panel"]/table/tbody/tr[1]').send_keys(Keys.ENTER)
-
         #self.set_end_time() #We continue this test later
 
         self.set_req('11')
         self.set_start_time()
+
         self.part = '01'
-    
         self.set_dataset_metadata_create(add_string='create')
         if self.do_screenshots:
             shot = 0
             for i in range(4):
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
-
         #self.set_end_time() #We continue this test later so we don't do the end time here
 
-        if self.test_files:
+        if self.do_file_tests:
             self.set_req('13')
             self.set_start_time()
-            self.part = '01' #click add button
 
+            self.part = '01' #click add button
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
             self.take_screenshot(shot:=1)
 
             self.part = '02' #file system dialog
-            # NOTE: We can't screenshot the file dialog via selenium because its not actually in the browser.
-            #       Instead we do a find element that will show up after upload and wait for the test-user to do the upload
-            #       We may be able to do this via robot later https://robotframework.org/robotframework/latest/libraries/Screenshot.html#Take%20Screenshot
             self.sesh.implicitly_wait(3600)
             print("User input required: upload test_file_1.txt")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
@@ -697,7 +666,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.set_start_time()
             self.part = '01' #confirm md5
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
-            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_1_md5)
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.md5_prefix + self.test_file_1_md5)
 
             self.part = '02' #update name and path
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
@@ -711,22 +680,22 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description')
             self.take_screenshot(shot:=1)
 
-        self.part = '04' #NOTE: This is part of req 20 even though with test_files disabled it won't be a part of it
+        self.part = '04' #NOTE: This is part of req 20 even though with do_file_tests disabled it won't be a part of it
         self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
-        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
-        self.take_screenshot(shot:=1) #TODO: probalby a different R#, check shot+1
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
+        self.take_screenshot(shot:=1)
 
         ### Get dataset id from permissions page url for later uses ###
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
 
         self.set_req('09')
 
-        # Dataset-terms (note: create and edit use the same code)
+        ### Dataset-terms (note: create and edit use the same code) ###
         self.part = '04'
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
         self.take_screenshot(shot:=shot+1)
-        time.sleep(1 + self.extra_wait) #TODO: Probably remove this wait when we replace the below dynamic id xpath with one based off a stable id
+        time.sleep(1 + self.extra_wait)
 
         self.part = '05'
         if not self.templates_exist:
@@ -788,7 +757,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.execute_script(f"window.scrollTo(0, {3 * self.scroll_height})") 
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[1]/a').text, 'test_file_1_renamed.txt')
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileHierarchy"]').text, 'testfolder/')
-        self.assertEqual('MD5: ' + self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_1_md5)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_1_md5)
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileDescNonEmpty"]').text, 'test_file_description')
         self.take_screenshot(shot:=1)
 
@@ -832,43 +801,22 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.part = '09'
 
         self.take_screenshot(shot:=1)
-        if self.test_files:
+        if self.do_file_tests:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
         else:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
-        #time.sleep(1 + self.extra_wait) #This failed randomly once so now I wait
         self.take_screenshot(shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:publishDataset_content"]/div[4]/button[1]').click() #click publish confirm
         self.take_screenshot(shot:=shot+1)
         self.sesh.implicitly_wait(30)
-        self.sesh.find_element('class name', 'label-default') #Find element to wait for load. May trigger prematurely with files added.
+        self.sesh.find_element('class name', 'label-default') #Find element to wait for load
         self.sesh.implicitly_wait(10)
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.0") #Test dataset published
         self.take_screenshot(shot:=shot+1)
 
         self.set_end_time()
-
-#TODO: Testing the published dataset is part of a later req (r22 or r23?)
-
-        # self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
-        # self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
-
-        # self.sesh.implicitly_wait(3) #We fail fast because we expect this to happen when a dataset template has been made already (normal test path)
-        # try: 
-        #     self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
-        # except Exception:
-        #     self.templates_exist = True
-        #     self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
-        # self.sesh.implicitly_wait(10)
-        
-        # self.sesh.find_element('xpath', '//*[@id="datasetForm:cancel"]').click() #click out after testing data
-        
-        # time.sleep(2 + self.extra_wait)
-
             
     def r10r12r15r16r17r18_mainpath_edit_dataset(self):
-        # It seems like there are no actual screenshots or steps for r10?
-        # I think we are using this as a catch-all for the editing that is not covered by other requirements
         self.set_req('12')
         self.set_start_time()
 
@@ -911,8 +859,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_req('10')
         self.set_start_time()
 
-        if self.test_files:
-            # File-level metadata
+        if self.do_file_tests:
+            ### File-level metadata ###
             self.part = '01'
             self.take_screenshot(shot:=1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr/td[1]/div').click()
@@ -948,12 +896,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success")
             self.take_screenshot(shot:=1)
     
-        # Dataset-terms (note: create and edit use the same code)
+        ### Dataset-terms (note: create and edit use the same code) ###
         self.part = '05'
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
         self.take_screenshot(shot:=shot+1)
-        time.sleep(1 + self.extra_wait) #TODO: Probably remove this wait when we replace the below dynamic id xpath with one based off a stable id
+        time.sleep(1 + self.extra_wait)
 
         self.part = '06'
         if not self.templates_exist:
@@ -986,7 +934,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        if self.test_files:
+        if self.do_file_tests:
             self.set_req('15') # replace file
             self.set_start_time()
 
@@ -1011,7 +959,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             print("Replace Completed")
 
             self.part = '04'
-            # self.part = '05'
+            # self.part = '05' #Drag and drop, untested
 
             self.part = '06'
             self.take_screenshot(shot:=1)
@@ -1019,7 +967,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '07'
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
             time.sleep(1 + self.extra_wait)
-            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_1_replace_md5)
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.md5_prefix + self.test_file_1_replace_md5)
 
             self.part = '08'
             time.sleep(1 + self.extra_wait)
@@ -1033,7 +981,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.part = '09'
             self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #save
-            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
             self.take_screenshot(shot:=1) 
             self.sesh.find_element('xpath','//*[@id="breadcrumbLnk2"]').click() #Go back to dataset page
 
@@ -1056,11 +1004,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             print("Upload Completed")
 
             self.part = '03'
-            # self.part = '04'
+            # self.part = '04' #Drag and drop, untested
 
             self.part = '05'
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
-            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.test_file_2_md5)
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.md5_prefix + self.test_file_2_md5)
 
             self.part = '06'
             time.sleep(1 + self.extra_wait)
@@ -1077,7 +1025,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.part = '08'
             self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #save changes
-            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") #confirm success alert
+            self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
             self.take_screenshot(shot:=1) 
 
             self.set_end_time()
@@ -1090,12 +1038,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.execute_script(f"window.scrollTo(0, {3 * self.scroll_height})") 
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[1]/a').text, 'test_file_1_replace_renamed.txt')
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileHierarchy"]').text, 'testreplacefolder/')
-        self.assertEqual('MD5: ' + self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_1_replace_md5)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_1_replace_md5)
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:0:fileDescNonEmpty"]').text, 'test_file_replace_description')
 
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[1]/a').text, 'test_file_2_renamed.png')
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileHierarchy"]').text, 'testfolder2/')
-        self.assertEqual('MD5: ' + self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_2_md5)
+        self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileInfoInclude-filesTable"]/div[2]/div[2]/div[2]/span[1]').get_attribute('data-clipboard-text'), self.test_file_2_md5)
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:1:fileDescNonEmpty"]').text, 'test_file_description2')
         self.take_screenshot(shot:=1)
 
@@ -1108,7 +1056,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         # else:
         #NOTE: This seems to line up with notemplate even though there is one at this point? Maybe its different off a draft dataset instead of off a non-draft?
         #      If this blows up testing without a template, investigate more
-        self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate) #xpath_dict=self.ds_edit_xpaths_yestemplate)
+        self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate)
         if self.do_screenshots:
             shot = 0
             for i in range(8):
@@ -1133,17 +1081,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         time.sleep(1 + self.extra_wait)
 
-#TODO: Add screenshots to code below after adding other requirements
-        if self.test_files:
+#TODO: Add this code to a part (with screenshots) once we get clarity on which test the rest of the code are a part of
+        if self.do_file_tests:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
         else:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[1]/div/a').click() #click publish
         
-        # if not self.templates_exist:
-        #     self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2547"]').click() #click publish confirm
-        # else:
-        #     self.sesh.find_element('xpath', '//*[@id="datasetForm:j_idt2544"]').click() #click publish confirm
-
         time.sleep(1 + self.extra_wait)
 
         self.sesh.find_element('xpath', '//*[@id="datasetForm:publishDataset"]/div[2]/div[2]/button[1]').click()
@@ -1151,7 +1094,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.implicitly_wait(30)
         self.sesh.find_element('class name', 'label-default') #Find element to wait for load. May trigger prematurely with files added.
         self.sesh.implicitly_wait(10)
-        if self.test_files:
+        if self.do_file_tests:
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 2.0") #Test dataset published
         else:
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="title-label-block"]/span').text, "Version 1.1") #Test dataset published
@@ -1160,13 +1103,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
 
         if not self.templates_exist:
-            # print("NO")
             self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate) 
         else:
-            # print("YES")
             self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_yestemplate) 
 
-        #TODO: When we finish this, maybe skip cancelling and try removing the sleep
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
         time.sleep(5 + self.extra_wait) #We have to sleep after cancelling, even though test 21 just goes to another page, because it won't nav
 
@@ -1174,7 +1114,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     # We may try to automate the file picker someday.
     # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
     # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
-
     def r21r22r23r24r25_dataset_file_discovery(self):
         self.set_req('21')
         self.set_start_time()
@@ -1250,7 +1189,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         #This code is not part of a req per say. But we need another version of the dataset for version testing, and more files to garuntee enough objects for browse pagination
 
-        if self.test_files:
+        if self.do_file_tests:
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[1]/a').click()
             time.sleep(1 + self.extra_wait)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click()
@@ -1284,7 +1223,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.take_screenshot(shot:=shot+1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:detailsBlocks"]/div[1]/a').click()
 
-        if self.test_files: #Requires files currently because uploading of the files creates the draft version which creates 3 version and enabled the checkbox compare dialog
+        if self.do_file_tests: #Requires files currently because uploading of the files creates the draft version which creates 3 version and enabled the checkbox compare dialog
             time.sleep(1 + self.extra_wait)
             self.take_screenshot(shot:=shot+1)
             self.part = '03' #compare two versions
@@ -1304,7 +1243,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_req('24')
         self.set_start_time()
 
-        if self.test_files: #Requires files currently because we upload 6 additional files to have enough files to ensure pagination exists
+        if self.do_file_tests: #Requires files currently because we upload 6 additional files to have enough files to ensure pagination exists
             self.part = '01' #from main page, exercise pagination.
             self.sesh.get(self.dv_url)
             self.sesh.find_element('xpath', '//*[@id="facetType"]/div[3]/a[1]/div/div[2]/span').click()
@@ -1339,7 +1278,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_req('25')
         self.set_start_time()
-        if self.test_files:
+        if self.do_file_tests:
             self.part = '01' #navigate to dataset
             self.take_screenshot(shot:=1)
 
@@ -1351,8 +1290,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.take_screenshot(shot:=shot+1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/ul/li[4]/a').click()
             time.sleep(2 + self.extra_wait)
-            downloaded_hash_single = hashlib.md5(open(f'{self.download_parent_dir}/seleniumdownloads/test_file_2_renamed.png', 'rb').read()).hexdigest()
-            self.assertEqual(self.test_file_2_md5, f'MD5: {downloaded_hash_single}')
+            downloaded_hash_single = hashlib.md5(open(f'{self.download_full_path}/test_file_2_renamed.png', 'rb').read()).hexdigest()
+            self.assertEqual(self.test_file_2_md5, downloaded_hash_single)
 
             self.part = '03' #select multiple files for download
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[1]/td[1]/div/div').click()
@@ -1365,11 +1304,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '04' #download files via download button above list
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:downloadButtonBlockNormal"]/a').click()
             time.sleep(4 + self.extra_wait)
-            with ZipFile(f'{self.download_parent_dir}/seleniumdownloads/dataverse_files.zip', 'r') as zip_ref:
-                zip_ref.extractall(f'{self.download_parent_dir}/seleniumdownloads/zipfolder/')
+            with ZipFile(f'{self.download_full_path}/dataverse_files.zip', 'r') as zip_ref:
+                zip_ref.extractall(f'{self.download_full_path}/zipfolder/')
 
-            downloaded_hash_folder_file_1_replaced = hashlib.md5(open(f'{self.download_parent_dir}/seleniumdownloads/zipfolder/testreplacefolder/test_file_1_replace_renamed.txt', 'rb').read()).hexdigest()
-            self.assertEqual(self.test_file_1_replace_md5, f'MD5: {downloaded_hash_folder_file_1_replaced}')
+            downloaded_hash_folder_file_1_replaced = hashlib.md5(open(f'{self.download_full_path}/zipfolder/testreplacefolder/test_file_1_replace_renamed.txt', 'rb').read()).hexdigest()
+            self.assertEqual(self.test_file_1_replace_md5, downloaded_hash_folder_file_1_replaced)
 
         self.set_end_time()
 
@@ -1378,7 +1317,6 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
     def take_screenshot(self, shot):
         if self.do_screenshots: 
             dict_key = f'r{self.req}_p{self.part}_s{"%02d" % (shot)}'
-            #print(dict[dict_key])
             if dict_key in self.screenshots.keys():
                 raise Exception("Duplicate screenshot key encountered. Check test code.")
             self.screenshots[dict_key] = self.sesh.get_screenshot_as_base64()

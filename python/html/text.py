@@ -71,7 +71,6 @@ text = {
     'r06_p09': 'In the Terms form, enter updated information that is standard across all datasets in the dataset into the applicable terms fields.',
     'r06_p10': 'Click on the Save Changes button.', 
 
-
     'r09_title': 'Dataverse must support study and dataset creation where the archivist must be able to create a new dataset/study',
     'r09_p01': 'Click on the Add Data button located at the upper-right hand side of the dataverse landing page.',
     'r09_p02': 'In the drop-down list that appears, select the New Dataset option.',
@@ -83,7 +82,7 @@ text = {
     'r09_p08': 'Click on the Save Changes button.',
     'r09_p09': 'Once the dataset record has been reviewed, click on the Publish Dataset button to the right-hand side of the dataset citation to finalize and create version 1 of the dataset.',
 
-#TODO: I guessed on some of these reqs and I think they need to be moved. Anything that isn't data (e.g. terms) is probably req 12?
+#TODO: I guessed on some of these reqs and I think they need to be moved. Anything that isn't data (e.g. dataset metadata, file metadata, terms) is probably req 12?
     'r10_title': 'Dataverse must support study and dataset creation where the archivist must be able to edit properties of dataset/study',
     'r10_p01': 'Click the checkbox next to the file(s) that require(s) editing.',
     'r10_p02': 'Click on the Edit Files button above the file list and select the Metadata option.',
@@ -102,7 +101,7 @@ text = {
     'r11_p04': 'Click on the Save Changes button.',
 
     'r12_title': 'Dataverse must support dataset/study management where the archivist must be able to edit metadata',
-    'r12_p01': 'Click on the Edit Dataset button located to the right-hand side of the dataset citation.  Select the Metadata option.',
+    'r12_p01': 'Click on the Edit Dataset button located to the right-hand side of the dataset citation. Select the Metadata option.',
     'r12_p02': 'In each section of the metadata form, edit descriptive information about the dataset by entering the updated information into the text fields provided or by selecting alternative options from the given drop-down list for each of the corresponding metadata fields.',
     'r12_p03': 'Click on the Save Changes button.',
 
