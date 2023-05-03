@@ -86,7 +86,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.r05_mainpath_create_metadata_template,
             self.r06_mainpath_edit_metadata_template,
             self.r09r11r13r20_mainpath_create_dataset,
-            self.r10r12r15r16r17r18_mainpath_edit_dataset,
+            self.r12r15r16r17r18_mainpath_edit_dataset,
             self.r21r22r23r24r25_dataset_file_discovery,
         ]
         for test in tests:
@@ -811,7 +811,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
             
-    def r10r12r15r16r17r18_mainpath_edit_dataset(self):
+    def r12r15r16r17r18_mainpath_edit_dataset(self):
         self.set_req('12')
         self.set_start_time()
 
@@ -848,17 +848,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        self.set_req('10')
-        self.set_start_time()
-
         if self.do_file_tests:
             ### File-level metadata ###
-            self.part = '01' #click the checkbox next to the file
+            self.part = '04' #click the checkbox next to the file
             self.take_screenshot(shot:=1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr/td[1]/div').click()
             self.take_screenshot(shot:=shot+1)
 
-            self.part = '02' #edit file button above file list
+            self.part = '05' #edit file button above file list
             time.sleep(.5 + self.extra_wait)
 
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_head"]/tr/th[3]/span/div/button').click()
@@ -869,7 +866,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             time.sleep(1 + self.extra_wait)
             self.take_screenshot(shot:=shot+1)
 
-            self.part = '03'
+            self.part = '06'
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').send_keys('test_file_1_renamed_again.txt')
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDirectoryName"]').clear()
@@ -878,23 +875,23 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description_renamed')
             self.take_screenshot(shot:=1)
 
-            self.part = '04'
+            self.part = '07'
             self.sesh.find_element('xpath', '//*[@id="datasetForm:savebutton"]').click()
             time.sleep(2 + self.extra_wait)
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success")
             self.take_screenshot(shot:=1)
     
         ### Dataset-terms (note: create and edit use the same code) ###
-        self.part = '05'
+        self.part = '08'
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
         self.take_screenshot(shot:=shot+1)
         time.sleep(1 + self.extra_wait)
 
-        self.part = '06'
+        self.part = '09'
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:termsTab"]/div[1]/a').click()
 
-        self.part = '07'
+        self.part = '10'
         self.take_screenshot(shot:=1)
         self.sesh.find_element('xpath','//*[@id="datasetForm:tabView:licenses"]').click() #click license dropdown
         time.sleep(.2 + self.extra_wait)
@@ -903,7 +900,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(.2 + self.extra_wait)
         self.take_screenshot(shot:=shot+1)
 
-        self.part = '08'
+        self.part = '11'
         self.set_license(add_string='edit', xpath_dict=self.ds_license_edit_xpaths)
         if self.do_screenshots:
             shot = 0
@@ -911,7 +908,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
 
-        self.part = '09'
+        self.part = '12'
         self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottomTerms"]').click()
         self.take_screenshot(shot:=1)
         time.sleep(1 + self.extra_wait)
