@@ -1,4 +1,5 @@
 import time, unittest, os, requests, re, hashlib
+from pathlib import Path
 from shutil import rmtree
 from zipfile import ZipFile
 from datetime import datetime
@@ -26,11 +27,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.dv_url = os.getenv('DATAVERSE_SERVER_URL')
         self.perm_test_username = os.getenv('DATAVERSE_USERNAME_FOR_PERM_TEST')
         self.sso_option_value = os.getenv('DATAVERSE_SSO_OPTION_VALUE')
-        self.download_full_path = os.getenv('DOWNLOAD_PARENT_DIR')+"/seleniumdownloads"
+        self.download_full_path = Path(os.getenv('DOWNLOAD_PARENT_DIR') + "/seleniumdownloads")
         self.extra_wait = int(os.getenv('EXTRA_WAIT'))
         self.scroll_height = 600
         self.api_token = None
-        self.templates_exist = False
         self.browser_type = "Chrome"
         self.req = None
         self.part = None
@@ -49,9 +49,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.role_alias_created = False
 
         options = Options()
+
         if self.browser_type == "Chrome":
             options.add_experimental_option("prefs", {
-                "download.default_directory":self.download_full_path, 
+                "download.default_directory":str(self.download_full_path), 
                 "download.prompt_for_download": False
             })
             
@@ -65,9 +66,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
     def tearDown(self):
         self.delete_dv_resources(self.dataset_id, self.dataverse_id, (self.role_alias if self.role_alias_created else None))
-        if os.path.isdir(self.download_full_path):
+        if os.path.isdir(str(self.download_full_path)):
             try:
-                rmtree(self.download_full_path)
+                rmtree(str(self.download_full_path))
             except Exception as e:
                 print("Unable to delete download folder even though it exists. Error: " + str(e))
 
@@ -76,8 +77,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = self.get_testing_info()
 
         tests = [
-            self.r01alt_mainpath_builtin_auth,
-            #self.r01_mainpath_test_sso_auth,
+            #self.r01alt_mainpath_builtin_auth,
+            self.r01_mainpath_test_sso_auth,
             self.get_api_token,
             self.r02_mainpath_add_user_group_role,
             self.r03_mainpath_create_sub_dataverse,
@@ -459,7 +460,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.execute_script('document.evaluate(\'//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]/div[3]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
         time.sleep(1 + self.extra_wait)
         self.part = '04'
-        self.set_dataset_metadata_edit(add_string='create', xpath_dict=self.ds_template_xpaths)
+        self.set_dataset_metadata_edit(add_string='create', xpath_dict=self.ds_template_xpaths, extra_wait=self.extra_wait)
         if self.do_screenshots:
             shot = 0
             for i in range(9):
@@ -547,7 +548,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.execute_script('document.evaluate(\'//*[@id="templateForm:j_idt620:0:j_idt623:5:j_idt677:0:j_idt679:2:cvv"]/div[3]\', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()')
         time.sleep(1 + self.extra_wait)    
         self.part = '03'    
-        self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_template_xpaths)
+        self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_template_xpaths, extra_wait=self.extra_wait)
         if self.do_screenshots:
             shot = 0
             for i in range(9):
@@ -635,7 +636,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_start_time()
 
         self.part = '01'
-        self.set_dataset_metadata_create(add_string='create')
+        self.set_dataset_metadata_create(add_string='create', extra_wait=self.extra_wait)
         if self.do_screenshots:
             shot = 0
             for i in range(4):
@@ -697,11 +698,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=shot+1)
         time.sleep(1 + self.extra_wait)
 
-        self.part = '05'
-        if not self.templates_exist:
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1722"]').click()
-        else:
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1719"]').click()
+        self.part = '05' #click edit terms
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/div/div[3]/div[1]/a').click()
+        time.sleep(2 + self.extra_wait)
 
         self.part = '06'
         self.take_screenshot(shot:=1)
@@ -735,7 +734,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=shot+1)
 
         self.part = '03' #edit metadata postcreate
-        self.set_dataset_metadata_edit(add_string='postcreate', xpath_dict=self.ds_edit_xpaths_notemplate)
+        self.set_dataset_metadata_edit(add_string='postcreate', xpath_dict=self.ds_edit_xpaths, extra_wait=self.extra_wait)
+
         if self.do_screenshots:
             shot = 0
             for i in range(8):
@@ -762,16 +762,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.take_screenshot(shot:=1)
 
         self.part = '02'
+
         self.sesh.execute_script("window.scrollTo(0, 0)") 
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
-        self.sesh.implicitly_wait(3) #We fail fast because we expect this to happen when a dataset template has been made already (normal test path)
-        try: 
-            self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
-        except Exception:
-            self.templates_exist = True
-            self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths_yestemplate)
-        self.sesh.implicitly_wait(10)
+        self.confirm_dataset_metadata(add_string='postcreate', is_update=False, xpath_dict=self.ds_edit_xpaths)
         if self.do_screenshots:
             shot = 0
             for i in range(8):
@@ -830,10 +825,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.part = '02'
 
-        if not self.templates_exist:
-            self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_edit_xpaths_notemplate)
-        else:
-            self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_edit_xpaths_yestemplate)
+        self.set_dataset_metadata_edit(add_string='edit', xpath_dict=self.ds_edit_xpaths, extra_wait=self.extra_wait)
 
         if self.do_screenshots:
             shot = 0
@@ -861,23 +853,19 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         if self.do_file_tests:
             ### File-level metadata ###
-            self.part = '01'
+            self.part = '01' #click the checkbox next to the file
             self.take_screenshot(shot:=1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr/td[1]/div').click()
             self.take_screenshot(shot:=shot+1)
 
-            self.part = '02'
+            self.part = '02' #edit file button above file list
             time.sleep(.5 + self.extra_wait)
-            if not self.templates_exist:
-                self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1295"]/span/div/button').click()
-            else:
-                self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1292"]/span/div/button').click()
+
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_head"]/tr/th[3]/span/div/button').click()
+
             self.take_screenshot(shot:=1)
             time.sleep(.5 + self.extra_wait)
-            if not self.templates_exist:
-                self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1300"]').click()
-            else:
-                self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:j_idt1297"]').click()
+            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_head"]/tr/th[3]/span/div/ul/li[1]/a').click()
             time.sleep(1 + self.extra_wait)
             self.take_screenshot(shot:=shot+1)
 
@@ -904,10 +892,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1 + self.extra_wait)
 
         self.part = '06'
-        if not self.templates_exist:
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1722"]').click()
-        else:
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:j_idt1719"]').click()
+        self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:termsTab"]/div[1]/a').click()
 
         self.part = '07'
         self.take_screenshot(shot:=1)
@@ -1051,12 +1036,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.execute_script("window.scrollTo(0, 0)") 
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click edit dataset
-        # if not self.templates_exist: 
-        #     self.confirm_dataset_metadata(add_string='edit', is_update=False, xpath_dict=self.ds_edit_xpaths_notemplate)
-        # else:
-        #NOTE: This seems to line up with notemplate even though there is one at this point? Maybe its different off a draft dataset instead of off a non-draft?
-        #      If this blows up testing without a template, investigate more
-        self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate)
+        self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths)
         if self.do_screenshots:
             shot = 0
             for i in range(8):
@@ -1102,11 +1082,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click add data
         self.sesh.find_element('xpath', '//*[@id="datasetForm:editMetadata"]').click() #click new dataset
 
-        if not self.templates_exist:
-            self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_notemplate) 
-        else:
-            self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths_yestemplate) 
-
+        self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths) 
+        
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
         time.sleep(5 + self.extra_wait) #We have to sleep after cancelling, even though test 21 just goes to another page, because it won't nav
 
@@ -1183,7 +1160,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.part = '04' #nav to terms tab
         self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[3]/a').click()
-        time.sleep(.2 + self.extra_wait)
+        time.sleep(2 + self.extra_wait)
         self.take_screenshot(shot:=1)
         self.set_end_time()
 
@@ -1191,7 +1168,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         if self.do_file_tests:
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView"]/ul/li[1]/a').click()
-            time.sleep(1 + self.extra_wait)
+            time.sleep(2 + self.extra_wait)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click()
             time.sleep(1 + self.extra_wait)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
@@ -1285,12 +1262,18 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '02' #download individual file via access file icon next to file info
             self.sesh.execute_script("window.scrollTo(0, 900)") 
             self.take_screenshot(shot:=1)
-            self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/a[2]/span[1]').click()
+
+            self.sesh.implicitly_wait(3)
+            try: #file previewers
+                self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/a[2]/span[1]').click()
+            except Exception: #no file previewers
+                self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/a/span[1]').click()
+            self.sesh.implicitly_wait(10)
             time.sleep(2 + self.extra_wait)
             self.take_screenshot(shot:=shot+1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[2]/td[3]/div/div[1]/ul/li[4]/a').click()
             time.sleep(2 + self.extra_wait)
-            downloaded_hash_single = hashlib.md5(open(f'{self.download_full_path}/test_file_2_renamed.png', 'rb').read()).hexdigest()
+            downloaded_hash_single = hashlib.md5(open(str(self.download_full_path / 'test_file_2_renamed.png'), 'rb').read()).hexdigest()
             self.assertEqual(self.test_file_2_md5, downloaded_hash_single)
 
             self.part = '03' #select multiple files for download
@@ -1304,10 +1287,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '04' #download files via download button above list
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:downloadButtonBlockNormal"]/a').click()
             time.sleep(4 + self.extra_wait)
-            with ZipFile(f'{self.download_full_path}/dataverse_files.zip', 'r') as zip_ref:
-                zip_ref.extractall(f'{self.download_full_path}/zipfolder/')
+            with ZipFile(str(self.download_full_path / 'dataverse_files.zip'), 'r') as zip_ref:
+                zip_ref.extractall(str(self.download_full_path / 'zipfolder/'))
 
-            downloaded_hash_folder_file_1_replaced = hashlib.md5(open(f'{self.download_full_path}/zipfolder/testreplacefolder/test_file_1_replace_renamed.txt', 'rb').read()).hexdigest()
+            downloaded_hash_folder_file_1_replaced = hashlib.md5(open(str(self.download_full_path / 'zipfolder/testreplacefolder/test_file_1_replace_renamed.txt'), 'rb').read()).hexdigest()
             self.assertEqual(self.test_file_1_replace_md5, downloaded_hash_folder_file_1_replaced)
 
         self.set_end_time()

@@ -45,7 +45,7 @@ def main():
                                 test_version = version,
                                 failure = failure)) #we want them in the dictionary for template iteration
 
-    print("rendered")
+    print("Rendered")
 
 # This custom function we add to jinja. It checks if an element is in a list, and if not returns a high number
 # This is because our failed tests won't be added to the list, so functionally we consider them late enough that they failed
