@@ -77,17 +77,17 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = self.get_testing_info()
 
         tests = [
-            #self.r01alt_mainpath_builtin_auth,
-            self.r01_mainpath_test_sso_auth,
+            self.r01alt_mainpath_builtin_auth,
+            #self.r01_mainpath_test_sso_auth,
             self.get_api_token,
             self.r02_mainpath_add_user_group_role,
             self.r03_mainpath_create_sub_dataverse,
             self.r04_mainpath_edit_dataverse,
             self.r05_mainpath_create_metadata_template,
             self.r06_mainpath_edit_metadata_template,
-            self.r09r11r13r20_mainpath_create_dataset,
-            self.r12r15r16r17r18_mainpath_edit_dataset,
-            self.r21r22r23r24r25_dataset_file_discovery,
+            self.r07r08r10r11r16_mainpath_create_dataset,
+            self.r09r12r13r14r15_mainpath_edit_dataset,
+            self.r17r18r19r20r21_dataset_file_discovery,
         ]
         for test in tests:
             test()
@@ -609,8 +609,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
             
-    def r09r11r13r20_mainpath_create_dataset(self):
-        self.set_req('09')
+    def r07r08r10r11r16_mainpath_create_dataset(self):
+        self.set_req('07')
         self.set_start_time()
 
         self.part = '01'
@@ -632,7 +632,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1 + self.extra_wait)
         #self.set_end_time() #We continue this test later
 
-        self.set_req('11')
+        self.set_req('08')
         self.set_start_time()
 
         self.part = '01'
@@ -645,7 +645,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         #self.set_end_time() #We continue this test later so we don't do the end time here
 
         if self.do_file_tests:
-            self.set_req('13')
+            self.set_req('10')
             self.set_start_time()
 
             self.part = '01' #click add button
@@ -663,7 +663,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             # self.part = '03' # We do not currently test drag & Drop
 
-            self.set_req('20')
+            self.set_req('16')
             self.set_start_time()
             self.part = '01' #confirm md5
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
@@ -681,7 +681,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileDescription"]').send_keys('test_file_description')
             self.take_screenshot(shot:=1)
 
-        self.part = '04' #NOTE: This is part of req 20 even though with do_file_tests disabled it won't be a part of it
+        self.part = '04' #NOTE: This is part of req 16 even though with do_file_tests disabled it won't be a part of it
         self.sesh.find_element('xpath','//*[@id="datasetForm:saveBottom"]').click() #create dataset
         self.assertEqual(self.sesh.find_element('xpath', '//*[@id="messagePanel"]/div/div[1]').get_attribute("class"), "alert alert-success") 
         self.take_screenshot(shot:=1)
@@ -689,7 +689,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         ### Get dataset id from permissions page url for later uses ###
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
 
-        self.set_req('09')
+        self.set_req('07')
 
         ### Dataset-terms (note: create and edit use the same code) ###
         self.part = '04'
@@ -725,7 +725,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         time.sleep(1 + self.extra_wait)
         self.take_screenshot(shot:=shot+1)
 
-        self.set_req('11')
+        self.set_req('08')
 
         self.part = '02' #click edit dataset
         self.sesh.find_element('xpath', '//*[@id="editDataSet"]').click() #click edit dataset
@@ -749,7 +749,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        self.set_req('14') #NOTE: Very similar to req 18. If you edit this also edit that
+        self.set_req('11') #NOTE: Very similar to req 15. If you edit this also edit that
         self.set_start_time()
 
         self.part = '01' 
@@ -791,7 +791,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        self.set_req('09')
+        self.set_req('07')
 
         self.part = '09'
 
@@ -811,8 +811,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
             
-    def r12r15r16r17r18_mainpath_edit_dataset(self):
-        self.set_req('12')
+    def r09r12r13r14r15_mainpath_edit_dataset(self):
+        self.set_req('09')
         self.set_start_time()
 
         self.part = '01'
@@ -833,14 +833,14 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
                 self.sesh.execute_script(f"window.scrollTo(0, {i * self.scroll_height})") 
                 self.take_screenshot(shot:=shot+1)
 
-        self.set_req('17')
+        self.set_req('14')
         self.set_start_time()
         self.part = '01'
         self.sesh.execute_script(f"window.scrollTo(0, {3 * self.scroll_height})") 
         self.take_screenshot(shot:=1)
         self.set_end_time()
 
-        self.set_req('12') #We switch back and forth between reqs
+        self.set_req('09') #We switch back and forth between reqs
         self.part = '03'
         self.sesh.find_element('xpath', '//*[@id="datasetForm:saveBottom"]').click() #click to save dataset
         time.sleep(2 + self.extra_wait) #added for screenshot
@@ -917,7 +917,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.set_end_time()
 
         if self.do_file_tests:
-            self.set_req('15') # replace file
+            self.set_req('12') # replace file
             self.set_start_time()
 
             self.part = '01'
@@ -969,7 +969,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.set_end_time()
 
-            self.set_req('16') # Add new file
+            self.set_req('13') # Add new file
             self.set_start_time()
 
             self.part = '01'
@@ -1012,7 +1012,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.set_end_time()
 
-        self.set_req('18') #NOTE: Very similar to req 14. If you edit this also edit that
+        self.set_req('15') #NOTE: Very similar to req 11. If you edit this also edit that
         self.set_start_time()
 
         self.part = '01' 
@@ -1058,7 +1058,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         time.sleep(1 + self.extra_wait)
 
-#TODO: Add this code to a part (with screenshots) once we get clarity on which test the rest of the code are a part of
+        #Note: None of our current requirements require us to publish another dataset version and check it worked, but we do it anyways for our own sanity
         if self.do_file_tests:
             self.sesh.find_element('xpath', '//*[@id="actionButtonBlock"]/div[2]/div/a').click() #click publish
         else:
@@ -1082,14 +1082,15 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.confirm_dataset_metadata(add_string='edit', is_update=True, xpath_dict=self.ds_edit_xpaths) 
         
         self.sesh.find_element('xpath', '//*[@id="datasetForm:cancelTop"]').click() #click cancel out of edit after testing
-        time.sleep(5 + self.extra_wait) #We have to sleep after cancelling, even though test 21 just goes to another page, because it won't nav
+        time.sleep(5 + self.extra_wait) #We have to sleep after cancelling, even though req 17 just goes to another page, because it won't nav
 
     # The test of file upload requires manual interaction by the user, as automating selecting file via toe OS file picker is super painful
     # We may try to automate the file picker someday.
     # Or explore maybe some way to get around this with automating drag and drop https://stackoverflow.com/questions/38829153/
     # We may also want to implement another verison of this function that just uses the API to do file upload for when compliance is not an issue.
-    def r21r22r23r24r25_dataset_file_discovery(self):
-        self.set_req('21')
+
+    def r17r18r19r20r21_dataset_file_discovery(self):
+        self.set_req('17')
         self.set_start_time()
 
         self.part = '01' # enter search terms (basic)
@@ -1134,7 +1135,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        self.set_req('22')
+        self.set_req('18')
         self.set_start_time()
 
         self.part = '01' #nav to landing (already there)
@@ -1176,7 +1177,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             print("Upload Completed")
             self.sesh.find_element('xpath','//*[@id="datasetForm:savebutton"]').click() #save files
 
-        self.set_req('23')
+        self.set_req('19')
         self.set_start_time()
 
         self.part = '01' #nav to dataset and then version tab
@@ -1214,7 +1215,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        self.set_req('24')
+        self.set_req('20')
         self.set_start_time()
 
         if self.do_file_tests: #Requires files currently because we upload 6 additional files to have enough files to ensure pagination exists
@@ -1250,7 +1251,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         self.set_end_time()
 
-        self.set_req('25')
+        self.set_req('21')
         self.set_start_time()
         if self.do_file_tests:
             self.part = '01' #navigate to dataset

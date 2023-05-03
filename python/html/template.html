@@ -34,7 +34,7 @@
   {% for approval in ['Business Owner Approval', 'System Owner Approval', 'Technical Approval', 'Quality Approval'] %}
   <table width="100%" class="border" >
     <tr>
-    <td class="border" colspan="4" style="background-color: #1e4ca8; color: #ffffff; padding:4px 4px 4px 4px;">Business Owner Approval</td>
+    <td class="border" colspan="4" style="background-color: #1e4ca8; color: #ffffff; padding:4px 4px 4px 4px;">{{approval}}</td>
     </tr>
     <tr>
     <td width="25%" class="border" style="padding:4px 4px 20% 4px;">Signee</td>
@@ -91,7 +91,7 @@
 <div>
   <h2>Results</h2>
 
-  {% set tested_reqs = [1,2,3,4,5,6,9,11,12,13,14,15,16,17,18,20,21,22,23,24,25] %}
+  {% set tested_reqs = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] %}
 
   {# p and i margins are for pdf gen not cutting off fontawesome element. Should make it styles #}
 
