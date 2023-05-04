@@ -123,7 +123,7 @@ text = {
     'r13_p01': 'Click on the Upload Files button above the file list.',
     'r13_p02': 'Upload the new file in the Upload with HTTP via your browser section of the page by clicking on the Select Files to Add button.',
     'r13_p03': 'In the file explorer box that appears, navigate to and select the new file to be included in the dataset.',
-    'r13_p04': 'Alternatively, drag and drop the new file into the Drag and drop files here box.  The new file uploaded files will appear with an MD5 and editable file-level metadata fields. ',
+    'r13_p04': 'The new file uploaded files will appear with an MD5 and editable file-level metadata fields. ', #Alternatively, drag and drop the new file into the Drag and drop files here box.  
     'r13_p05': 'Confirm that the MD5 matches the pre-dataverse ingest MD5.',
     'r13_p06': 'If necessary, update the file name and define the file path in the corresponding metadata fields.',
     'r13_p07': 'Add a file description in the Description text field for the new file.',
