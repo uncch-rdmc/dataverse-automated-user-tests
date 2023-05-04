@@ -77,8 +77,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = self.get_testing_info()
 
         tests = [
-            self.r01alt_mainpath_builtin_auth,
-            #self.r01_mainpath_test_sso_auth,
+            #self.r01alt_mainpath_builtin_auth,
+            self.r01_mainpath_test_sso_auth,
             self.get_api_token,
             self.r02_mainpath_add_user_group_role,
             self.r03_mainpath_create_sub_dataverse,
@@ -668,6 +668,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '01' #confirm md5
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span')
             self.assertEqual(self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileChecksum"]').text, self.md5_prefix + self.test_file_1_md5)
+            self.take_screenshot(shot:=1)
 
             self.part = '02' #update name and path
             self.sesh.find_element('xpath', '//*[@id="datasetForm:filesTable:0:fileName"]').clear()
@@ -1240,12 +1241,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.sesh.get(self.dv_url)
         time.sleep(1 + self.extra_wait)
         self.take_screenshot(shot:=1)
-        self.sesh.get(f'{self.dv_url}/dataverse/root?q=&fq1=keywordValue_ss%3A%22edit{self.ds_props["keyword_term"]}%22&fq0=dvObjectType%3A%28dataverses+OR+datasets+OR+files%29&types=dataverses%3Adatasets%3Afiles&sort=dateSort&order=') 
+        self.sesh.get(f'{self.dv_url}/dataverse/root?q=&fq2=publicationStatus%3A%22Draft%22&fq0=keywordValue_ss%3A%22edit{self.ds_props["keyword_term"]}%22&fq1=dvObjectType%3A%28dataverses+OR+datasets+OR+files%29&types=dataverses%3Adatasets%3Afiles&sort=dateSort&order=') 
         time.sleep(1 + self.extra_wait)
         self.take_screenshot(shot:=shot+1)
 
         self.part = '03' #select dataset
-        self.sesh.find_element('xpath', '//*[@id="resultsTable"]/tbody/tr[2]/td/div/div[1]/a/span').click()
+        self.sesh.find_element('xpath', '//*[@id="resultsTable"]/tbody/tr/td/div/div[1]/a').click()
         time.sleep(1 + self.extra_wait)
         self.take_screenshot(shot:=1)
 
@@ -1276,9 +1277,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.part = '03' #select multiple files for download
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[1]/td[1]/div/div').click()
-            time.sleep(1 + self.extra_wait)
+            time.sleep(3 + self.extra_wait)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable_data"]/tr[3]/td[1]/div/div').click()
-            time.sleep(1 + self.extra_wait)
+            time.sleep(3 + self.extra_wait)
             self.sesh.execute_script("window.scrollTo(0, 900)") 
             self.take_screenshot(shot:=1)
 
