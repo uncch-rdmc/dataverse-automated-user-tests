@@ -1,6 +1,6 @@
 text = {
-    'document_title':'Validator for FDA Dataverse',
-    'document_description':'This document shows the automated compliance of tests on the FDA dataverse to ensure CFR Part11 functionality operates.',
+    'document_title':'Automated User Testing for UNC Dataverse 21 CFR Part 11 validation project',
+    'document_description':'This report displays the output of automated user tests based on the 21 CFR Part 11 validation user requirements. The tests listed below correspond directly to the requirements listed in URS-DV-001. Each test is automated using the Selenium WebDriver to produce events functionally identical to user-initiated web browser events. This process allows for the testing of user actions without manual intervention.',
 
     ### TESTS ###
 
