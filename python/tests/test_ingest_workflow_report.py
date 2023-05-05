@@ -59,9 +59,10 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         else:
             print("Browsers other than Chrome have not been tested, and certain tests will fail (file downloading).")
-        if self.do_screenshots:
-            self.sesh.set_window_size(1200,827) #675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
 
+        # Window size set for all paths to ensure elements are on screen when expected.
+        # 675 should be the height with the screenshot not including the top/bottom bar. At least with chrome v111
+        self.sesh.set_window_size(1200,827) 
         self.sesh.implicitly_wait(10)
 
     def tearDown(self):
@@ -77,8 +78,9 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         self.info = self.get_testing_info()
 
         tests = [
-            #self.r01alt_mainpath_builtin_auth,
-            self.r01_mainpath_test_sso_auth,
+#TODO: SWITCH BACK TO SSO!
+            self.r01alt_mainpath_builtin_auth,
+            #self.r01_mainpath_test_sso_auth,
             self.get_api_token,
             self.r02_mainpath_add_user_group_role,
             self.r03_mainpath_create_sub_dataverse,
@@ -171,12 +173,12 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
         
         self.part = '03'
         self.sesh.find_element('xpath', '//*[@id="idpSelectListButton"]').click()
+        print("User input required: complete oauth login.")
         time.sleep(2 + self.extra_wait)
         self.take_screenshot(shot:=1)
 
         self.part = '04'
         self.sesh.implicitly_wait(3600)
-        print("User input required: complete oauth login.")
         self.sesh.find_element('xpath', '//*[@id="dataverseDesc"]') #Find element to wait login to complete
         self.assertEqual(f'{self.dv_url}/dataverse.xhtml', self.sesh.current_url)
         self.take_screenshot(shot:=1)
@@ -650,11 +652,11 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
             self.part = '01' #click add button
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
+            print("User input required: upload test_file_1.txt")
             self.take_screenshot(shot:=1)
 
             self.part = '02' #file system dialog
             self.sesh.implicitly_wait(3600)
-            print("User input required: upload test_file_1.txt")
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("Upload Completed")
@@ -935,8 +937,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '03'
             self.take_screenshot(shot:=1)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
-            self.sesh.implicitly_wait(3600)
             print("User input required: upload test_file_1_replace.txt")
+            self.sesh.implicitly_wait(3600)
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("Replace Completed")
@@ -980,8 +982,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.part = '02'
             self.take_screenshot(shot:=1) 
             self.sesh.find_element('xpath','//*[@id="datasetForm:fileUpload"]/div[1]/span').click() #save
-            self.sesh.implicitly_wait(3600)
             print("User input required: upload test_file_2.png")
+            self.sesh.implicitly_wait(3600)
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("Upload Completed")
@@ -1171,8 +1173,8 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
             self.sesh.find_element('xpath', '//*[@id="datasetForm:tabView:filesTable:filesButtons"]/a').click()
             time.sleep(1 + self.extra_wait)
             self.sesh.find_element('xpath', '//*[@id="datasetForm:fileUpload"]/div[1]/span').click()
-            self.sesh.implicitly_wait(3600)
             print("User input required: upload 6 pagination files (select multiple in the system dialog).")
+            self.sesh.implicitly_wait(3600)
             self.sesh.find_element('xpath', '//*[@id="filesHeaderCount"]') 
             self.sesh.implicitly_wait(10)
             print("Upload Completed")

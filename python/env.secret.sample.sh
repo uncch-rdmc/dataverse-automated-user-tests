@@ -13,3 +13,6 @@ export DOWNLOAD_PARENT_DIR=
 
 #Increment this to add a fixed additional wait to all sleep statements. Useful for when a server is being slow etc.
 export EXTRA_WAIT=0
+
+#Location where the output.html will be saved to
+export OUTPUT_DIR=

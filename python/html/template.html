@@ -31,7 +31,7 @@
 <div>
   <h2>Approval Signatures</h2>
   <hr style="margin-bottom:20px">
-  {% for approval in ['Business Owner Approval', 'System Owner Approval', 'Technical Approval', 'Quality Approval'] %}
+  {%- for approval in ['Business Owner Approval', 'System Owner Approval', 'Technical Approval', 'Quality Approval'] -%}
   <table width="100%" class="border" >
     <tr>
     <td class="border" colspan="4" style="background-color: #1e4ca8; color: #ffffff; padding:4px 4px 4px 4px;">{{approval}}</td>
@@ -44,7 +44,7 @@
     </tr>
   </table>
   <br/>
-  {% endfor %}
+  {%- endfor -%}
 
 </div>
 
@@ -91,46 +91,46 @@
 <div>
   <h2>Results</h2>
 
-  {% set tested_reqs = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] %}
+  {%- set tested_reqs = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] -%}
 
   {# p and i margins are for pdf gen not cutting off fontawesome element. Should make it styles #}
 
-  {% for req in tested_reqs %}
-    {% for key, value in text.items() %}
-      {% if key.startswith('r' + ('%02d' % req) + '_title') %}
-        {% if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) %}
+  {%- for req in tested_reqs -%}
+    {%- for key, value in text.items() -%}
+      {%- if key.startswith('r' + ('%02d' % req) + '_title') -%}
+        {%- if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) -%}
           <p style="margin-bottom: 1px;"><i class="fa-solid fa-circle-xmark" style="color: #c91c1c; margin: 1px;"></i> {{value}}</p>
-        {% else %}
+        {%- else -%}
           <p style="margin-bottom: 1px;"><i class="fa-solid fa-circle-check" style="color: #008e00; margin: 1px;"></i> {{value}}</p>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
 </div>
 
 {# TODO: try adding page breaks at the end of each section for when we print to pdf. Start at https://stackoverflow.com/questions/42005819/ #}
 
-{% for req in tested_reqs %} {# range(1, 25) #}
+{%- for req in tested_reqs -%} {# range(1, 25) #}
   <br/>{# remove after page break? #}
   {# TODO: Round "PASS" text corners #}
   <div class="pagebreak">
   <h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>
-  {# {% if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) %}
+  {# {%- if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) -%}
     <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #c91c1c; color: #ffffff; border-radius: 4px;">FAIL</h4></div>
-  {% else %}
+  {%- else -%}
     <div><h2 style="display:inline-block;">{{text['r' + ('%02d' % req) + '_title']}} </h2>&nbsp;&nbsp;<h4 style="position:relative; top: -6px; padding: 3px 3px 0px 3px; display:inline-block; background-color: #008e00; color: #ffffff; border-radius: 4px;">PASS</h4></div>
-  {% endif %} #}
+  {%- endif -%} #}
 
-  {% if req in end_times %}
+  {%- if req in end_times -%}
   <table>
     <tr>
       <td>Status:</td>
       <td>
-      {% if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) %}
+      {%- if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and failure == True) -%}
         <span style="padding: 3px 3px 0px 3px; display:inline-block; background-color: #c91c1c; color: #ffffff; border-radius: 4px;">FAIL</span>
-      {% else %}
+      {%- else -%}
         <span style="padding: 3px 3px 0px 3px; display:inline-block; background-color: #008e00; color: #ffffff; border-radius: 4px;">PASS</span>
-      {% endif %}
+      {%- endif -%}
       </td>
     </tr>
     <tr>
@@ -142,36 +142,36 @@
       <td>{{'%0.1f' % (end_times[req]-start_times[req])}} seconds</td>
     </tr>
   </table>
-  {% endif %}
+  {%- endif -%}
   <hr>
-  {% for key, value in text.items() %}
-    {% if key.startswith('r' + ('%02d' % req) + '_p') %}
-      {% set part = key[-2:] | int %}
-      {% if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and part > last_part) or (req == last_req and part == last_part and failure == True) %}
+  {%- for key, value in text.items() -%}
+    {%- if key.startswith('r' + ('%02d' % req) + '_p') -%}
+      {%- set part = key[-2:] | int -%}
+      {%- if index_with_default(test_order, req) > index_with_default(test_order, last_req) or (req == last_req and part > last_part) or (req == last_req and part == last_part and failure == True) -%}
         <p style="margin-bottom: 1px;"><i class="fa-solid fa-circle-xmark" style="color: #c91c1c; margin: 1px;"></i> {{value}}</p>
-      {% else %}
+      {%- else -%}
         <p style="margin-bottom: 1px;"><i class="fa-solid fa-circle-check" style="color: #008e00; margin: 1px;"></i> {{value}}</p>
-      {% endif %}
+      {%- endif -%}
       <div style="margin-left: 7px;">
         {# We have to do make our count an object to deal with scoping issues in jinja #}
-        {% set count = namespace(value=0) %}
+        {%- set count = namespace(value=0) -%}
         {# We first count how many screenshots #}
-        {% for name in screenshots.keys() %}
-          {% if name.startswith(key) %}
-            {% set count.value = count.value + 1 %}
-          {% endif %}
-        {% endfor %}
+        {%- for name in screenshots.keys() -%}
+          {%- if name.startswith(key) -%}
+            {%- set count.value = count.value + 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
         {# Then we display each screenshot in a div #}
-        {% for index in range(1, count.value + 1) %}
+        {%- for index in range(1, count.value + 1) -%}
           <div style="display: inline-block; margin: 10px;">
             <img src="data:image/jpeg;base64,{{screenshots.get(key + '_s' + ('%02d' % index)) | safe}}" width="208" height="117" />
           </div>
-        {% endfor %}
+        {%- endfor -%}
       </div>
-    {% endif %}
-  {% endfor %}
+    {%- endif -%}
+  {%- endfor -%}
   </div>
-{% endfor %}
+{%- endfor -%}
 
 </body>
 </html>

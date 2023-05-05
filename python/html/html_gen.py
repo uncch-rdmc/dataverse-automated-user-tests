@@ -1,10 +1,10 @@
-import jinja2, sys, traceback, datetime
+import jinja2, sys, traceback, datetime, os
 from python.html.text import *
 from ..tests import test_ingest_workflow_report as t
 #import html.text #Imports a text variable that stores our strings
 
 def main():
-    version = "1.0" #Update this number when doing a new release
+    version = "1.1" #Update this number when doing a new release
     if sys.version_info < (3, 7):
         print("Code requires Python 3.7 or later for ordered dictionaries")
         print("Exiting...")
@@ -25,7 +25,7 @@ def main():
         traceback.print_exc()
     ingest_test.tearDown()
 
-    with open('output.html', 'w') as f:
+    with open(os.getenv('OUTPUT_DIR')+'/dv_automated_test_output.html', 'w') as f:
         #f.write(template.render(**text))
         # print(result)
         print("Last Req: " + ingest_test.req)
