@@ -689,6 +689,7 @@ class IngestWorkflowReportTestCase(unittest.TestCase, DataverseTestingMixin, Dat
 
         ### Get dataset id from permissions page url for later uses ###
         self.dataset_id = re.sub(".*=", "", self.sesh.find_element('xpath', '//*[@id="datasetForm:manageDatasetPermissions"]').get_attribute("href")) 
+        self.set_end_time()
 
         self.set_req('07')
 
